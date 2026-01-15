@@ -1,9 +1,12 @@
 package com.contract.master.service;
 
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+
+import java.nio.charset.StandardCharsets;
 
 @Service
 public class ExtractionTaskService {
@@ -13,21 +16,14 @@ public class ExtractionTaskService {
 
     public void submitTask(String contractId) {
         String tenantId = com.contract.master.security.TenantContext.getCurrentTenant();
-        String message = tenantId + ":" + contractId;
-        kafkaTemplate.send("contract-extraction", message);
+        ProducerRecord<String, String> record = new ProducerRecord<>("contract-extraction", contractId);
+        if (tenantId != null) {
+            record.headers().add("tenant-id", tenantId.getBytes(StandardCharsets.UTF_8));
+        }
+        kafkaTemplate.send(record);
     }
 
     @KafkaListener(topics = "contract-extraction", groupId = "contract-master-group")
-    public void processTask(String message) {
-        if (message == null || !message.contains(":")) return;
-        String[] parts = message.split(":");
-        String tenantId = parts[0];
-        String contractId = parts[1];
-        
-        try {
-            com.contract.master.security.TenantContext.setCurrentTenant(tenantId);
-        } finally {
-            com.contract.master.security.TenantContext.clear();
-        }
+    public void processTask(String contractId) {
     }
 }

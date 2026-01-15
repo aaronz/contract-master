@@ -8,6 +8,10 @@ Auto-generated from all feature plans. Last updated: 2026-01-15
 - Java 17, Vue 3 + Spring Boot 3.2.x, Spring Data JPA, Playwright, Drools 9.x (001-implementation-gap-analysis)
 - PostgreSQL, Redis, MinIO (001-implementation-gap-analysis)
 - Java 17, Vue 3 + Spring Boot 3.2.x, Spring Data JPA, Element Plus, Playwrigh (003-implementation-gap-analysis)
+- Java 17, Vue 3 + Spring Boot 3.2.x, Spring Data JPA, Spring Kafka, Hibernate 6.x, Element Plus, Playwrigh (004-core-stabilization)
+- PostgreSQL (with JSONB), Redis, MinIO (004-core-stabilization)
+- Java 17, Vue 3 + Spring Boot 3.2.x, Spring Web (RestTemplate/WebClient), Element Plus (005-integration-hub)
+- PostgreSQL (for `integration_log` table) (005-integration-hub)
 
 - Java 17, Vue 3 + Spring Boot 3.2.x, Spring Data JPA, Spring AI (OpenAI/Azure), Drools 9.x, Kafka, Element Plus (001-contract-master-core)
 
@@ -28,9 +32,9 @@ tests/
 Java 17, Vue 3: Follow standard conventions
 
 ## Recent Changes
+- 005-integration-hub: Added Java 17, Vue 3 + Spring Boot 3.2.x, Spring Web (RestTemplate/WebClient), Element Plus
+- 004-core-stabilization: Added Java 17, Vue 3 + Spring Boot 3.2.x, Spring Data JPA, Spring Kafka, Hibernate 6.x, Element Plus, Playwrigh
 - 003-implementation-gap-analysis: Added Java 17, Vue 3 + Spring Boot 3.2.x, Spring Data JPA, Element Plus, Playwrigh
-- 002-implementation-gap-analysis: Added Java 17, Vue 3 + Spring Boot 3.2.x, Spring Data JPA, Playwright, Drools 9.x
-- 001-implementation-gap-analysis: Added Java 17, Vue 3 + Spring Boot 3.2.x, Spring Data JPA, Playwright, Drools 9.x
 
 
 <!-- MANUAL ADDITIONS START -->

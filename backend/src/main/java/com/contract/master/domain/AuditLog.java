@@ -47,4 +47,6 @@ public class AuditLog extends BaseTenantEntity {
     public void setNewValue(String newValue) { this.newValue = newValue; }
     public void setModifyType(String modifyType) { this.modifyType = modifyType; }
     public void setModifyUser(String modifyUser) { this.modifyUser = modifyUser; }
+    public void setDetails(String details) { this.details = details; }
+    public String getDetails() { return details; }
 }

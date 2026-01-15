@@ -21,9 +21,11 @@ public class TenantAspect {
     @Before("repositoryMethods()")
     public void enableTenantFilter() {
         String tenantId = TenantContext.getCurrentTenant();
+        Session session = entityManager.unwrap(Session.class);
         if (tenantId != null) {
-            Session session = entityManager.unwrap(Session.class);
             session.enableFilter("tenantFilter").setParameter("tenantId", tenantId);
+        } else {
+            session.enableFilter("tenantFilter").setParameter("tenantId", "LOGICAL_ISOLATION_BYPASS_PROTECTION");
         }
     }
 }

@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 @Table(name = "downstream_system")
 @Data
 @EqualsAndHashCode(callSuper = true)
+@EntityListeners({TenantEntityListener.class})
 public class DownstreamSystem extends BaseTenantEntity {
     @Id
     @Column(name = "system_id", length = 64)
@@ -16,12 +17,23 @@ public class DownstreamSystem extends BaseTenantEntity {
     @Column(name = "system_name", length = 128)
     private String systemName;
 
-    @Column(name = "access_key", length = 64, unique = true)
-    private String accessKey;
+    @Column(name = "endpoint_url", length = 512)
+    private String endpointUrl;
 
-    @Column(name = "publish_scope", columnDefinition = "TEXT")
-    private String publishScope;
+    @Column(name = "auth_type", length = 32)
+    private String authType;
+
+    @Column(name = "auth_config", columnDefinition = "TEXT")
+    private String authConfig;
 
     @Column(name = "is_enabled")
     private Boolean isEnabled;
+
+    @Column(name = "access_key", length = 64, unique = true)
+    private String accessKey;
+
+    public void setSystemId(String systemId) { this.systemId = systemId; }
+    public String getSystemId() { return systemId; }
+    public String getAccessKey() { return accessKey; }
+    public void setAccessKey(String accessKey) { this.accessKey = accessKey; }
 }

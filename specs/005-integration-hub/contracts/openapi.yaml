@@ -1,0 +1,29 @@
+openapi: 3.0.3
+info:
+  title: Integration Hub API
+  version: 1.0.0
+paths:
+  /integration/logs:
+    get:
+      summary: List all outbound sync attempts
+      responses:
+        '200':
+          description: List of logs
+  /integration/logs/{id}/retry:
+    post:
+      summary: Manually trigger a retry for a failed sync
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '202':
+          description: Retry scheduled
+  /integration/stats:
+    get:
+      summary: Get high-level integration health metrics
+      responses:
+        '200':
+          description: Stats object

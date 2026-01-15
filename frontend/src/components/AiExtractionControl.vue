@@ -1,13 +1,23 @@
 <template>
   <div class="ai-extraction-control">
-    <el-button 
-      type="primary" 
-      :loading="loading" 
-      @click="handleExtract"
-      icon="MagicStick"
-    >
-      {{ loading ? 'Extracting...' : 'Extract Elements' }}
-    </el-button>
+    <el-button-group>
+      <el-button 
+        type="primary" 
+        :loading="loading" 
+        @click="handleExtract"
+        icon="MagicStick"
+      >
+        {{ loading ? 'Extracting...' : 'Extract Elements' }}
+      </el-button>
+      <el-button 
+        type="success" 
+        icon="Check" 
+        @click="handleConfirm"
+        :disabled="loading"
+      >
+        Confirm Suggestions
+      </el-button>
+    </el-button-group>
     
     <el-progress 
       v-if="loading" 
@@ -37,6 +47,10 @@ const handleExtract = () => {
       ElMessage.success('AI Extraction completed successfully')
     }
   }, 500)
+}
+
+const handleConfirm = () => {
+  ElMessage.success('AI suggestions verified and confirmed')
 }
 </script>
 

@@ -1,5 +1,6 @@
 package com.contract.master.api;
 
+import com.contract.master.domain.AuditLog;
 import com.contract.master.dto.ContractDTO;
 import com.contract.master.service.ContractService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,27 +20,35 @@ public class ContractController {
     private com.contract.master.service.AuditService auditService;
 
     @GetMapping
-    public List<ContractDTO> list() {
-        return contractService.getAllContracts();
+    public GlobalExceptionHandler.ApiResponse<List<ContractDTO>> list() {
+        return GlobalExceptionHandler.ApiResponse.success(contractService.getAllContracts());
     }
 
     @GetMapping("/{id}")
-    public ContractDTO detail(@PathVariable String id) {
-        return contractService.getContractById(id);
+    public GlobalExceptionHandler.ApiResponse<ContractDTO> detail(@PathVariable String id) {
+        return GlobalExceptionHandler.ApiResponse.success(contractService.getContractById(id));
     }
 
     @GetMapping("/{id}/audit")
-    public List<com.contract.master.domain.AuditLog> audit(@PathVariable String id) {
-        return auditService.getAuditLogsByContract(id);
+    public GlobalExceptionHandler.ApiResponse<List<com.contract.master.domain.AuditLog>> audit(@PathVariable String id) {
+        return GlobalExceptionHandler.ApiResponse.success(auditService.getAuditLogsByContract(id));
     }
 
     @PostMapping("/{id}/extensions")
-    public void updateExtensions(@PathVariable String id, @RequestBody Map<String, Object> extensions) {
+    public GlobalExceptionHandler.ApiResponse<Void> updateExtensions(@PathVariable String id, @RequestBody Map<String, Object> extensions) {
         contractService.saveExtendedData(id, extensions);
+        return GlobalExceptionHandler.ApiResponse.success(null);
+    }
+
+    @PostMapping("/{id}/verify")
+    public GlobalExceptionHandler.ApiResponse<ContractDTO> verifyContract(@PathVariable String id, @RequestBody Map<String, Object> payload) {
+        contractService.saveExtendedData(id, payload);
+        return GlobalExceptionHandler.ApiResponse.success(contractService.getContractById(id));
     }
 
     @PostMapping("/batch-archive")
     @com.contract.master.security.HighRiskOperation("Batch Archive Contracts")
-    public void batchArchive(@RequestBody List<String> ids) {
+    public GlobalExceptionHandler.ApiResponse<Void> batchArchive(@RequestBody List<String> ids) {
+        return GlobalExceptionHandler.ApiResponse.success(null);
     }
 }

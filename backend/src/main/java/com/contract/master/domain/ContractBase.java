@@ -141,6 +141,9 @@ public class ContractBase extends BaseTenantEntity {
     @Column(name = "archive_time")
     private LocalDateTime archiveTime;
 
+    @Column(name = "validation_results", columnDefinition = "TEXT")
+    private String validationResults;
+
     public String getContractId() { return contractId; }
     public void setContractId(String contractId) { this.contractId = contractId; }
     public String getContractNo() { return contractNo; }
@@ -202,6 +205,8 @@ public class ContractBase extends BaseTenantEntity {
     public LocalDateTime getLastChangeTime() { return lastChangeTime; }
     public String getRemark() { return remark; }
     public void setRemark(String remark) { this.remark = remark; }
+    public String getValidationResults() { return validationResults; }
+    public void setValidationResults(String validationResults) { this.validationResults = validationResults; }
     public Boolean getArchiveFlag() { return archiveFlag; }
     public LocalDateTime getArchiveTime() { return archiveTime; }
 }

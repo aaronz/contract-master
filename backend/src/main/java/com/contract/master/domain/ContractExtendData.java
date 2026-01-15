@@ -33,10 +33,16 @@ public class ContractExtendData {
     @Column(name = "fill_time")
     private LocalDateTime fillTime;
 
+    @Column(name = "verification_status", length = 32)
+    private String verificationStatus;
+
     public String getFieldId() { return fieldId; }
     public void setFieldId(String fieldId) { this.fieldId = fieldId; }
     public String getFieldValue() { return fieldValue; }
     public void setFieldValue(String fieldValue) { this.fieldValue = fieldValue; }
     public void setContractId(String contractId) { this.contractId = contractId; }
+    public String getFillType() { return fillType; }
     public void setFillType(String fillType) { this.fillType = fillType; }
+    public String getVerificationStatus() { return verificationStatus; }
+    public void setVerificationStatus(String verificationStatus) { this.verificationStatus = verificationStatus; }
 }
