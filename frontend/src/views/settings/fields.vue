@@ -5,10 +5,36 @@
         <h1 class="page-title">Field Configuration</h1>
         <p class="page-subtitle">Customize how fields are displayed and returned by the API.</p>
       </div>
-      <el-button type="primary" @click="saveConfig">
-        <el-icon><Check /></el-icon> Save Changes
-      </el-button>
+      <div class="header-actions">
+        <el-button @click="handleAddField" icon="Plus">Add Field</el-button>
+        <el-button type="primary" @click="saveConfig">
+          <el-icon><Check /></el-icon> Save Changes
+        </el-button>
+      </div>
     </div>
+
+    <!-- Add Field Dialog -->
+    <el-dialog v-model="showAddDialog" title="Add Extended Field" width="450px">
+      <el-form :model="newField" label-position="top">
+        <el-form-item label="Field Code (Technical ID)" required>
+          <el-input v-model="newField.fieldCode" placeholder="e.g. project_manager" />
+        </el-form-item>
+        <el-form-item label="Field Name (Display)" required>
+          <el-input v-model="newField.fieldName" placeholder="e.g. Project Manager" />
+        </el-form-item>
+        <el-form-item label="Field Type" required>
+          <el-select v-model="newField.fieldType" style="width: 100%">
+            <el-option label="Text" value="TEXT" />
+            <el-option label="Number" value="NUMBER" />
+            <el-option label="Date" value="DATE" />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="showAddDialog = false">Cancel</el-button>
+        <el-button type="primary" @click="confirmAddField" :loading="adding">Add</el-button>
+      </template>
+    </el-dialog>
 
     <el-alert
       title="Drag and drop rows to reorder fields."
@@ -72,11 +98,46 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { Check, Rank } from '@element-plus/icons-vue'
+import { Check, Rank, Plus } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import Sortable from 'sortablejs'
 
 const configs = ref([])
+const showAddDialog = ref(false)
+const adding = ref(false)
+const newField = ref({
+  fieldCode: '',
+  fieldName: '',
+  fieldType: 'TEXT'
+})
+
+const handleAddField = () => {
+  newField.value = { fieldCode: '', fieldName: '', fieldType: 'TEXT' }
+  showAddDialog.value = true
+}
+
+const confirmAddField = async () => {
+  adding.value = true
+  try {
+    const response = await fetch('/api/settings/extend-fields', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
+      body: JSON.stringify(newField.value)
+    })
+    if (response.ok) {
+      ElMessage.success('Field added successfully')
+      showAddDialog.value = false
+      fetchFields()
+    }
+  } catch (error) {
+    console.error('Failed to add field', error)
+  } finally {
+    adding.value = false
+  }
+}
 
 const fetchFields = async () => {
   try {

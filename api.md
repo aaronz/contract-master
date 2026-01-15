@@ -7,3 +7,5 @@
 | `/api/metadata/contract-fields` | GET | Unified field metadata | 1.1.0 |
 | `/api/rules` | POST | Create hybrid rules | 1.1.0 |
 | `/api/problems/{id}/resolve` | POST | Resolve system issue | 1.0.0 |
+| `/api/settings/extend-fields` | POST | Create extended contract field | 1.0.0 |
+| `/api/settings/extend-fields` | GET | List extended fields | 1.0.0 |

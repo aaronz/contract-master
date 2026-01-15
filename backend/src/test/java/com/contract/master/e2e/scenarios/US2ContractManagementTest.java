@@ -33,6 +33,7 @@ public class US2ContractManagementTest extends E2ETestBase {
         page.fill(".el-form-item:has-text('Contract Name') input", "E2E Automated Contract");
         page.fill(".el-form-item:has-text('Party A') input", "Test Party A");
         page.fill(".el-form-item:has-text('Party B') input", "Test Party B");
+        page.fill(".el-form-item:has-text('Contract Type') input", "Sales");
         page.click("button:has-text('Create')");
         
         assertThat(page.locator(".el-message--success")).isVisible();

@@ -12,5 +12,12 @@ public class US3ConfigTest extends E2ETestBase {
         page.navigate(baseUrl + "/settings/fields");
         page.waitForSelector(".page-title");
         assertThat(page.locator(".page-title")).containsText("Field Configuration");
+        
+        page.click("button:has-text('Add Field')");
+        page.fill("input[placeholder*='project_manager']", "project_manager");
+        page.fill("input[placeholder*='Project Manager']", "Project Manager");
+        page.click("button:has-text('Add')");
+        
+        assertThat(page.locator("table")).containsText("project_manager");
     }
 }

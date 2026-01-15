@@ -7,3 +7,4 @@
 | `rule_config` | Rule & AI config | Added `rule_type`, `ai_prompt_template` |
 | `downstream_system` | External connectors | Added access key generation |
 | `notification` | System alerts/issues | Added resolution logic |
+| `contract_extend_field` | Custom field definitions | Added tenant-scoped extensions |

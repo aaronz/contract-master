@@ -757,6 +757,7 @@ const saveContract = async () => {
     if (response.ok) {
       isEditMode.value = false
       ElMessage.success('Contract updated successfully')
+      fetchContractDetail() // Refresh after save
     }
   } catch (error) {
     console.error('Update failed', error)
