@@ -64,30 +64,6 @@
         <el-form-item label="Remark" prop="remark">
           <el-input v-model="newContractForm.remark" type="textarea" />
         </el-form-item>
-
-        <div class="form-grid">
-          <el-form-item label="Currency" prop="currencyType">
-            <el-select v-model="newContractForm.currencyType" style="width: 100%">
-              <el-option label="USD" value="USD" />
-              <el-option label="EUR" value="EUR" />
-              <el-option label="CNY" value="CNY" />
-            </el-select>
-          </el-form-item>
-          <el-form-item label="Contract Type" prop="contractType">
-            <el-input v-model="newContractForm.contractType" />
-          </el-form-item>
-        </div>
-        <div class="form-grid">
-          <el-form-item label="Effective Date" prop="effectiveDate">
-            <el-date-picker v-model="newContractForm.effectiveDate" type="date" style="width: 100%" />
-          </el-form-item>
-          <el-form-item label="Expire Date" prop="expireDate">
-            <el-date-picker v-model="newContractForm.expireDate" type="date" style="width: 100%" />
-          </el-form-item>
-        </div>
-        <el-form-item label="Remark" prop="remark">
-          <el-input v-model="newContractForm.remark" type="textarea" />
-        </el-form-item>
         
         <!-- Extended Fields -->
         <div v-if="contractFields.length > 0">
