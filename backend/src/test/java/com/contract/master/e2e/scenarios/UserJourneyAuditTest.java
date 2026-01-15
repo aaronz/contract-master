@@ -10,9 +10,9 @@ public class UserJourneyAuditTest extends E2ETestBase {
     void testFullContractLifecycleProbe() {
         login("admin", "password", "tenant-1");
         page.navigate(baseUrl + "/contracts");
-        page.click(".el-table__row:nth-child(1) button");
-        boolean hasVerifyBtn = page.isVisible("button:has-text('Confirm Suggestions')");
-        boolean hasPublishBtn = page.isVisible("button:has-text('Publish')");
+        page.locator(".el-table__row").first().locator("button").first().click();
+        boolean hasVerifyBtn = page.locator("button:has-text('Confirm Suggestions')").first().isVisible();
+        boolean hasPublishBtn = page.locator("button:has-text('Publish')").first().isVisible();
         page.navigate(baseUrl + "/settings/downstream");
     }
 }

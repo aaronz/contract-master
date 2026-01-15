@@ -2,6 +2,7 @@ package com.contract.master.service;
 
 import com.contract.master.domain.ContractAttachment;
 import com.contract.master.domain.ContractAttachmentRepository;
+import com.contract.master.dto.ContractDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,6 +17,10 @@ public class AIService {
 
     @Autowired
     private ContractAttachmentRepository attachmentRepository;
+
+    public String analyzeWithPrompt(ContractDTO contract, String promptTemplate) {
+        return "AI Analysis Result: NO VIOLATION";
+    }
 
     public Map<String, Object> extractContractData(String contractId, MultipartFile file) throws IOException {
         String fileId = UUID.randomUUID().toString();

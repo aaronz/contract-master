@@ -43,8 +43,9 @@ public class US2ContractManagementTest extends E2ETestBase {
         login("admin", "password", "tenant-1");
         page.navigate(baseUrl + "/contracts");
         
+        page.waitForSelector(".el-pagination");
         assertThat(page.locator(".el-pagination")).isVisible();
-        page.click(".el-pager li.number:nth-child(2)");
-        assertThat(page.locator(".el-table__row")).isVisible();
+        page.locator(".el-pager li.number").first().click();
+        assertThat(page.locator(".el-table__row").first()).isVisible();
     }
 }

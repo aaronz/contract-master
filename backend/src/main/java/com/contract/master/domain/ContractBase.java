@@ -172,41 +172,75 @@ public class ContractBase extends BaseTenantEntity {
     public void setSyncTime(LocalDateTime syncTime) { this.syncTime = syncTime; }
 
     public BigDecimal getTaxRate() { return taxRate; }
+    public void setTaxRate(BigDecimal taxRate) { this.taxRate = taxRate; }
     public BigDecimal getTaxAmount() { return taxAmount; }
+    public void setTaxAmount(BigDecimal taxAmount) { this.taxAmount = taxAmount; }
     public BigDecimal getTotalAmountWithTax() { return totalAmountWithTax; }
+    public void setTotalAmountWithTax(BigDecimal totalAmountWithTax) { this.totalAmountWithTax = totalAmountWithTax; }
     public String getCurrencyType() { return currencyType; }
+    public void setCurrencyType(String currencyType) { this.currencyType = currencyType; }
     public String getPaymentMethod() { return paymentMethod; }
+    public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
     public String getPaymentTerm() { return paymentTerm; }
+    public void setPaymentTerm(String paymentTerm) { this.paymentTerm = paymentTerm; }
     public String getInvoiceType() { return invoiceType; }
+    public void setInvoiceType(String invoiceType) { this.invoiceType = invoiceType; }
     public String getInvoiceTitle() { return invoiceTitle; }
+    public void setInvoiceTitle(String invoiceTitle) { this.invoiceTitle = invoiceTitle; }
     public String getTaxpayerId() { return taxpayerId; }
+    public void setTaxpayerId(String taxpayerId) { this.taxpayerId = taxpayerId; }
     public LocalDate getSignDate() { return signDate; }
+    public void setSignDate(LocalDate signDate) { this.signDate = signDate; }
     public LocalDate getEffectiveDate() { return effectiveDate; }
+    public void setEffectiveDate(LocalDate effectiveDate) { this.effectiveDate = effectiveDate; }
     public LocalDate getExpireDate() { return expireDate; }
+    public void setExpireDate(LocalDate expireDate) { this.expireDate = expireDate; }
     public String getPerformanceLocation() { return performanceLocation; }
+    public void setPerformanceLocation(String performanceLocation) { this.performanceLocation = performanceLocation; }
     public String getPerformanceMethod() { return performanceMethod; }
+    public void setPerformanceMethod(String performanceMethod) { this.performanceMethod = performanceMethod; }
     public LocalDate getPerformanceStartDate() { return performanceStartDate; }
+    public void setPerformanceStartDate(LocalDate performanceStartDate) { this.performanceStartDate = performanceStartDate; }
     public LocalDate getPerformanceEndDate() { return performanceEndDate; }
+    public void setPerformanceEndDate(LocalDate performanceEndDate) { this.performanceEndDate = performanceEndDate; }
     public String getQualityStandard() { return qualityStandard; }
+    public void setQualityStandard(String qualityStandard) { this.qualityStandard = qualityStandard; }
     public String getApprovalStatus() { return approvalStatus; }
+    public void setApprovalStatus(String approvalStatus) { this.approvalStatus = approvalStatus; }
     public String getApprovalUser() { return approvalUser; }
+    public void setApprovalUser(String approvalUser) { this.approvalUser = approvalUser; }
     public Boolean getLegalReviewFlag() { return legalReviewFlag; }
+    public void setLegalReviewFlag(Boolean legalReviewFlag) { this.legalReviewFlag = legalReviewFlag; }
     public String getLegalReviewOpinion() { return legalReviewOpinion; }
+    public void setLegalReviewOpinion(String legalReviewOpinion) { this.legalReviewOpinion = legalReviewOpinion; }
     public String getDisputeResolution() { return disputeResolution; }
+    public void setDisputeResolution(String disputeResolution) { this.disputeResolution = disputeResolution; }
     public String getGoverningLaw() { return governingLaw; }
+    public void setGoverningLaw(String governingLaw) { this.governingLaw = governingLaw; }
     public Boolean getGuaranteeFlag() { return guaranteeFlag; }
+    public void setGuaranteeFlag(Boolean guaranteeFlag) { this.guaranteeFlag = guaranteeFlag; }
     public String getGuaranteeType() { return guaranteeType; }
+    public void setGuaranteeType(String guaranteeType) { this.guaranteeType = guaranteeType; }
     public String getGuarantorInfo() { return guarantorInfo; }
+    public void setGuarantorInfo(String guarantorInfo) { this.guarantorInfo = guarantorInfo; }
     public Integer getAttachmentCount() { return attachmentCount; }
+    public void setAttachmentCount(Integer attachmentCount) { this.attachmentCount = attachmentCount; }
     public String getMainAttachmentId() { return mainAttachmentId; }
+    public void setMainAttachmentId(String mainAttachmentId) { this.mainAttachmentId = mainAttachmentId; }
     public String getOwnerDeptId() { return ownerDeptId; }
+    public void setOwnerDeptId(String ownerDeptId) { this.ownerDeptId = ownerDeptId; }
     public String getOwnerUserId() { return ownerUserId; }
+    public void setOwnerUserId(String ownerUserId) { this.ownerUserId = ownerUserId; }
     public Integer getChangeCount() { return changeCount; }
+    public void setChangeCount(Integer changeCount) { this.changeCount = changeCount; }
     public LocalDateTime getLastChangeTime() { return lastChangeTime; }
+    public void setLastChangeTime(LocalDateTime lastChangeTime) { this.lastChangeTime = lastChangeTime; }
     public String getRemark() { return remark; }
     public void setRemark(String remark) { this.remark = remark; }
     public String getValidationResults() { return validationResults; }
     public void setValidationResults(String validationResults) { this.validationResults = validationResults; }
     public Boolean getArchiveFlag() { return archiveFlag; }
+    public void setArchiveFlag(Boolean archiveFlag) { this.archiveFlag = archiveFlag; }
     public LocalDateTime getArchiveTime() { return archiveTime; }
+    public void setArchiveTime(LocalDateTime archiveTime) { this.archiveTime = archiveTime; }
 }

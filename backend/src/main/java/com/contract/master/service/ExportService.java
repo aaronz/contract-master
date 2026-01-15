@@ -1,13 +1,15 @@
 package com.contract.master.service;
 
+import com.contract.master.domain.ContractExtendField;
+import com.contract.master.domain.ContractExtendFieldRepository;
 import com.contract.master.dto.ContractDTO;
-import com.contract.master.domain.ContractBase;
-import com.contract.master.domain.ContractBaseRepository;
+import com.contract.master.security.TenantContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.PrintWriter;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class ExportService {
@@ -15,25 +17,40 @@ public class ExportService {
     @Autowired
     private ContractService contractService;
 
-    public void exportToCsv(PrintWriter writer) {
-        List<ContractDTO> contracts = contractService.getAllContracts();
-        writer.println("Contract No,Name,Party A,Party B,Amount,Status");
+    @Autowired
+    private ContractExtendFieldRepository extendFieldRepository;
+
+    public void exportToCsv(java.io.PrintWriter writer) {
+        String tenantId = TenantContext.getCurrentTenant();
+        List<ContractDTO> contracts = contractService.getAllContracts().stream()
+                .filter(c -> tenantId.equals(c.getTenantId()))
+                .collect(Collectors.toList());
+
+        List<ContractExtendField> extendFields = extendFieldRepository.findByTenantId(tenantId);
+
+        writer.print("Contract No,Contract Name,Party A,Party B,Amount,Status");
+        for (ContractExtendField f : extendFields) {
+            writer.print("," + f.getFieldName());
+        }
+        writer.println();
+
         for (ContractDTO c : contracts) {
-            writer.println(String.format("%s,%s,%s,%s,%s,%s",
-                    c.getContractNo(),
-                    c.getContractName(),
-                    c.getPartyAName(),
-                    c.getPartyBName(),
-                    c.getContractAmount(),
-                    c.getContractStatus()));
+            writer.print(c.getContractNo() + ",");
+            writer.print(c.getContractName() + ",");
+            writer.print(c.getPartyAName() + ",");
+            writer.print(c.getPartyBName() + ",");
+            writer.print(c.getContractAmount() + ",");
+            writer.print(c.getContractStatus());
+            
+            Map<String, Object> ext = c.getExtendedFields();
+            for (ContractExtendField f : extendFields) {
+                writer.print("," + (ext != null ? ext.getOrDefault(f.getFieldCode(), "") : ""));
+            }
+            writer.println();
         }
     }
 
-    public byte[] exportToPdf(String contractId) {
-        return "MOCK PDF CONTENT WITH WATERMARK".getBytes();
-    }
-
-    public byte[] exportToExcel() {
-        return "MOCK EXCEL CONTENT".getBytes();
+    public byte[] exportToPdf(String id) {
+        return new byte[0];
     }
 }

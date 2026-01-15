@@ -1,4 +1,4 @@
-# Java
+# Java / Maven
 target/
 *.class
 *.jar
@@ -11,16 +11,30 @@ build/
 .classpath
 .project
 .factorypath
+.mvn/wrapper/*.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
 
-# Node.js
+# Node.js / Vue
 node_modules/
 dist/
-build/
+dist-ssr/
+*.local
 .npm
 *.log
 package-lock.json
 yarn.lock
 pnpm-lock.yaml
+.eslintcache
+.stylelintcache
+.prettiercache
+.vite-inspect
+
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
 
 # Environment files
 .env*
@@ -30,8 +44,15 @@ pnpm-lock.yaml
 .docker/
 
 # IDEs
-.vscode/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
 .idea/
+*.iws
+*.iml
+*.ipr
 *.swp
 *.tmp
 *.bak
@@ -39,3 +60,20 @@ pnpm-lock.yaml
 # OS
 .DS_Store
 Thumbs.db
+desktop.ini
+
+# Python (if applicable)
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+env/
+.pytest_cache/
+
+# Project Specific
+backend/target/
+frontend/dist/
+frontend/node_modules/
+tests/test-results/

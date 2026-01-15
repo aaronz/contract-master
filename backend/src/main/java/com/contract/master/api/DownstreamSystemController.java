@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/settings/downstream")
@@ -23,7 +24,10 @@ public class DownstreamSystemController {
     @PostMapping
     public GlobalExceptionHandler.ApiResponse<DownstreamSystem> create(@RequestBody DownstreamSystem system) {
         if (system.getSystemId() == null) {
-            system.setSystemId(java.util.UUID.randomUUID().toString());
+            system.setSystemId(UUID.randomUUID().toString());
+        }
+        if (system.getAccessKey() == null) {
+            system.setAccessKey("AK_" + UUID.randomUUID().toString().replace("-", "").substring(0, 16));
         }
         system.setTenantId(TenantContext.getCurrentTenant());
         return GlobalExceptionHandler.ApiResponse.success(repository.save(system));

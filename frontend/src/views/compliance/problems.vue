@@ -125,7 +125,7 @@
       <template #footer>
         <div class="drawer-actions">
            <el-button @click="drawerVisible = false">Cancel</el-button>
-           <el-button type="primary">Resolve Issue</el-button>
+           <el-button type="primary" @click="handleResolve" :loading="resolving">Resolve Issue</el-button>
         </div>
       </template>
     </el-drawer>
@@ -142,6 +142,7 @@ const search = ref('')
 const filterSeverity = ref('all')
 const drawerVisible = ref(false)
 const currentTask = ref(null)
+const resolving = ref(false)
 
 const columns = reactive([
   {
@@ -190,6 +191,37 @@ const claimTask = (task) => {
   task.assignee = 'You'
   task.assigneeAvatar = 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png'
   ElMessage.success('Task claimed successfully')
+}
+
+const handleResolve = async () => {
+  if (!currentTask.value) return
+  resolving.value = true
+  try {
+    // In real app, currentTask.id would be a numeric primary key for this endpoint
+    // Since mock uses T-101, we take the digits for demo
+    const numericId = currentTask.value.id.split('-')[1] || 1
+    const response = await fetch(`/api/problems/${numericId}/resolve`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    if (response.ok) {
+      ElMessage.success('Issue resolved')
+      // Move to resolved column in UI
+      const foundCol = columns.find(c => c.tasks.some(t => t.id === currentTask.value.id))
+      if (foundCol) {
+        const taskIdx = foundCol.tasks.findIndex(t => t.id === currentTask.value.id)
+        const [task] = foundCol.tasks.splice(taskIdx, 1)
+        columns.find(c => c.id === 'closed').tasks.unshift(task)
+      }
+      drawerVisible.value = false
+    }
+  } catch (error) {
+    console.error('Resolution failed', error)
+  } finally {
+    resolving.value = false
+  }
 }
 
 const handleChange = (evt, colId) => {

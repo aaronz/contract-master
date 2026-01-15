@@ -94,6 +94,15 @@ const handleGenerate = () => {
 }
 
 const confirmGenerate = () => {
+  const newKey = {
+    id: Date.now(),
+    label: keyLabel.value || 'New Key',
+    accessKey: 'AK_' + Math.random().toString(36).substring(2, 12).toUpperCase(),
+    secretKey: 'sk_live_' + Math.random().toString(36).substring(2, 24),
+    lastUsed: 'Never',
+    hidden: true
+  }
+  keys.value.push(newKey)
   newKeyGenerated.value = true
 }
 

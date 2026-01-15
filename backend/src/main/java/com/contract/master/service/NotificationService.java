@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -16,6 +17,18 @@ public class NotificationService {
 
     @Autowired
     private NotificationRepository notificationRepository;
+
+    @Autowired
+    private AuditService auditService;
+
+    @Transactional
+    public void resolveIssue(Long id) {
+        notificationRepository.findById(id).ifPresent(n -> {
+            n.setIsRead(true);
+            notificationRepository.save(n);
+            auditService.logChange(id.toString(), "notification", "OPEN", "RESOLVED", "MANUAL", "admin");
+        });
+    }
 
     public void sendNotification(String userId, String title, String content, String type) {
         Notification notification = new Notification();

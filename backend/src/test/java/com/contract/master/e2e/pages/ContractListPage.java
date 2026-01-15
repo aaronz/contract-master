@@ -14,7 +14,7 @@ public class ContractListPage {
     }
 
     public ContractDetailPage viewFirstDetail() {
-        page.click(".el-table__row:nth-child(1) button");
+        page.locator(".el-table__row").first().locator("button").first().click();
         return new ContractDetailPage(page);
     }
 }

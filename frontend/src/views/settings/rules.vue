@@ -52,10 +52,18 @@
     >
       <el-form :model="editingRule" label-position="top">
         <el-form-item label="Rule Name">
-           <el-input v-model="editingRule.name" placeholder="e.g. High Value Contract Alert" />
+            <el-input v-model="editingRule.name" placeholder="e.g. High Value Contract Alert" />
+        </el-form-item>
+
+        <el-form-item label="Rule Type">
+          <el-radio-group v-model="editingRule.ruleType" size="small">
+            <el-radio-button label="LOGIC">Logic (SpEL)</el-radio-button>
+            <el-radio-button label="AI_PROMPT">AI Prompt</el-radio-button>
+          </el-radio-group>
         </el-form-item>
         
-        <el-row :gutter="20">
+        <el-row :gutter="20" v-if="editingRule.ruleType === 'LOGIC'">
+
           <el-col :span="12">
             <el-form-item label="Risk Level">
                <el-select v-model="editingRule.level" style="width: 100%">
@@ -76,7 +84,7 @@
           </el-col>
         </el-row>
 
-        <el-form-item label="Conditions">
+        <el-form-item label="Conditions" v-if="editingRule.ruleType === 'LOGIC'">
            <div class="conditions-builder">
               <div v-for="(cond, idx) in editingRule.conditions" :key="idx" class="condition-row">
                  <el-select v-model="cond.field" placeholder="Field" style="width: 140px">
@@ -108,6 +116,15 @@
                  </el-radio-group>
               </div>
            </div>
+        </el-form-item>
+
+        <el-form-item label="AI Prompt Template" v-if="editingRule.ruleType === 'AI_PROMPT'">
+          <el-input 
+            v-model="editingRule.aiPromptTemplate" 
+            type="textarea" 
+            :rows="4" 
+            placeholder="e.g. Check if the payment terms in this contract are unusually long. Return VIOLATION if > 90 days." 
+          />
         </el-form-item>
         
         <el-form-item label="Action">
@@ -165,10 +182,12 @@ const editingRule = ref({})
 const addRule = () => {
   editingRule.value = {
     name: '',
+    ruleType: 'LOGIC',
     level: 'INFO',
     trigger: 'ON_SAVE',
     logic: 'AND',
     conditions: [{ field: '', operator: '', value: '' }],
+    aiPromptTemplate: '',
     sendEmail: false,
     blockProcess: false
   }

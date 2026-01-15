@@ -1,19 +1,3 @@
-<!--
-Sync Impact Report:
-- Version change: 1.0.0 → 1.1.0
-- List of modified principles:
-  - Principle 6: VI. Comprehensive End-to-End Testing (Added)
-  - Principle 7: VII. Continuous Design Document Optimization (Added)
-  - Principle 8: VIII. UX & Functional Completeness Reflection (Added)
-- Added sections: none (extended Core Principles)
-- Removed sections: none
-- Templates requiring updates:
-  - .specify/templates/plan-template.md (✅ updated)
-  - .specify/templates/spec-template.md (✅ updated)
-  - .specify/templates/tasks-template.md (✅ updated)
-- Follow-up TODOs: none
--->
-
 # Contract Master (合同全量要素系统) Constitution
 
 ## Core Principles
@@ -59,6 +43,12 @@ development. If a planned feature is found to be confusing, incomplete, or techn
 MUST be challenged and refined before completion. MVP doesn't mean "broken" or "confusing"; it means
 "minimal but high quality".
 
+### IX. Maintenance of Global Manifests
+The project maintains four critical global manifests: `features.md` (Features), `bugs.md` (Known Bugs),
+`api.md` (API Registry), and `table.md` (Database Schema). These files MUST be refreshed with every
+relevant code change (feature add, bug fix, API change, schema change) to ensuring a real-time,
+accurate view of the system state.
+
 ## Technology Stack & Performance Standards
 
 - **Backend**: Java 17, Spring Boot 3.2.x, Spring Data JPA.
@@ -72,7 +62,8 @@ MUST be challenged and refined before completion. MVP doesn't mean "broken" or "
 - **Security**: Mandatory `tenant_id` filtering in all Repository layers.
 - **Testing**: Minimum 80% coverage for core business logic + mandatory E2E coverage for all P1/P2 user stories.
 - **Audit**: All entity modifications must be captured via `TenantEntityListener` or equivalent automated mechanisms.
-- **Review**: Every PR must verify adherence to all eight Core Principles and ensure design docs are in sync with code.
+- **Documentation**: All feature merges must trigger updates to global manifests (`features.md`, `bugs.md`, `api.md`, `table.md`) as per Principle IX.
+- **Review**: Every PR must verify adherence to all nine Core Principles and ensure design docs are in sync with code.
 
 ## Governance
 
@@ -83,4 +74,4 @@ MUST be challenged and refined before completion. MVP doesn't mean "broken" or "
    "Constitution Check" section.
 4. Versioning follows Semantic Versioning (SemVer) rules.
 
-**Version**: 1.1.0 | **Ratified**: 2026-01-14 | **Last Amended**: 2026-01-14
+**Version**: 1.2.0 | **Ratified**: 2026-01-14 | **Last Amended**: 2026-01-15

@@ -39,6 +39,7 @@
 - [ ] **VI. E2E Testing**: Is there an E2E test plan for every user story journey?
 - [ ] **VII. Doc Sync**: Plan includes tasks to keep design docs updated?
 - [ ] **VIII. UX/Completeness**: Has the user journey been reviewed for clarity and logic?
+- [ ] **IX. Manifest Sync**: Plan includes tasks to update global manifests (features, bugs, api, table)?
 
 ## Project Structure
 

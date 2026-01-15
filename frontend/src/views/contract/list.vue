@@ -33,9 +33,65 @@
             <el-input v-model="newContractForm.partyBName" />
           </el-form-item>
         </div>
-        <el-form-item label="Amount" prop="amount">
-          <el-input-number v-model="newContractForm.amount" :precision="2" :step="1000" style="width: 100%" />
+        <div class="form-grid">
+          <el-form-item label="Amount" prop="amount">
+            <el-input-number v-model="newContractForm.amount" :precision="2" :step="1000" style="width: 100%" />
+          </el-form-item>
+          <el-form-item label="Tax Rate (%)" prop="taxRate">
+            <el-input-number v-model="newContractForm.taxRate" :precision="2" :step="0.1" style="width: 100%" />
+          </el-form-item>
+        </div>
+        <div class="form-grid">
+          <el-form-item label="Currency" prop="currencyType">
+            <el-select v-model="newContractForm.currencyType" style="width: 100%">
+              <el-option label="USD" value="USD" />
+              <el-option label="EUR" value="EUR" />
+              <el-option label="CNY" value="CNY" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="Contract Type" prop="contractType">
+            <el-input v-model="newContractForm.contractType" />
+          </el-form-item>
+        </div>
+        <div class="form-grid">
+          <el-form-item label="Effective Date" prop="effectiveDate">
+            <el-date-picker v-model="newContractForm.effectiveDate" type="date" style="width: 100%" />
+          </el-form-item>
+          <el-form-item label="Expire Date" prop="expireDate">
+            <el-date-picker v-model="newContractForm.expireDate" type="date" style="width: 100%" />
+          </el-form-item>
+        </div>
+        <el-form-item label="Remark" prop="remark">
+          <el-input v-model="newContractForm.remark" type="textarea" />
         </el-form-item>
+        
+        <!-- Extended Fields -->
+        <div v-if="contractFields.length > 0">
+          <h3 class="section-header mt-4 mb-2" style="font-size: 14px; color: var(--text-secondary)">Additional Fields</h3>
+          <div class="form-grid">
+            <el-form-item 
+              v-for="field in contractFields.filter(f => f.source === 'EXTEND')" 
+              :key="field.fieldCode" 
+              :label="field.fieldName"
+            >
+              <el-input-number 
+                v-if="field.fieldType === 'NUMBER'" 
+                v-model="newContractForm.extendedFields[field.fieldCode]" 
+                style="width: 100%"
+              />
+              <el-date-picker
+                v-else-if="field.fieldType === 'DATE'"
+                v-model="newContractForm.extendedFields[field.fieldCode]"
+                type="date"
+                style="width: 100%"
+              />
+              <el-input 
+                v-else 
+                v-model="newContractForm.extendedFields[field.fieldCode]" 
+              />
+            </el-form-item>
+          </div>
+        </div>
       </el-form>
       <template #footer>
         <el-button @click="showNewContractDialog = false">Cancel</el-button>
@@ -132,6 +188,20 @@
             </div>
           </template>
         </el-table-column>
+
+        <!-- Dynamic Extended Columns -->
+        <el-table-column 
+          v-for="field in contractFields.filter(f => f.source === 'EXTEND')" 
+          :key="field.fieldCode" 
+          :label="field.fieldName"
+          :prop="field.fieldCode"
+          width="150"
+        >
+          <template #default="{ row }">
+            {{ row.extendedFields ? row.extendedFields[field.fieldCode] : 'N/A' }}
+          </template>
+        </el-table-column>
+
         <el-table-column label="Actions" width="100" fixed="right">
           <template #default="{ row }">
             <el-button circle text type="primary" @click="viewDetail(row.id)">
@@ -233,7 +303,14 @@ const newContractForm = ref({
   contractName: '',
   partyAName: '',
   partyBName: '',
-  amount: 0
+  amount: 0,
+  taxRate: 0,
+  currencyType: 'USD',
+  contractType: '',
+  effectiveDate: '',
+  expireDate: '',
+  remark: '',
+  extendedFields: {}
 })
 
 const rules = {
@@ -241,6 +318,24 @@ const rules = {
   contractName: [{ required: true, message: 'Please input contract name', trigger: 'blur' }],
   partyAName: [{ required: true, message: 'Please input Party A', trigger: 'blur' }],
   partyBName: [{ required: true, message: 'Please input Party B', trigger: 'blur' }]
+}
+
+const contractFields = ref([])
+
+const fetchMetadata = async () => {
+  try {
+    const response = await fetch('/api/metadata/contract-fields', {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    if (response.ok) {
+      const result = await response.json()
+      contractFields.value = result.data
+    }
+  } catch (error) {
+    console.error('Failed to fetch metadata', error)
+  }
 }
 
 const fetchContracts = async () => {
@@ -280,6 +375,7 @@ const handleCreateContract = async () => {
         if (response.ok) {
           ElMessage.success('Contract created successfully')
           showNewContractDialog.value = false
+          currentPage.value = 1 // Reset to first page to see the new record
           fetchContracts()
         }
       } catch (error) {
@@ -298,6 +394,7 @@ const handlePageChange = (page) => {
 
 onMounted(() => {
   fetchContracts()
+  fetchMetadata()
 })
 
 const handleSelectionChange = (val) => {
@@ -336,10 +433,6 @@ const handleBatchArchive = () => {
       type: 'warning'
     }
   ).then(({ value }) => {
-    // In real app:
-    // axios.post('/api/contracts/batch-archive', selectedRows.value.map(r => r.id), {
-    //   headers: { 'X-Secondary-Confirm': 'VERIFIED' }
-    // })
     ElMessage.success('Security verification successful. Batch archiving initiated.')
     clearSelection()
   }).catch(() => {

@@ -48,7 +48,7 @@ description: "Task list template for feature implementation"
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Create project structure per implementation plan
+- [ ] T001 Initialize branch and directory structure per plan.md
 - [ ] T002 Initialize [language] project with [framework] dependencies
 - [ ] T003 [P] Configure linting and formatting tools
 
@@ -153,6 +153,7 @@ Examples of foundational tasks (adjust based on your project):
 
 - [ ] TXXX [P] Documentation updates in docs/
 - [ ] TXXX [VIII] Final UX review and functional completeness check
+- [ ] TXXX [IX] Update global manifests (features.md, bugs.md, api.md, table.md) with all changes
 - [ ] TXXX [VII] Synchronize design documents (spec.md, plan.md) with implementation
 - [ ] TXXX Code cleanup and refactoring
 - [ ] TXXX Performance optimization across all stories

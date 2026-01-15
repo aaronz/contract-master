@@ -1,0 +1,24 @@
+openapi: 3.0.0
+info:
+  title: Problem Center API
+  version: 1.0.0
+paths:
+  /api/problems/{id}/resolve:
+    post:
+      summary: Resolve a system issue
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Issue resolved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: {type: integer}
+                  message: {type: string}

@@ -18,7 +18,7 @@ public class LoginPage {
 
     public boolean hasErrorMessage() {
         try {
-            page.waitForSelector(".el-message--error", new Page.WaitForSelectorOptions().setTimeout(5000));
+            page.waitForSelector(".el-message--error", new Page.WaitForSelectorOptions().setTimeout(3000));
             return true;
         } catch (Exception e) {
             return false;

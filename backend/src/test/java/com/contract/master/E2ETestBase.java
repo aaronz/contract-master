@@ -32,15 +32,16 @@ public class E2ETestBase {
     void createContext() {
         context = browser.newContext();
         page = context.newPage();
+        page.setDefaultTimeout(3000);
     }
 
     protected void login(String username, String password) {
         page.navigate(baseUrl + "/login");
-        page.waitForSelector("input[name='username']", new Page.WaitForSelectorOptions().setTimeout(10000));
+        page.waitForSelector("input[name='username']");
         page.fill("input[name='username']", username);
         page.fill("input[name='password']", password);
         page.fill("input[name='tenantId']", "tenant-1");
         page.click("button.login-button");
-        page.waitForURL(url -> !url.contains("/login"), new Page.WaitForURLOptions().setTimeout(30000));
+        page.waitForURL(url -> !url.contains("/login"));
     }
 }

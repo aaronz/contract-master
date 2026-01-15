@@ -15,11 +15,12 @@ public class IntegrationHubTest extends E2ETestBase {
         page.click("button:has-text('Add Mapping')");
         
         page.click(".el-select");
+        page.waitForSelector(".el-select-dropdown:visible");
         page.click("li.el-select-dropdown__item:has-text('Contract Amount')");
         
         page.fill("input[placeholder='e.g. amount_total']", "contract_value");
-        page.click(".el-dialog__footer button:has-text('Save')", new Page.ClickOptions().setForce(true));
-        assertThat(page.locator("table")).containsText("contract_value");
+        page.click(".el-dialog__footer button:has-text('Save')", new com.microsoft.playwright.Page.ClickOptions().setForce(true));
+        assertThat(page.locator(".table-card table").first()).containsText("contract_value");
     }
 
     @Test
@@ -30,8 +31,8 @@ public class IntegrationHubTest extends E2ETestBase {
         page.click("button:has-text('Create WebHook')");
         page.fill("input[placeholder*='ERP Finance Sync']", "E2E Test WebHook");
         page.fill("input[placeholder*='webhooks/contracts']", "https://example.com/webhook");
-        page.click(".el-dialog__footer button:has-text('Save')", new Page.ClickOptions().setForce(true));
-        assertThat(page.locator("table")).containsText("E2E Test WebHook");
+        page.click(".el-dialog__footer button:has-text('Save')", new com.microsoft.playwright.Page.ClickOptions().setForce(true));
+        assertThat(page.locator("table").first()).containsText("E2E Test WebHook");
     }
 
     @Test
@@ -62,7 +63,7 @@ public class IntegrationHubTest extends E2ETestBase {
     void testIntegrationHealthDashboard() {
         login("admin", "password", "tenant-1");
         page.navigate(baseUrl + "/integrations");
-        assertThat(page.locator(".glass-card")).containsText("Integration Hub");
+        assertThat(page.locator(".glass-card").first()).containsText("Integration Hub");
         assertThat(page.locator(".health-metrics")).isVisible();
     }
 
@@ -70,7 +71,7 @@ public class IntegrationHubTest extends E2ETestBase {
     void testRetryFailedSync() {
         login("admin", "password", "tenant-1");
         page.navigate(baseUrl + "/integrations");
-        page.click("button.retry-btn:nth-child(1)", new Page.ClickOptions().setForce(true));
+        page.locator("button.retry-btn").first().click(new com.microsoft.playwright.Locator.ClickOptions().setForce(true));
         assertThat(page.locator(".el-message--success")).isVisible();
     }
 }

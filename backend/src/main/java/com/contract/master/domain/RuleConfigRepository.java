@@ -8,4 +8,5 @@ import java.util.List;
 @Repository
 public interface RuleConfigRepository extends JpaRepository<RuleConfig, String> {
     List<RuleConfig> findByTenantIdAndIsEnabled(String tenantId, Boolean isEnabled);
+    List<RuleConfig> findByTenantId(String tenantId);
 }

@@ -28,6 +28,12 @@ public class RuleConfig extends BaseTenantEntity {
     @Column(name = "rule_name", length = 128)
     private String ruleName;
 
+    @Column(name = "rule_type", length = 32)
+    private String ruleType;
+
+    @Column(name = "ai_prompt_template", columnDefinition = "TEXT")
+    private String aiPromptTemplate;
+
     @Column(name = "rule_level", length = 32)
     private String ruleLevel;
 
@@ -60,4 +66,10 @@ public class RuleConfig extends BaseTenantEntity {
     public void setExecutionActions(String executionActions) { this.executionActions = executionActions; }
     public Boolean getIsEnabled() { return isEnabled; }
     public void setIsEnabled(Boolean isEnabled) { this.isEnabled = isEnabled; }
+    public String getRuleType() { return ruleType; }
+    public void setRuleType(String ruleType) { this.ruleType = ruleType; }
+    public String getAiPromptTemplate() { return aiPromptTemplate; }
+    public void setAiPromptTemplate(String aiPromptTemplate) { this.aiPromptTemplate = aiPromptTemplate; }
+    public String getRuleId() { return ruleId; }
+    public void setRuleId(String ruleId) { this.ruleId = ruleId; }
 }

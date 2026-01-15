@@ -110,6 +110,7 @@
 - [ ] **VI. E2E Testing**: User stories define clear end-to-end success criteria?
 - [ ] **VII. Doc Sync**: Specification includes all necessary functional details?
 - [ ] **VIII. UX/Completeness**: User journey is intuitive and addresses the core need?
+- [ ] **IX. Manifest Sync**: Impact on global manifests (features, bugs, api, table) is analyzed?
 
 ## Success Criteria *(mandatory)*
 

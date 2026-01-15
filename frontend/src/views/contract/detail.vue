@@ -35,6 +35,10 @@
         <el-button type="success" @click="publishContract" v-if="form.contractStatus === 'VERIFIED'">
           Publish to Downstream
         </el-button>
+
+        <el-button type="info" @click="showCardGenerator = true">
+          <el-icon><IdCard /></el-icon> Card Generator
+        </el-button>
         
         <el-progress 
           v-if="analyzing" 
@@ -60,13 +64,129 @@
             <div class="section-grid">
               <!-- Basic Info -->
               <div class="form-section">
-                <h3 class="section-header">Basic Information</h3>
+                <h3 class="section-header">Core Details</h3>
                 <div class="form-grid">
+                  <div class="field-group">
+                    <label>Contract Number</label>
+                    <el-input v-if="isEditMode" v-model="form.contractNo" />
+                    <div v-else class="display-val font-mono">{{ form.contractNo }}</div>
+                  </div>
                   <div class="field-group">
                     <label>Contract Name</label>
                     <el-input v-if="isEditMode" v-model="form.contractName" />
-                    <div v-else class="display-val primary">{{ form.contractName }}</div>
+                    <div v-else class="display-val">{{ form.contractName }}</div>
                   </div>
+                  <div class="field-group">
+                    <label>Contract Type</label>
+                    <el-input v-if="isEditMode" v-model="form.contractType" />
+                    <div v-else class="display-val">{{ form.contractType }}</div>
+                  </div>
+                  <div class="field-group">
+                    <label>Status</label>
+                    <el-select v-if="isEditMode" v-model="form.contractStatus" style="width: 100%">
+                      <el-option label="Active" value="Active" />
+                      <el-option label="Draft" value="Draft" />
+                      <el-option label="Pending" value="Pending" />
+                      <el-option label="Expired" value="Expired" />
+                    </el-select>
+                    <el-tag v-else :type="getStatusType(form.contractStatus)" round>{{ form.contractStatus }}</el-tag>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-section">
+                <h3 class="section-header">Financials</h3>
+                <div class="form-grid">
+                  <div class="field-group">
+                    <label>Amount</label>
+                    <el-input-number v-if="isEditMode" v-model="form.contractAmount" :precision="2" style="width: 100%" />
+                    <div v-else class="display-val amount">{{ formatCurrency(form.contractAmount) }}</div>
+                  </div>
+                  <div class="field-group">
+                    <label>Tax Rate (%)</label>
+                    <el-input-number v-if="isEditMode" v-model="form.taxRate" :precision="2" style="width: 100%" />
+                    <div v-else class="display-val">{{ form.taxRate }}%</div>
+                  </div>
+                  <div class="field-group">
+                    <label>Currency</label>
+                    <el-select v-if="isEditMode" v-model="form.currencyType" style="width: 100%">
+                      <el-option label="USD" value="USD" />
+                      <el-option label="EUR" value="EUR" />
+                      <el-option label="CNY" value="CNY" />
+                    </el-select>
+                    <div v-else class="display-val">{{ form.currencyType }}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-section">
+                <h3 class="section-header">Performance & Quality</h3>
+                <div class="form-grid">
+                  <div class="field-group">
+                    <label>Performance Location</label>
+                    <el-input v-if="isEditMode" v-model="form.performanceLocation" />
+                    <div v-else class="display-val">{{ form.performanceLocation }}</div>
+                  </div>
+                  <div class="field-group">
+                    <label>Performance Method</label>
+                    <el-input v-if="isEditMode" v-model="form.performanceMethod" />
+                    <div v-else class="display-val">{{ form.performanceMethod }}</div>
+                  </div>
+                  <div class="field-group">
+                    <label>Quality Standard</label>
+                    <el-input v-if="isEditMode" v-model="form.qualityStandard" type="textarea" />
+                    <div v-else class="display-val">{{ form.qualityStandard }}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-section">
+                <h3 class="section-header">Legal & Compliance</h3>
+                <div class="form-grid">
+                  <div class="field-group">
+                    <label>Governing Law</label>
+                    <el-input v-if="isEditMode" v-model="form.governingLaw" />
+                    <div v-else class="display-val">{{ form.governingLaw }}</div>
+                  </div>
+                  <div class="field-group">
+                    <label>Dispute Resolution</label>
+                    <el-input v-if="isEditMode" v-model="form.disputeResolution" />
+                    <div v-else class="display-val">{{ form.disputeResolution }}</div>
+                  </div>
+                  <div class="field-group">
+                    <label>Legal Review</label>
+                    <el-switch v-if="isEditMode" v-model="form.legalReviewFlag" />
+                    <el-tag v-else :type="form.legalReviewFlag ? 'success' : 'info'">{{ form.legalReviewFlag ? 'Reviewed' : 'Pending' }}</el-tag>
+                  </div>
+                </div>
+                <div class="field-group mt-4" v-if="form.legalReviewFlag">
+                  <label>Legal Opinion</label>
+                  <el-input v-if="isEditMode" v-model="form.legalReviewOpinion" type="textarea" />
+                  <div v-else class="display-val">{{ form.legalReviewOpinion }}</div>
+                </div>
+              </div>
+
+              <div class="form-section">
+                <h3 class="section-header">Billing & Invoicing</h3>
+                <div class="form-grid">
+                  <div class="field-group">
+                    <label>Invoice Title</label>
+                    <el-input v-if="isEditMode" v-model="form.invoiceTitle" />
+                    <div v-else class="display-val">{{ form.invoiceTitle }}</div>
+                  </div>
+                  <div class="field-group">
+                    <label>Taxpayer ID</label>
+                    <el-input v-if="isEditMode" v-model="form.taxpayerId" />
+                    <div v-else class="display-val">{{ form.taxpayerId }}</div>
+                  </div>
+                  <div class="field-group">
+                    <label>Invoice Type</label>
+                    <el-input v-if="isEditMode" v-model="form.invoiceType" />
+                    <div v-else class="display-val">{{ form.invoiceType }}</div>
+                  </div>
+                </div>
+              </div>
+
                   <div class="field-group">
                     <label>Contract No.</label>
                     <el-input v-if="isEditMode" v-model="form.contractNo" disabled />
@@ -426,6 +546,48 @@
         </div>
       </transition>
     </div>
+    <!-- Card Generator Dialog -->
+    <el-dialog v-model="showCardGenerator" title="Contract Card Generator" width="800px">
+      <div class="card-generator-container">
+        <div class="field-selector">
+          <h4 class="mb-4">Select Fields to Include</h4>
+          <el-checkbox-group v-model="cardConfig.selectedFields">
+            <div class="field-selection-grid">
+              <div v-for="field in contractFields" :key="field.fieldCode" class="field-selection-item">
+                <el-checkbox :label="field.fieldCode">{{ field.fieldName }}</el-checkbox>
+                <el-input 
+                  v-if="cardConfig.selectedFields.includes(field.fieldCode)"
+                  v-model="cardConfig.customLabels[field.fieldCode]" 
+                  size="small" 
+                  placeholder="Custom Label"
+                  class="mt-1"
+                />
+              </div>
+            </div>
+          </el-checkbox-group>
+        </div>
+        
+        <div class="card-preview mt-8">
+          <h4 class="mb-4">Preview</h4>
+          <div class="contract-card-visual">
+            <div class="card-header">
+              <div class="card-title">{{ form.contractName }}</div>
+              <div class="card-subtitle">{{ form.contractNo }}</div>
+            </div>
+            <div class="card-body">
+              <div v-for="code in cardConfig.selectedFields" :key="code" class="card-field">
+                <div class="card-label">{{ cardConfig.customLabels[code] || getFieldName(code) }}</div>
+                <div class="card-value">{{ getFieldValue(code) }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <template #footer>
+        <el-button @click="showCardGenerator = false">Cancel</el-button>
+        <el-button type="primary" @click="downloadCard">Download Card</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -441,9 +603,67 @@ const newComment = ref('')
 const isEditMode = ref(false)
 const analyzing = ref(false)
 const progress = ref(0)
-const customFields = ref([
-  { id: 1, fieldName: 'Custom Field 1', fieldCode: '1', fieldType: 'TEXT' }
-])
+const showCardGenerator = ref(false)
+const contractFields = ref([])
+const cardConfig = ref({
+  selectedFields: ['contractNo', 'partyAName', 'partyBName', 'amount'],
+  customLabels: {}
+})
+
+const fetchMetadata = async () => {
+  try {
+    const response = await fetch('/api/metadata/contract-fields', {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    if (response.ok) {
+      const result = await response.json()
+      contractFields.value = result.data
+    }
+  } catch (error) {
+    console.error('Failed to fetch metadata', error)
+  }
+}
+
+const getFieldName = (code) => {
+  const f = contractFields.value.find(field => field.fieldCode === code)
+  return f ? f.fieldName : code
+}
+
+const getFieldValue = (code) => {
+  if (form.hasOwnProperty(code)) return form[code]
+  if (form.customData && form.customData.hasOwnProperty(code)) return form.customData[code]
+  if (form.extendedFields && form.extendedFields.hasOwnProperty(code)) return form.extendedFields[code]
+  return 'N/A'
+}
+
+const downloadCard = () => {
+  ElMessage.success('Card generation started...')
+  showCardGenerator.value = false
+}
+
+const fetchContractDetail = async () => {
+  const contractId = router.currentRoute.value.params.id
+  try {
+    const response = await fetch(`/api/contracts/${contractId}`, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    if (response.ok) {
+      const result = await response.json()
+      Object.assign(form, result.data)
+    }
+  } catch (error) {
+    console.error('Failed to fetch contract detail', error)
+  }
+}
+
+onMounted(() => {
+  fetchMetadata()
+  fetchContractDetail()
+})
 
 const form = reactive({
   contractNo: 'CON-2024-001',
@@ -524,10 +744,23 @@ const handleAIAnalysis = () => {
   }, 200)
 }
 
-const saveContract = () => {
-  isEditMode.value = false
-  form.contractStatus = 'Draft' // Draft is 'info' in getStatusType
-  ElMessage.success('Contract saved successfully')
+const saveContract = async () => {
+  try {
+    const response = await fetch(`/api/contracts/${form.contractId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
+      body: JSON.stringify(form)
+    })
+    if (response.ok) {
+      isEditMode.value = false
+      ElMessage.success('Contract updated successfully')
+    }
+  } catch (error) {
+    console.error('Update failed', error)
+  }
 }
 
 const addComment = () => {
@@ -844,5 +1077,63 @@ const publishContract = () => {
   width: 0;
   opacity: 0;
   transform: translateX(20px);
+}
+.field-selection-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.field-selection-item {
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+}
+
+.contract-card-visual {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  padding: 24px;
+  max-width: 400px;
+  border-top: 4px solid var(--primary-color);
+}
+
+.contract-card-visual .card-header {
+  margin-bottom: 20px;
+}
+
+.contract-card-visual .card-title {
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--text-primary);
+}
+
+.contract-card-visual .card-subtitle {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-family: monospace;
+}
+
+.contract-card-visual .card-body {
+  display: grid;
+  gap: 12px;
+}
+
+.contract-card-visual .card-field {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+}
+
+.contract-card-visual .card-label {
+  color: var(--text-secondary);
+}
+
+.contract-card-visual .card-value {
+  font-weight: 500;
+  color: var(--text-primary);
 }
 </style>

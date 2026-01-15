@@ -36,6 +36,12 @@ public class ContractController {
         return GlobalExceptionHandler.ApiResponse.success(contractService.getContractById(id));
     }
 
+    @PutMapping("/{id}")
+    public GlobalExceptionHandler.ApiResponse<Void> update(@PathVariable String id, @RequestBody ContractDTO dto) {
+        contractService.updateContractFromDTO(id, dto);
+        return GlobalExceptionHandler.ApiResponse.success(null);
+    }
+
     @GetMapping("/{id}/audit")
     public GlobalExceptionHandler.ApiResponse<List<com.contract.master.domain.AuditLog>> audit(@PathVariable String id) {
         return GlobalExceptionHandler.ApiResponse.success(auditService.getAuditLogsByContract(id));

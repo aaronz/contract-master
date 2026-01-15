@@ -10,11 +10,8 @@ public class US1AuthTest extends E2ETestBase {
 
     @Test
     void testSuccessfulLogin() {
-        page.navigate(baseUrl + "/login");
-        LoginPage loginPage = new LoginPage(page);
-        DashboardPage dashboard = loginPage.login("admin", "password", "tenant-1");
-        page.waitForURL(url -> !url.contains("/login"));
-        assertTrue(page.url().contains("/dashboard") || page.isVisible(".dashboard-container"));
+        login("admin", "password", "tenant-1");
+        assertTrue(page.url().contains("/dashboard") || page.locator(".dashboard-container").first().isVisible());
     }
 
     @Test
