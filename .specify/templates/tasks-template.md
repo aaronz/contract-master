@@ -62,12 +62,13 @@ description: "Task list template for feature implementation"
 
 Examples of foundational tasks (adjust based on your project):
 
-- [ ] T004 Setup database schema and migrations framework
-- [ ] T005 [P] Implement authentication/authorization framework
-- [ ] T006 [P] Setup API routing and middleware structure
+- [ ] T004 Setup database schema and migrations framework (Verify tenant_id inclusion)
+- [ ] T005 [P] Implement authentication/authorization framework (Enforce tenant context)
+- [ ] T006 [P] Setup API routing and middleware structure (Audit log interceptors)
 - [ ] T007 Create base models/entities that all stories depend on
 - [ ] T008 Configure error handling and logging infrastructure
 - [ ] T009 Setup environment configuration management
+- [ ] T010 [P] Define E2E test scenarios for all P1 user stories
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -151,6 +152,8 @@ Examples of foundational tasks (adjust based on your project):
 **Purpose**: Improvements that affect multiple user stories
 
 - [ ] TXXX [P] Documentation updates in docs/
+- [ ] TXXX [VIII] Final UX review and functional completeness check
+- [ ] TXXX [VII] Synchronize design documents (spec.md, plan.md) with implementation
 - [ ] TXXX Code cleanup and refactoring
 - [ ] TXXX Performance optimization across all stories
 - [ ] TXXX [P] Additional unit tests (if requested) in tests/unit/

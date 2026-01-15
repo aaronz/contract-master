@@ -100,6 +100,17 @@
 - **[Entity 1]**: [What it represents, key attributes without implementation]
 - **[Entity 2]**: [What it represents, relationships to other entities]
 
+## Constitution Check *(mandatory)*
+
+- [ ] **I. Tenant Isolation**: Feature respects multi-tenant boundaries?
+- [ ] **II. AI-Manual Synergy**: Data source (AI/User) is identified?
+- [ ] **III. Rule Governance**: Feature utilizes rule engine for validation?
+- [ ] **IV. Middleware Std**: Uses standard integration protocols?
+- [ ] **V. Auditability**: Actions are recorded in audit logs?
+- [ ] **VI. E2E Testing**: User stories define clear end-to-end success criteria?
+- [ ] **VII. Doc Sync**: Specification includes all necessary functional details?
+- [ ] **VIII. UX/Completeness**: User journey is intuitive and addresses the core need?
+
 ## Success Criteria *(mandatory)*
 
 <!--

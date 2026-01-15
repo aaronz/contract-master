@@ -2,9 +2,10 @@ package com.contract.master.service;
 
 import com.contract.master.dto.AttachmentDTO;
 import com.contract.master.dto.ContractDTO;
-import com.contract.master.entity.*;
-import com.contract.master.repository.*;
-import com.contract.master.security.TenantContext;
+import com.contract.master.domain.ContractBase;
+import com.contract.master.domain.ContractBaseRepository;
+import com.contract.master.domain.*;
+import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,7 +51,7 @@ public class ContractService {
         contractBaseRepository.findById(id).ifPresent(existing -> {
             auditService.logChange(id, "contract_name", existing.getContractName(), updated.getContractName(), "MANUAL", "admin");
             existing.setContractName(updated.getContractName());
-            existing.setContractAmount(updated.getContractAmount());
+            existing.setAmount(updated.getAmount());
             contractBaseRepository.save(existing);
         });
     }
@@ -91,107 +92,22 @@ public class ContractService {
         ContractDTO dto = new ContractDTO();
         dto.setContractId(base.getContractId());
         dto.setContractNo(base.getContractNo());
-        dto.setCrmContractId(base.getCrmContractId());
+        dto.setCrmContractId(base.getCrmId());
         dto.setContractName(base.getContractName());
         dto.setContractType(base.getContractType());
         
         dto.setPartyAId(base.getPartyAId());
         dto.setPartyAName(base.getPartyAName());
-        dto.setPartyAContact(base.getPartyAContact());
-        dto.setPartyAPhone(base.getPartyAPhone());
-        dto.setPartyAAddress(base.getPartyAAddress());
 
-        dto.setPartyBId(base.getPartyBId());
         dto.setPartyBName(base.getPartyBName());
-        dto.setPartyBContact(base.getPartyBContact());
-        dto.setPartyBPhone(base.getPartyBPhone());
-        dto.setPartyBAddress(base.getPartyBAddress());
 
-        dto.setContractAmount(base.getContractAmount());
-        dto.setTaxRate(base.getTaxRate());
-        dto.setTaxAmount(base.getTaxAmount());
-        dto.setTotalAmountWithTax(base.getTotalAmountWithTax());
-        dto.setCurrencyType(base.getCurrencyType());
-        dto.setPaymentMethod(base.getPaymentMethod());
-        dto.setPaymentTerm(base.getPaymentTerm());
+        dto.setContractAmount(base.getAmount());
+        dto.setContractStatus(base.getStatus());
 
-        dto.setInvoiceType(base.getInvoiceType());
-        dto.setInvoiceTitle(base.getInvoiceTitle());
-        dto.setTaxpayerId(base.getTaxpayerId());
-
-        dto.setSignDate(base.getSignDate());
-        dto.setEffectiveDate(base.getEffectiveDate());
-        dto.setExpireDate(base.getExpireDate());
-
-        dto.setPerformanceLocation(base.getPerformanceLocation());
-        dto.setPerformanceMethod(base.getPerformanceMethod());
-        dto.setPerformanceStartDate(base.getPerformanceStartDate());
-        dto.setPerformanceEndDate(base.getPerformanceEndDate());
-        dto.setQualityStandard(base.getQualityStandard());
-
-        dto.setContractStatus(base.getContractStatus());
-        dto.setApprovalStatus(base.getApprovalStatus());
-        dto.setApprovalUser(base.getApprovalUser());
-        dto.setOwnerUserId(base.getOwnerUserId());
-        dto.setOwnerDeptId(base.getOwnerDeptId());
-
-        dto.setLegalReviewFlag(base.getLegalReviewFlag());
-        dto.setLegalReviewOpinion(base.getLegalReviewOpinion());
-        dto.setDisputeResolution(base.getDisputeResolution());
-        dto.setGoverningLaw(base.getGoverningLaw());
-        dto.setGuaranteeFlag(base.getGuaranteeFlag());
-        dto.setGuaranteeType(base.getGuaranteeType());
-        dto.setGuarantorInfo(base.getGuarantorInfo());
-
-        dto.setSubjectType(base.getSubjectType());
-        dto.setSubjectDesc(base.getSubjectDesc());
-        dto.setSubjectQuantity(base.getSubjectQuantity());
-        dto.setUnitPrice(base.getUnitPrice());
-
-        dto.setThirdPartyFlag(base.getThirdPartyFlag());
-        dto.setThirdPartyInfo(base.getThirdPartyInfo());
-
-        dto.setAttachmentCount(base.getAttachmentCount());
-        dto.setMainAttachmentId(base.getMainAttachmentId());
-        dto.setChangeCount(base.getChangeCount());
-        dto.setLastChangeTime(base.getLastChangeTime());
-        dto.setRemark(base.getRemark());
-        
         dto.setCreateTime(base.getCreateTime());
         dto.setCreateUser(base.getCreateUser());
         dto.setUpdateTime(base.getUpdateTime());
         dto.setUpdateUser(base.getUpdateUser());
-
-        List<ContractExtendData> dataList = extendDataRepository.findByContractId(base.getContractId());
-        Map<String, Object> extendedFields = new HashMap<>();
-        for (ContractExtendData data : dataList) {
-            extendFieldRepository.findById(data.getFieldId()).ifPresent(field -> {
-                extendedFields.put(field.getFieldCode(), data.getFieldValue());
-            });
-        }
-        
-        List<FieldConfig> configs = fieldConfigRepository.findByTenantId(TenantContext.getCurrentTenant());
-        if (!configs.isEmpty()) {
-            Map<String, Object> filtered = new HashMap<>();
-            configs.stream().filter(c -> "API_RETURN".equals(c.getConfigType()) && c.getIsVisible())
-                    .forEach(c -> {
-                        if (extendedFields.containsKey(c.getFieldCode())) {
-                            if (checkFieldRole(c)) {
-                                filtered.put(c.getFieldAlias() != null ? c.getFieldAlias() : c.getFieldCode(), extendedFields.get(c.getFieldCode()));
-                            }
-                        }
-                    });
-            dto.setExtendedFields(filtered);
-
-            // Filter base fields based on config
-            configs.stream().filter(c -> !"API_RETURN".equals(c.getConfigType()) && !c.getIsVisible())
-                    .forEach(c -> {
-                        if ("contractAmount".equals(c.getFieldCode())) dto.setContractAmount(null);
-                        if ("taxpayerId".equals(c.getFieldCode())) dto.setTaxpayerId(null);
-                    });
-        } else {
-            dto.setExtendedFields(extendedFields);
-        }
 
         return dto;
     }
@@ -203,4 +119,3 @@ public class ContractService {
                 .anyMatch(a -> a.getAuthority().equals(config.getRequiredRole()));
     }
 }
-

@@ -1,8 +1,8 @@
 package com.contract.master.service;
 
 import com.contract.master.dto.ContractDTO;
-import com.contract.master.entity.ContractBase;
-import com.contract.master.repository.ContractBaseRepository;
+import com.contract.master.domain.ContractBase;
+import com.contract.master.domain.ContractBaseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,11 +31,11 @@ public class ImportService {
             contract.setPartyAName(row[2]);
             contract.setPartyBName(row[3]);
             try {
-                contract.setContractAmount(new BigDecimal(row[4].trim()));
+                contract.setAmount(new BigDecimal(row[4].trim()));
             } catch (Exception e) {
-                contract.setContractAmount(BigDecimal.ZERO);
+                contract.setAmount(BigDecimal.ZERO);
             }
-            contract.setContractStatus("ACTIVE");
+            contract.setStatus("ACTIVE");
             
             contractBaseRepository.save(contract);
         }

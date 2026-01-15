@@ -1,7 +1,7 @@
 package com.contract.master.security;
 
-import com.contract.master.entity.DataPermissionRule;
-import com.contract.master.repository.DataPermissionRuleRepository;
+import com.contract.master.domain.DataPermissionRule;
+import com.contract.master.domain.DataPermissionRuleRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
@@ -28,7 +28,7 @@ public class DataScopeAspect {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Pointcut("execution(* com.contract.master.repository.ContractBaseRepository..*(..))")
+    @Pointcut("execution(* com.contract.master.domain.ContractBaseRepository..*(..))")
     public void contractRepositoryMethods() {}
 
     @Before("contractRepositoryMethods()")

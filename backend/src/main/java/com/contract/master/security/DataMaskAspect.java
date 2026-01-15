@@ -14,7 +14,7 @@ import java.util.Collection;
 @Component
 public class DataMaskAspect {
 
-    @AfterReturning(pointcut = "execution(* com.contract.master.controller..*(..))", returning = "result")
+    @AfterReturning(pointcut = "execution(* com.contract.master.api..*(..))", returning = "result")
     public void maskResult(Object result) {
         if (result == null) return;
 

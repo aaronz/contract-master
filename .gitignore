@@ -1,0 +1,41 @@
+# Java
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.tar.gz
+.gradle/
+build/
+.settings/
+.classpath
+.project
+.factorypath
+
+# Node.js
+node_modules/
+dist/
+build/
+.npm
+*.log
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Environment files
+.env*
+!.env.example
+
+# Docker
+.docker/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.tmp
+*.bak
+
+# OS
+.DS_Store
+Thumbs.db

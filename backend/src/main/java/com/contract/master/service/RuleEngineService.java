@@ -1,8 +1,8 @@
 package com.contract.master.service;
 
 import com.contract.master.dto.ContractDTO;
-import com.contract.master.entity.RuleConfig;
-import com.contract.master.repository.RuleConfigRepository;
+import com.contract.master.domain.RuleConfig;
+import com.contract.master.domain.RuleConfigRepository;
 import com.contract.master.security.TenantContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.expression.ExpressionParser;

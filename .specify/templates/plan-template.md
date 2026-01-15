@@ -31,7 +31,14 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+- [ ] **I. Tenant Isolation**: Does this feature maintain strict logical isolation?
+- [ ] **II. AI-Manual Synergy**: Are data sources and actors traceable?
+- [ ] **III. Rule Governance**: Does this integrate with the rule engine for validation?
+- [ ] **IV. Middleware Std**: Does it use standardized APIs/WebHooks for integration?
+- [ ] **V. Auditability**: Are all state changes captured in audit logs?
+- [ ] **VI. E2E Testing**: Is there an E2E test plan for every user story journey?
+- [ ] **VII. Doc Sync**: Plan includes tasks to keep design docs updated?
+- [ ] **VIII. UX/Completeness**: Has the user journey been reviewed for clarity and logic?
 
 ## Project Structure
 

@@ -1,0 +1,68 @@
+openapi: 3.0.3
+info:
+  title: Contract Master Core API
+  version: 1.0.0
+  description: API for managing contract full elements, AI extraction, and rule validation.
+servers:
+  - url: /api/v1
+paths:
+  /contracts:
+    get:
+      summary: List contracts for current tenant
+      responses:
+        '200':
+          description: List of contracts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Contract'
+  /contracts/{id}:
+    get:
+      summary: Get contract details including extension fields
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Detailed contract data
+  /contracts/{id}/extract:
+    post:
+      summary: Trigger AI extraction from attachment
+      responses:
+        '202':
+          description: Extraction started
+  /webhooks/{source}:
+    post:
+      summary: CRM WebHook receiver
+      parameters:
+        - name: source
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [salesforce, hubspot, dingtalk]
+      responses:
+        '204':
+          description: Accepted
+components:
+  schemas:
+    Contract:
+      type: object
+      properties:
+        contract_id:
+          type: string
+        contract_no:
+          type: string
+        contract_name:
+          type: string
+        status:
+          type: string
+        extend_data:
+          type: object
+          additionalProperties:
+            type: string

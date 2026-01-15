@@ -1,7 +1,7 @@
 package com.contract.master.service;
 
-import com.contract.master.entity.ContractAttachment;
-import com.contract.master.repository.ContractAttachmentRepository;
+import com.contract.master.domain.ContractAttachment;
+import com.contract.master.domain.ContractAttachmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

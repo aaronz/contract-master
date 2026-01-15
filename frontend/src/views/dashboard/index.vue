@@ -135,7 +135,7 @@
             <el-tag size="small" :type="task.priority === 'High' ? 'danger' : 'warning'">{{ task.priority }}</el-tag>
           </div>
         </div>
-      </el-card>
+      </div>
     </div>
   </div>
 </template>

@@ -1,7 +1,7 @@
 package com.contract.master.service;
 
-import com.contract.master.entity.AuditLog;
-import com.contract.master.repository.AuditLogRepository;
+import com.contract.master.domain.AuditLog;
+import com.contract.master.domain.AuditLogRepository;
 import com.contract.master.security.TenantContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
