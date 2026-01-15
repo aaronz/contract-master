@@ -28,8 +28,8 @@ public class IntegrationHubTest extends E2ETestBase {
         page.navigate(baseUrl + "/integrations/webhooks");
         assertThat(page.locator("h1")).containsText("Outbound WebHooks");
         page.click("button:has-text('Create WebHook')");
-        page.fill("input[placeholder='e.g. ERP Finance Sync']", "E2E Test WebHook");
-        page.fill("input[placeholder='https://api.yourcompany.com/webhooks/contracts']", "https://example.com/webhook");
+        page.fill("input[placeholder*='ERP Finance Sync']", "E2E Test WebHook");
+        page.fill("input[placeholder*='webhooks/contracts']", "https://example.com/webhook");
         page.click(".el-dialog__footer button:has-text('Save')", new Page.ClickOptions().setForce(true));
         assertThat(page.locator("table")).containsText("E2E Test WebHook");
     }

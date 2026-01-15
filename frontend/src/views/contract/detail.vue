@@ -542,7 +542,14 @@ const addComment = () => {
 }
 
 const getStatusType = (status) => {
-  return status === 'Active' ? 'success' : 'warning'
+  const map = {
+    'Active': 'success',
+    'AI_EXTRACTED': 'warning',
+    'VERIFIED': 'primary',
+    'PUBLISHED': 'success',
+    'Draft': 'info'
+  }
+  return map[status] || 'warning'
 }
 
 const formatCurrency = (val, currency) => {

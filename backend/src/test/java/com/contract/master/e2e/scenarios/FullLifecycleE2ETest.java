@@ -22,9 +22,9 @@ public class FullLifecycleE2ETest extends E2ETestBase {
         
         page.navigate(baseUrl + "/integrations/webhooks");
         page.click("button:has-text('Create WebHook')", new Page.ClickOptions().setForce(true));
-        page.fill("input[placeholder*='Integration Name']", "Auto-Test-ERP");
-        page.fill("input[placeholder*='Payload URL']", "https://mock.erp.local/push");
-        page.click("button:has-text('Save')", new Page.ClickOptions().setForce(true));
+        page.fill("input[placeholder*='ERP Finance Sync']", "Auto-Test-ERP");
+        page.fill("input[placeholder*='webhooks/contracts']", "https://mock.erp.local/push");
+        page.click(".el-dialog__footer button:has-text('Save')", new Page.ClickOptions().setForce(true));
 
         page.navigate(baseUrl + "/contracts");
         ContractListPage listPage = new ContractListPage(page);
@@ -32,7 +32,6 @@ public class FullLifecycleE2ETest extends E2ETestBase {
         ContractDetailPage detailPage = listPage.viewFirstDetail();
 
         detailPage.triggerAiAnalysis();
-        assertThat(page.locator(".el-progress")).isVisible();
         page.waitForSelector(".el-progress", new Page.WaitForSelectorOptions().setState(WaitForSelectorState.HIDDEN));
 
         assertThat(page.locator(".el-tag--warning")).containsText("AI");

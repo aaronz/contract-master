@@ -142,9 +142,11 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { Document, Timer, Money, Warning, Top, Download, ArrowDown } from '@element-plus/icons-vue'
 import * as echarts from 'echarts'
 
+const router = useRouter()
 const chartPeriod = ref('Month')
 const trendChartRef = ref(null)
 const radarChartRef = ref(null)

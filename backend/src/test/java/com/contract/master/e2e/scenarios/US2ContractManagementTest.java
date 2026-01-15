@@ -14,7 +14,8 @@ public class US2ContractManagementTest extends E2ETestBase {
     void testSearchAndViewDetail() {
         login("admin", "password", "tenant-1");
         
-        page.navigate(baseUrl + "/contract/list");
+        page.navigate(baseUrl + "/contracts");
+        page.waitForSelector(".search-input input");
         ContractListPage listPage = new ContractListPage(page);
         listPage.search("CON-2024-001");
         
@@ -25,7 +26,7 @@ public class US2ContractManagementTest extends E2ETestBase {
     @Test
     void testNewContractCreation() {
         login("admin", "password", "tenant-1");
-        page.navigate(baseUrl + "/contract/list");
+        page.navigate(baseUrl + "/contracts");
         
         page.click("button:has-text('New Contract')");
         page.fill("input[placeholder='e.g. CON-2026-001']", "E2E-NEW-001");
@@ -40,7 +41,7 @@ public class US2ContractManagementTest extends E2ETestBase {
     @Test
     void testPaginationNavigation() {
         login("admin", "password", "tenant-1");
-        page.navigate(baseUrl + "/contract/list");
+        page.navigate(baseUrl + "/contracts");
         
         assertThat(page.locator(".el-pagination")).isVisible();
         page.click(".el-pager li.number:nth-child(2)");

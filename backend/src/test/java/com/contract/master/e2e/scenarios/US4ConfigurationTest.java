@@ -11,8 +11,9 @@ public class US4ConfigurationTest extends E2ETestBase {
         login("admin", "password", "tenant-1");
         
         page.navigate(baseUrl + "/settings/fields");
-        assertThat(page.locator("table")).containsText("contractNo");
-        assertThat(page.locator("table")).containsText("amount");
+        page.waitForSelector(".draggable-table");
+        assertThat(page.locator(".draggable-table")).containsText("contractNo");
+        assertThat(page.locator(".draggable-table")).containsText("amount");
     }
 
     @Test
@@ -21,8 +22,7 @@ public class US4ConfigurationTest extends E2ETestBase {
         page.navigate(baseUrl + "/compliance/masking");
         
         page.click("button:has-text('Add Masking Rule')");
-        page.click(".el-select");
-        assertThat(page.locator(".el-select-dropdown")).containsText("Contract Number");
-        assertThat(page.locator(".el-select-dropdown")).containsText("Amount");
+        page.click(".el-table__row:last-child .el-select");
+        assertThat(page.locator(".el-select-dropdown:visible").first()).containsText("Contract Number");
     }
 }

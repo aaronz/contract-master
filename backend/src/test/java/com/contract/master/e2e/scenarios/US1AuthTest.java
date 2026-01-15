@@ -19,6 +19,7 @@ public class US1AuthTest extends E2ETestBase {
 
     @Test
     void testInvalidLogin() {
+        page.navigate(baseUrl + "/login");
         LoginPage loginPage = new LoginPage(page);
         loginPage.login("admin", "wrong-password", "tenant-1");
         assertTrue(loginPage.hasErrorMessage());

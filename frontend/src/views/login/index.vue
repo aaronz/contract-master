@@ -73,6 +73,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { User, Lock, Check } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
 
 const router = useRouter()
 const loading = ref(false)
@@ -88,7 +89,10 @@ const handleLogin = async () => {
   try {
     const response = await fetch('/api/auth/login', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'X-Tenant-ID': loginForm.value.tenantId
+      },
       body: JSON.stringify(loginForm.value)
     })
     if (response.ok) {

@@ -44,5 +44,13 @@ public class User extends BaseTenantEntity {
     private LocalDateTime updateTime;
 
     public String getUserName() { return userName; }
+    public void setUserName(String userName) { this.userName = userName; }
     public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+    public String getUserId() { return userId; }
+    public void setUserId(String userId) { this.userId = userId; }
+    public String getRealName() { return realName; }
+    public void setRealName(String realName) { this.realName = realName; }
+    public Integer getStatus() { return status; }
+    public void setStatus(Integer status) { this.status = status; }
 }

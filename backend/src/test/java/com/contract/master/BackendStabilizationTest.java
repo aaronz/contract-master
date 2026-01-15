@@ -29,8 +29,9 @@ public class BackendStabilizationTest {
     void testTenantIsolationAtApiLevel() throws Exception {
         mockMvc.perform(get("/api/contracts"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data").isEmpty());
+                .andExpect(jsonPath("$.data.content").isEmpty());
     }
+
 
     @Test
     void testContractVerificationLogic() throws Exception {

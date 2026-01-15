@@ -87,8 +87,9 @@ const fetchFields = async () => {
     })
     if (response.ok) {
       const result = await response.json()
-      // Map metadata to config structure
-      configs.value = result.data.map(f => ({
+      // Use result.data since the backend response is wrapped in ApiResponse
+      const fieldList = result.data || []
+      configs.value = fieldList.map(f => ({
         fieldCode: f.fieldCode,
         fieldAlias: f.fieldName,
         apiReturn: true,
@@ -102,17 +103,19 @@ const fetchFields = async () => {
   }
 }
 
-onMounted(() => {
-  fetchFields()
+onMounted(async () => {
+  await fetchFields()
   const tableBody = document.querySelector('.draggable-table tbody')
-  Sortable.create(tableBody, {
-    handle: '.drag-handle',
-    animation: 150,
-    onEnd: ({ newIndex, oldIndex }) => {
-      const targetRow = configs.value.splice(oldIndex, 1)[0]
-      configs.value.splice(newIndex, 0, targetRow)
-    }
-  })
+  if (tableBody) {
+    Sortable.create(tableBody, {
+      handle: '.drag-handle',
+      animation: 150,
+      onEnd: ({ newIndex, oldIndex }) => {
+        const targetRow = configs.value.splice(oldIndex, 1)[0]
+        configs.value.splice(newIndex, 0, targetRow)
+      }
+    })
+  }
 })
 
 const saveConfig = () => {

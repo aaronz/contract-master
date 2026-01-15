@@ -17,6 +17,11 @@ public class LoginPage {
     }
 
     public boolean hasErrorMessage() {
-        return page.isVisible(".el-message--error");
+        try {
+            page.waitForSelector(".el-message--error", new Page.WaitForSelectorOptions().setTimeout(5000));
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

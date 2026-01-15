@@ -200,7 +200,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { Filter, Search, Files, ArrowDown, ArrowRight, Download, User, Delete, Close, Plus } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
@@ -211,6 +211,15 @@ const activeTab = ref('all')
 const searchQuery = ref('')
 const selectedRows = ref([])
 const tableRef = ref(null)
+const contracts = ref([])
+const isSticky = ref(false)
+const filterForm = ref({
+  dateRange: [],
+  type: '',
+  minAmount: '',
+  maxAmount: '',
+  status: []
+})
 
 const showNewContractDialog = ref(false)
 const creating = ref(false)

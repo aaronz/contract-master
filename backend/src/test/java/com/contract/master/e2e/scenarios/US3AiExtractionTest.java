@@ -13,7 +13,7 @@ public class US3AiExtractionTest extends E2ETestBase {
         LoginPage loginPage = new LoginPage(page);
         loginPage.login("admin", "password", "tenant-1");
         
-        page.navigate(baseUrl + "/contract/detail/1");
+        page.navigate(baseUrl + "/contracts/1");
         ContractDetailPage detailPage = new ContractDetailPage(page);
         
         detailPage.triggerAiAnalysis();

@@ -9,7 +9,7 @@ public class RuleGateAuditTest extends E2ETestBase {
     @Test
     void testRuleViolationBlocking() {
         login("admin", "password", "tenant-1");
-        page.navigate(baseUrl + "/contract/new");
+        page.navigate(baseUrl + "/contracts/new");
         page.fill("input[name=\"amount\"]", "2000000");
         page.click("button.sync-btn");
         assertThat(page.locator(".status-badge")).containsText("RISK_FLAGGED");

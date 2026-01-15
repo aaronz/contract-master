@@ -20,7 +20,7 @@ public class MetadataController {
     private ContractExtendFieldRepository extendFieldRepository;
 
     @GetMapping("/contract-fields")
-    public List<FieldMetadataDTO> getContractFields() {
+    public GlobalExceptionHandler.ApiResponse<List<FieldMetadataDTO>> getContractFields() {
         List<FieldMetadataDTO> fields = new ArrayList<>();
         
         fields.add(new FieldMetadataDTO("contractNo", "Contract Number", "TEXT", "STANDARD"));
@@ -37,6 +37,6 @@ public class MetadataController {
                 .map(f -> new FieldMetadataDTO(f.getFieldCode(), f.getFieldName(), f.getFieldType(), "EXTEND"))
                 .collect(Collectors.toList()));
 
-        return fields;
+        return GlobalExceptionHandler.ApiResponse.success(fields);
     }
 }

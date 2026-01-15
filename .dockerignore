@@ -8,3 +8,7 @@ dist/
 Dockerfile*
 .dockerignore
 coverage/
+.claude/
+.opencode/
+.specify/
+.vscode/

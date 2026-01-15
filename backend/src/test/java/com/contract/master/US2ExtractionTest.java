@@ -9,9 +9,10 @@ public class US2ExtractionTest extends E2ETestBase {
     @Test
     void testAiExtractionFlow() {
         login("admin", "password");
-        page.navigate(baseUrl + "/contract/detail/1");
+        page.navigate(baseUrl + "/contracts/1");
         page.waitForSelector("button:has-text('AI Analysis')");
         page.click("button:has-text('AI Analysis')", new Page.ClickOptions().setForce(true));
+        page.waitForSelector(".contract-name");
         assertThat(page.locator(".contract-name")).isVisible();
     }
 }

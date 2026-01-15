@@ -152,7 +152,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { Connection, Check, DataAnalysis, Warning, Plus, Refresh } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 
