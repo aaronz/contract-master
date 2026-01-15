@@ -34,6 +34,9 @@ public class AuditLog extends BaseTenantEntity {
     @Column(name = "modify_user", length = 64)
     private String modifyUser;
 
+    @Column(name = "details", columnDefinition = "TEXT")
+    private String details;
+
     @CreatedDate
     @Column(name = "create_time", updatable = false)
     private LocalDateTime createTime;

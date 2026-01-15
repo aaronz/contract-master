@@ -30,6 +30,8 @@ public class AIService {
         extracted.put("payment_term", "30 days after delivery");
         extracted.put("liquidated_damages", "0.5% per day");
         extracted.put("warranty_period", "24 months");
+        extracted.put("fill_type", "AI");
+        extracted.put("verification_status", "UNVERIFIED");
         
         return extracted;
     }

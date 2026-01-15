@@ -17,6 +17,9 @@ public class CrmIntegrationService {
     @Autowired
     private ContractBaseRepository contractBaseRepository;
 
+    @Autowired
+    private com.contract.master.rule.DroolsRuleEngine ruleEngine;
+
     @Transactional
     public void syncContract(Map<String, Object> payload, String source) {
         String crmId = (String) payload.get("id");
@@ -36,8 +39,15 @@ public class CrmIntegrationService {
             contract.setAmount(new BigDecimal(payload.get("amount").toString()));
         }
 
+        java.util.List<String> violations = ruleEngine.validate(contract, com.contract.master.security.TenantContext.getCurrentTenant());
+        if (!violations.isEmpty()) {
+            contract.setStatus("RISK_FLAGGED");
+            contract.setRemark("MANDATORY_GATE_VIOLATION: " + String.join("; ", violations));
+        } else {
+            contract.setStatus("SYNCED");
+        }
+
         contract.setSyncTime(LocalDateTime.now());
-        contract.setStatus("SYNCED");
 
         if (contract.getContractId() == null) {
             contract.setContractId(UUID.randomUUID().toString());

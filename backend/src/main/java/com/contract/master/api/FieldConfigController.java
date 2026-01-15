@@ -14,12 +14,13 @@ public class FieldConfigController {
     private FieldConfigService fieldConfigService;
 
     @GetMapping
-    public List<FieldConfig> getConfigs() {
-        return fieldConfigService.getConfigs();
+    public GlobalExceptionHandler.ApiResponse<List<FieldConfig>> getConfigs() {
+        return GlobalExceptionHandler.ApiResponse.success(fieldConfigService.getConfigs());
     }
 
     @PostMapping
-    public void saveConfig(@RequestBody FieldConfig config) {
+    public GlobalExceptionHandler.ApiResponse<Void> saveConfig(@RequestBody FieldConfig config) {
         fieldConfigService.saveConfig(config);
+        return GlobalExceptionHandler.ApiResponse.success(null);
     }
 }

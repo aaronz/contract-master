@@ -64,24 +64,32 @@ public class ContractService {
                 .findFirst()
                 .ifPresent(field -> {
                     String newVal = value != null ? value.toString() : null;
-                    
+                    boolean isVerifying = fieldCode.endsWith("_verified") && value instanceof Boolean && (Boolean)value;
+                    String targetFieldCode = isVerifying ? fieldCode.replace("_verified", "") : fieldCode;
+
                     Optional<ContractExtendData> existing = extendDataRepository.findByContractId(contractId).stream()
                             .filter(d -> d.getFieldId().equals(field.getFieldId()))
                             .findFirst();
 
                     if (existing.isPresent()) {
-                        if (!Objects.equals(existing.get().getFieldValue(), newVal)) {
+                        if (isVerifying) {
+                            existing.get().setVerificationStatus("VERIFIED");
+                            extendDataRepository.save(existing.get());
+                        } else if (!Objects.equals(existing.get().getFieldValue(), newVal)) {
                             auditService.logChange(contractId, fieldCode, existing.get().getFieldValue(), newVal, "MANUAL", "admin");
                             existing.get().setFieldValue(newVal);
+                            existing.get().setFillType("MANUAL");
+                            existing.get().setVerificationStatus("VERIFIED");
                             extendDataRepository.save(existing.get());
                         }
-                    } else {
+                    } else if (!isVerifying) {
                         auditService.logChange(contractId, fieldCode, null, newVal, "MANUAL", "admin");
                         ContractExtendData extendData = new ContractExtendData();
                         extendData.setContractId(contractId);
                         extendData.setFieldId(field.getFieldId());
                         extendData.setFieldValue(newVal);
                         extendData.setFillType("MANUAL");
+                        extendData.setVerificationStatus("VERIFIED");
                         extendDataRepository.save(extendData);
                     }
                 });
@@ -108,6 +116,17 @@ public class ContractService {
         dto.setCreateUser(base.getCreateUser());
         dto.setUpdateTime(base.getUpdateTime());
         dto.setUpdateUser(base.getUpdateUser());
+
+        List<ContractExtendData> dataList = extendDataRepository.findByContractId(base.getContractId());
+        Map<String, Object> extendedFields = new HashMap<>();
+        for (ContractExtendData data : dataList) {
+            extendFieldRepository.findById(data.getFieldId()).ifPresent(field -> {
+                extendedFields.put(field.getFieldCode(), data.getFieldValue());
+                extendedFields.put(field.getFieldCode() + "_source", data.getFillType());
+                extendedFields.put(field.getFieldCode() + "_verified", "VERIFIED".equals(data.getVerificationStatus()));
+            });
+        }
+        dto.setExtendedFields(extendedFields);
 
         return dto;
     }

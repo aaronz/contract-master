@@ -35,5 +35,12 @@ public class AuditLogInterceptor {
 
     private void logAction(Object entity, String action) {
         if (entity instanceof AuditLog) return;
+        if (auditLogRepository == null) return;
+
+        AuditLog log = new AuditLog();
+        log.setModifyType(action);
+        log.setModifyUser(com.contract.master.security.TenantContext.getCurrentTenant());
+        
+        auditLogRepository.save(log);
     }
 }

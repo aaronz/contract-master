@@ -39,6 +39,9 @@ public class ContractBase extends BaseTenantEntity {
     @Column(name = "crm_source", length = 32)
     private String crmSource;
 
+    @Column(name = "group_id", length = 64)
+    private String groupId;
+
     @Column(name = "contract_type", length = 32)
     private String contractType;
 
@@ -146,6 +149,8 @@ public class ContractBase extends BaseTenantEntity {
     public void setCrmId(String crmId) { this.crmId = crmId; }
     public String getCrmSource() { return crmSource; }
     public void setCrmSource(String crmSource) { this.crmSource = crmSource; }
+    public String getGroupId() { return groupId; }
+    public void setGroupId(String groupId) { this.groupId = groupId; }
     public String getContractType() { return contractType; }
     public void setContractType(String contractType) { this.contractType = contractType; }
     public String getContractName() { return contractName; }
@@ -196,6 +201,7 @@ public class ContractBase extends BaseTenantEntity {
     public Integer getChangeCount() { return changeCount; }
     public LocalDateTime getLastChangeTime() { return lastChangeTime; }
     public String getRemark() { return remark; }
+    public void setRemark(String remark) { this.remark = remark; }
     public Boolean getArchiveFlag() { return archiveFlag; }
     public LocalDateTime getArchiveTime() { return archiveTime; }
 }

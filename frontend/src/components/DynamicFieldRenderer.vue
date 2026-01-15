@@ -1,7 +1,17 @@
 <template>
   <div class="dynamic-fields">
     <div v-for="field in fields" :key="field.id" class="field-item">
-      <label>{{ field.fieldAlias || field.fieldCode }}</label>
+      <div class="field-header">
+        <label>{{ field.fieldAlias || field.fieldCode }}</label>
+        <el-tag 
+          v-if="data[field.fieldCode + '_source']" 
+          :type="data[field.fieldCode + '_source'] === 'AI' ? 'warning' : 'info'"
+          size="small"
+          effect="plain"
+        >
+          {{ data[field.fieldCode + '_source'] }}
+        </el-tag>
+      </div>
       <el-input v-model="data[field.fieldCode]" v-if="field.isVisible" />
     </div>
   </div>
@@ -25,5 +35,6 @@ onMounted(async () => {
 
 <style scoped>
 .field-item { margin-bottom: 12px; }
-label { display: block; font-size: 12px; color: #666; margin-bottom: 4px; }
+.field-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+label { display: block; font-size: 12px; color: #666; }
 </style>
