@@ -54,4 +54,8 @@ public class ContractExtendField extends BaseTenantEntity {
     public void setFieldId(String fieldId) { this.fieldId = fieldId; }
     public String getFieldCode() { return fieldCode; }
     public void setFieldCode(String fieldCode) { this.fieldCode = fieldCode; }
+    public String getFieldName() { return fieldName; }
+    public void setFieldName(String fieldName) { this.fieldName = fieldName; }
+    public String getFieldType() { return fieldType; }
+    public void setFieldType(String fieldType) { this.fieldType = fieldType; }
 }

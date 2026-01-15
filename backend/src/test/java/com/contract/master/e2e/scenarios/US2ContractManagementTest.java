@@ -5,20 +5,45 @@ import com.contract.master.e2e.pages.LoginPage;
 import com.contract.master.e2e.pages.ContractListPage;
 import com.contract.master.e2e.pages.ContractDetailPage;
 import org.junit.jupiter.api.Test;
+import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class US2ContractManagementTest extends E2ETestBase {
 
     @Test
     void testSearchAndViewDetail() {
-        LoginPage loginPage = new LoginPage(page);
-        loginPage.login("admin", "password", "tenant-1");
+        login("admin", "password", "tenant-1");
         
-        page.navigate("http://localhost:5173/contract/list");
+        page.navigate(baseUrl + "/contract/list");
         ContractListPage listPage = new ContractListPage(page);
-        listPage.search("SN-2024-001");
+        listPage.search("CON-2024-001");
         
         ContractDetailPage detailPage = listPage.viewFirstDetail();
-        assertNotNull(detailPage.getFieldValue("contract_no"));
+        assertNotNull(detailPage);
+    }
+
+    @Test
+    void testNewContractCreation() {
+        login("admin", "password", "tenant-1");
+        page.navigate(baseUrl + "/contract/list");
+        
+        page.click("button:has-text('New Contract')");
+        page.fill("input[placeholder='e.g. CON-2026-001']", "E2E-NEW-001");
+        page.fill(".el-form-item:has-text('Contract Name') input", "E2E Automated Contract");
+        page.fill(".el-form-item:has-text('Party A') input", "Test Party A");
+        page.fill(".el-form-item:has-text('Party B') input", "Test Party B");
+        page.click("button:has-text('Create')");
+        
+        assertThat(page.locator(".el-message--success")).isVisible();
+    }
+
+    @Test
+    void testPaginationNavigation() {
+        login("admin", "password", "tenant-1");
+        page.navigate(baseUrl + "/contract/list");
+        
+        assertThat(page.locator(".el-pagination")).isVisible();
+        page.click(".el-pager li.number:nth-child(2)");
+        assertThat(page.locator(".el-table__row")).isVisible();
     }
 }

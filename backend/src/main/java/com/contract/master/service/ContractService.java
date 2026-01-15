@@ -5,11 +5,15 @@ import com.contract.master.dto.ContractDTO;
 import com.contract.master.domain.ContractBase;
 import com.contract.master.domain.ContractBaseRepository;
 import com.contract.master.domain.*;
+import com.contract.master.security.TenantContext;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -40,6 +44,15 @@ public class ContractService {
                 .collect(Collectors.toList());
     }
 
+    public Page<ContractDTO> searchContracts(Pageable pageable) {
+        String tenantId = TenantContext.getCurrentTenant();
+        Page<ContractBase> basePage = contractBaseRepository.findByTenantId(tenantId, pageable);
+        List<ContractDTO> dtoList = basePage.getContent().stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+        return new org.springframework.data.domain.PageImpl<>(dtoList, pageable, basePage.getTotalElements());
+    }
+
     public ContractDTO getContractById(String id) {
         return contractBaseRepository.findById(id)
                 .map(this::convertToDTO)
@@ -54,6 +67,25 @@ public class ContractService {
             existing.setAmount(updated.getAmount());
             contractBaseRepository.save(existing);
         });
+    }
+
+    @Transactional
+    public ContractDTO createContract(ContractDTO dto) {
+        ContractBase base = new ContractBase();
+        base.setContractId(UUID.randomUUID().toString());
+        base.setContractNo(dto.getContractNo());
+        base.setContractName(dto.getContractName());
+        base.setPartyAName(dto.getPartyAName());
+        base.setPartyBName(dto.getPartyBName());
+        base.setAmount(dto.getContractAmount());
+        base.setStatus(dto.getContractStatus());
+        base.setTenantId(TenantContext.getCurrentTenant());
+        base.setCreateTime(LocalDateTime.now());
+        base.setCreateUser("admin");
+        
+        ContractBase saved = contractBaseRepository.save(base);
+        auditService.logChange(saved.getContractId(), "contract_base", null, "CREATED", "MANUAL", "admin");
+        return convertToDTO(saved);
     }
 
     @Transactional

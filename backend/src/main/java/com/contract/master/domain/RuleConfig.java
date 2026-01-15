@@ -51,7 +51,13 @@ public class RuleConfig extends BaseTenantEntity {
     private LocalDateTime createTime;
 
     public String getRuleCondition() { return ruleCondition; }
+    public void setRuleCondition(String ruleCondition) { this.ruleCondition = ruleCondition; }
     public String getRuleName() { return ruleName; }
+    public void setRuleName(String ruleName) { this.ruleName = ruleName; }
     public String getRuleLevel() { return ruleLevel; }
+    public void setRuleLevel(String ruleLevel) { this.ruleLevel = ruleLevel; }
     public String getExecutionActions() { return executionActions; }
+    public void setExecutionActions(String executionActions) { this.executionActions = executionActions; }
+    public Boolean getIsEnabled() { return isEnabled; }
+    public void setIsEnabled(Boolean isEnabled) { this.isEnabled = isEnabled; }
 }

@@ -1,0 +1,15 @@
+package com.contract.master.rules;
+
+import com.contract.master.domain.ContractBase;
+import java.util.List;
+import java.math.BigDecimal;
+
+global java.util.List violations;
+
+rule "Large Contract Review"
+when
+    $c : ContractBase(amount != null)
+    eval($c.getAmount().compareTo(new BigDecimal("1000000")) > 0)
+then
+    violations.add("CRITICAL: Contract amount " + $c.getAmount() + " exceeds limit, requires manual legal review");
+end

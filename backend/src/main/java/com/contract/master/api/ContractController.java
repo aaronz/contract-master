@@ -4,6 +4,8 @@ import com.contract.master.domain.AuditLog;
 import com.contract.master.dto.ContractDTO;
 import com.contract.master.service.ContractService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,8 +22,13 @@ public class ContractController {
     private com.contract.master.service.AuditService auditService;
 
     @GetMapping
-    public GlobalExceptionHandler.ApiResponse<List<ContractDTO>> list() {
-        return GlobalExceptionHandler.ApiResponse.success(contractService.getAllContracts());
+    public GlobalExceptionHandler.ApiResponse<Page<ContractDTO>> list(Pageable pageable) {
+        return GlobalExceptionHandler.ApiResponse.success(contractService.searchContracts(pageable));
+    }
+
+    @PostMapping
+    public GlobalExceptionHandler.ApiResponse<ContractDTO> create(@RequestBody ContractDTO dto) {
+        return GlobalExceptionHandler.ApiResponse.success(contractService.createContract(dto));
     }
 
     @GetMapping("/{id}")

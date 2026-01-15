@@ -21,10 +21,17 @@ public class DownstreamSystemController {
     }
 
     @PostMapping
-    public GlobalExceptionHandler.ApiResponse<DownstreamSystem> save(@RequestBody DownstreamSystem system) {
+    public GlobalExceptionHandler.ApiResponse<DownstreamSystem> create(@RequestBody DownstreamSystem system) {
         if (system.getSystemId() == null) {
             system.setSystemId(java.util.UUID.randomUUID().toString());
         }
+        system.setTenantId(TenantContext.getCurrentTenant());
+        return GlobalExceptionHandler.ApiResponse.success(repository.save(system));
+    }
+
+    @PutMapping("/{id}")
+    public GlobalExceptionHandler.ApiResponse<DownstreamSystem> update(@PathVariable String id, @RequestBody DownstreamSystem system) {
+        system.setSystemId(id);
         system.setTenantId(TenantContext.getCurrentTenant());
         return GlobalExceptionHandler.ApiResponse.success(repository.save(system));
     }

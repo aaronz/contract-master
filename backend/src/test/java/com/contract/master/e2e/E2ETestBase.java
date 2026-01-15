@@ -3,20 +3,26 @@ package com.contract.master.e2e;
 import com.microsoft.playwright.*;
 import org.junit.jupiter.api.*;
 
+import com.microsoft.playwright.options.RequestOptions;
+
 public class E2ETestBase {
     protected static Playwright playwright;
     protected static Browser browser;
     protected BrowserContext context;
     protected Page page;
+    protected String baseUrl = System.getProperty("test.baseUrl", "http://localhost:5173");
 
     @BeforeAll
     static void launchBrowser() {
         playwright = Playwright.create();
-        browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(true));
+        browser = playwright.firefox().launch(new BrowserType.LaunchOptions().setHeadless(true));
     }
 
     @AfterAll
     static void closeBrowser() {
+        if (browser != null) {
+            browser.close();
+        }
         if (playwright != null) {
             playwright.close();
         }
@@ -38,7 +44,22 @@ public class E2ETestBase {
         }
     }
 
-    protected BrowserContext createTenantContext(String tenantId) {
-        return browser.newContext();
+    protected void login(String username, String password, String tenantId) {
+        page.navigate(baseUrl + "/login");
+        page.waitForSelector("input[name='username']");
+        page.fill("input[name='username']", username);
+        page.fill("input[name='password']", password);
+        page.fill("input[name='tenantId']", tenantId);
+        page.click("button.login-button");
+        page.waitForURL(url -> !url.contains("/login"), new Page.WaitForURLOptions().setTimeout(10000));
+    }
+
+    protected String getToken() {
+        return (String) page.evaluate("() => localStorage.getItem('token')");
+    }
+
+    protected APIResponse getAuthorized(String url) {
+        return page.context().request().get(url, RequestOptions.create()
+            .setHeader("Authorization", "Bearer " + getToken()));
     }
 }

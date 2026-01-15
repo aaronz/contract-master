@@ -1,6 +1,7 @@
 package com.contract.master.e2e.scenarios;
 
 import com.contract.master.e2e.E2ETestBase;
+import com.microsoft.playwright.Page;
 import org.junit.jupiter.api.Test;
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 
@@ -8,48 +9,68 @@ public class IntegrationHubTest extends E2ETestBase {
 
     @Test
     void testFieldMappingManagement() {
-        page.navigate("http://localhost:5173/integrations/mapping");
+        login("admin", "password", "tenant-1");
+        page.navigate(baseUrl + "/integrations/mapping");
         assertThat(page.locator("h1")).containsText("Field Mapping");
         page.click("button:has-text('Add Mapping')");
-        page.selectOption("select", "amount");
+        
+        page.click(".el-select");
+        page.click("li.el-select-dropdown__item:has-text('Contract Amount')");
+        
         page.fill("input[placeholder='e.g. amount_total']", "contract_value");
-        page.click("button:has-text('Save')");
+        page.click(".el-dialog__footer button:has-text('Save')", new Page.ClickOptions().setForce(true));
         assertThat(page.locator("table")).containsText("contract_value");
     }
 
     @Test
     void testWebHookManagement() {
-        page.navigate("http://localhost:5173/integrations/webhooks");
+        login("admin", "password", "tenant-1");
+        page.navigate(baseUrl + "/integrations/webhooks");
         assertThat(page.locator("h1")).containsText("Outbound WebHooks");
         page.click("button:has-text('Create WebHook')");
         page.fill("input[placeholder='e.g. ERP Finance Sync']", "E2E Test WebHook");
         page.fill("input[placeholder='https://api.yourcompany.com/webhooks/contracts']", "https://example.com/webhook");
-        page.click("button:has-text('Save')");
+        page.click(".el-dialog__footer button:has-text('Save')", new Page.ClickOptions().setForce(true));
         assertThat(page.locator("table")).containsText("E2E Test WebHook");
     }
 
     @Test
     void testSecretsManagement() {
-        page.navigate("http://localhost:5173/integrations/secrets");
+        login("admin", "password", "tenant-1");
+        page.navigate(baseUrl + "/integrations/secrets");
         assertThat(page.locator("h1")).containsText("Secrets & Keys");
         page.click("button:has-text('Generate New Key')");
         page.fill("input[placeholder='e.g. ERP-Production-Sync']", "E2E API Key");
-        page.click("button:has-text('Generate')");
+        page.click(".el-dialog__footer button:has-text('Generate')", new Page.ClickOptions().setForce(true));
         assertThat(page.locator(".bg-gray-900")).containsText("AK_");
-        page.click("button:has-text('Done')");
+        page.click(".el-dialog__footer button:has-text('Done')", new Page.ClickOptions().setForce(true));
+    }
+
+    @Test
+    void testConnectorConfiguration() {
+        login("admin", "password", "tenant-1");
+        page.navigate(baseUrl + "/integrations");
+        
+        page.click("button:has-text('Configure')");
+        assertThat(page.locator(".el-dialog")).isVisible();
+        page.fill("input[placeholder*='System Name']", "Updated Salesforce");
+        page.click("button:has-text('Save')");
+        assertThat(page.locator(".el-message--success")).isVisible();
     }
 
     @Test
     void testIntegrationHealthDashboard() {
-        page.navigate("http://localhost:5173/integrations");
+        login("admin", "password", "tenant-1");
+        page.navigate(baseUrl + "/integrations");
         assertThat(page.locator(".glass-card")).containsText("Integration Hub");
         assertThat(page.locator(".health-metrics")).isVisible();
     }
 
     @Test
     void testRetryFailedSync() {
-        page.navigate("http://localhost:5173/integrations");
-        page.click("button.retry-btn:nth-child(1)");
+        login("admin", "password", "tenant-1");
+        page.navigate(baseUrl + "/integrations");
+        page.click("button.retry-btn:nth-child(1)", new Page.ClickOptions().setForce(true));
         assertThat(page.locator(".el-message--success")).isVisible();
     }
 }

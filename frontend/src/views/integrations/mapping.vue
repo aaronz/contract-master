@@ -30,10 +30,18 @@
     <el-dialog v-model="dialogVisible" title="Field Mapping Configuration" width="500px">
       <el-form :model="form" label-position="top">
         <el-form-item label="Internal Field (Contract Element)">
-          <el-select v-model="form.internalField" style="width: 100%">
-            <el-option label="Contract Name" value="contractName" />
-            <el-option label="Contract Amount" value="amount" />
-            <el-option label="Effective Date" value="effectiveDate" />
+          <el-select v-model="form.internalField" style="width: 100%" placeholder="Select contract field">
+            <el-option 
+              v-for="field in contractFields" 
+              :key="field.fieldCode" 
+              :label="field.fieldName" 
+              :value="field.fieldCode"
+            >
+              <span style="float: left">{{ field.fieldName }}</span>
+              <span style="float: right; color: var(--el-text-color-secondary); font-size: 13px">
+                {{ field.source }}
+              </span>
+            </el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="Downstream Field Name">
@@ -74,6 +82,28 @@ const form = ref({
   externalField: '',
   transformation: 'NONE',
   enabled: true
+})
+
+const contractFields = ref([])
+
+const fetchMetadata = async () => {
+  try {
+    const response = await fetch('/api/metadata/contract-fields', {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    if (response.ok) {
+      const result = await response.json()
+      contractFields.value = result.data
+    }
+  } catch (error) {
+    console.error('Failed to fetch metadata', error)
+  }
+}
+
+onMounted(() => {
+  fetchMetadata()
 })
 
 const handleAdd = () => {

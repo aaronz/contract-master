@@ -24,10 +24,26 @@
         
         <el-divider direction="vertical" />
 
-        <el-button @click="handleAIAnalysis" class="glass-btn">
+        <el-button @click="handleAIAnalysis" class="glass-btn" :loading="analyzing">
           <el-icon><Cpu /></el-icon> AI Analysis
         </el-button>
-        <el-button type="primary" @click="saveContract" v-if="isEditMode">
+        
+        <el-button type="warning" @click="confirmAiSuggestions" v-if="form.contractStatus === 'AI_EXTRACTED'">
+          Confirm Suggestions
+        </el-button>
+        
+        <el-button type="success" @click="publishContract" v-if="form.contractStatus === 'VERIFIED'">
+          Publish to Downstream
+        </el-button>
+        
+        <el-progress 
+          v-if="analyzing" 
+          :percentage="progress" 
+          :stroke-width="2" 
+          :show-text="false" 
+          class="ai-progress"
+        />
+        <el-button type="primary" @click="saveContract" v-if="isEditMode" class="save-btn">
           <el-icon><Check /></el-icon> Save Changes
         </el-button>
         <el-button circle @click="toggleSidePanel" class="glass-btn">
@@ -144,6 +160,22 @@
                    <el-input v-if="isEditMode" v-model="form.thirdPartyInfo" type="textarea" />
                    <div v-else class="display-val">{{ form.thirdPartyInfo }}</div>
                  </div>
+              </div>
+
+              <!-- Custom Fields -->
+              <div class="form-section" v-if="customFields.length > 0">
+                <h3 class="section-header">Additional Information</h3>
+                <div class="form-grid">
+                  <div class="field-group" v-for="field in customFields" :key="field.id">
+                    <label>{{ field.fieldName }}</label>
+                    <el-input 
+                      v-if="isEditMode" 
+                      v-model="form.customData[field.fieldCode]" 
+                      :name="'custom_field_' + field.fieldCode"
+                    />
+                    <div v-else class="display-val">{{ form.customData[field.fieldCode] }}</div>
+                  </div>
+                </div>
               </div>
             </div>
           </el-tab-pane>
@@ -407,6 +439,11 @@ const showSidePanel = ref(true)
 const panelTab = ref('comments')
 const newComment = ref('')
 const isEditMode = ref(false)
+const analyzing = ref(false)
+const progress = ref(0)
+const customFields = ref([
+  { id: 1, fieldName: 'Custom Field 1', fieldCode: '1', fieldType: 'TEXT' }
+])
 
 const form = reactive({
   contractNo: 'CON-2024-001',
@@ -452,7 +489,10 @@ const form = reactive({
   guarantorInfo: '',
   legalReviewFlag: true,
   legalReviewOpinion: 'Approved with standard clauses.',
-  contractStatus: 'Active'
+  contractStatus: 'Active',
+  customData: {
+    '1': 'AI Suggested Value'
+  }
 })
 
 const comments = ref([
@@ -471,11 +511,22 @@ const toggleSidePanel = () => {
 }
 
 const handleAIAnalysis = () => {
-  ElMessage.info('AI Analysis started...')
+  analyzing.value = true
+  progress.value = 0
+  const interval = setInterval(() => {
+    progress.value += 10
+    if (progress.value >= 100) {
+      clearInterval(interval)
+      analyzing.value = false
+      ElMessage.success('AI Analysis completed')
+      form.contractStatus = 'AI_EXTRACTED'
+    }
+  }, 200)
 }
 
 const saveContract = () => {
   isEditMode.value = false
+  form.contractStatus = 'Draft' // Draft is 'info' in getStatusType
   ElMessage.success('Contract saved successfully')
 }
 
@@ -496,6 +547,15 @@ const getStatusType = (status) => {
 
 const formatCurrency = (val, currency) => {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(val)
+}
+const confirmAiSuggestions = () => {
+  form.contractStatus = 'VERIFIED'
+  ElMessage.success('Suggestions confirmed')
+}
+
+const publishContract = () => {
+  form.contractStatus = 'PUBLISHED'
+  ElMessage.success('Publication initiated')
 }
 </script>
 
@@ -548,6 +608,14 @@ const formatCurrency = (val, currency) => {
   display: flex;
   align-items: center;
   gap: 16px;
+  position: relative;
+}
+
+.ai-progress {
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  right: 0;
 }
 
 .mode-toggle {

@@ -10,11 +10,18 @@
 
     <div class="glass-card table-wrapper">
       <el-table :data="maskingRules" style="width: 100%">
-        <el-table-column prop="field" label="Sensitive Field" width="200">
+        <el-table-column prop="field" label="Sensitive Field" width="250">
           <template #default="{ row }">
             <div class="flex items-center gap-2">
               <el-icon class="text-secondary"><Lock /></el-icon>
-              <span class="font-medium">{{ row.field }}</span>
+              <el-select v-model="row.fieldCode" size="small" placeholder="Select field" @change="handleFieldChange(row)">
+                <el-option 
+                  v-for="field in contractFields" 
+                  :key="field.fieldCode" 
+                  :label="field.fieldName" 
+                  :value="field.fieldCode"
+                />
+              </el-select>
             </div>
           </template>
         </el-table-column>
@@ -77,11 +84,39 @@ import { ref } from 'vue'
 import { Lock, Right, Delete, Plus } from '@element-plus/icons-vue'
 
 const maskingRules = ref([
-  { field: 'Tax ID', strategy: 'last4', pattern: '******$1', sample: '91310000X8761234', exemptions: ['admin', 'finance'] },
-  { field: 'Contact Phone', strategy: 'last4', pattern: '*******$1', sample: '13812345678', exemptions: ['sales'] },
-  { field: 'Email Address', strategy: 'email', pattern: 's****@$2', sample: 'john.doe@example.com', exemptions: ['admin'] },
-  { field: 'Bank Account', strategy: 'full', pattern: '****************', sample: '6222023000123456', exemptions: ['finance'] },
+  { fieldCode: 'taxpayerId', strategy: 'last4', pattern: '******$1', sample: '91310000X8761234', exemptions: ['admin', 'finance'] },
+  { fieldCode: 'contactPhone', strategy: 'last4', pattern: '*******$1', sample: '13812345678', exemptions: ['sales'] },
 ])
+
+const contractFields = ref([])
+
+const fetchMetadata = async () => {
+  try {
+    const response = await fetch('/api/metadata/contract-fields', {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    if (response.ok) {
+      const result = await response.json()
+      contractFields.value = result.data
+    }
+  } catch (error) {
+    console.error('Failed to fetch metadata', error)
+  }
+}
+
+import { onMounted } from 'vue'
+onMounted(() => {
+  fetchMetadata()
+})
+
+const handleFieldChange = (row) => {
+  const field = contractFields.value.find(f => f.fieldCode === row.fieldCode)
+  if (field) {
+    row.field = field.fieldName
+  }
+}
 
 const getPattern = (strategy) => {
   const map = {

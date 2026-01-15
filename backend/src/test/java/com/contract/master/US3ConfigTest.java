@@ -8,9 +8,10 @@ public class US3ConfigTest extends E2ETestBase {
 
     @Test
     void testCustomFieldAndRuleFlow() {
-        page.navigate("http://localhost:5173/settings/fields");
+        login("admin", "password");
+        page.navigate(baseUrl + "/settings/fields");
         page.click("button:has-text('New Field')");
-        page.navigate("http://localhost:5173/settings/rules");
+        page.navigate(baseUrl + "/settings/rules");
         assertThat(page.locator("h1")).containsText("Fields");
     }
 }

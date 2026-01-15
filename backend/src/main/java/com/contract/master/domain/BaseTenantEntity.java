@@ -48,7 +48,11 @@ public abstract class BaseTenantEntity implements TenantAware {
     public void setTenantId(String tenantId) { this.tenantId = tenantId; }
 
     public LocalDateTime getCreateTime() { return createTime; }
+    public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
     public String getCreateUser() { return createUser; }
+    public void setCreateUser(String createUser) { this.createUser = createUser; }
     public LocalDateTime getUpdateTime() { return updateTime; }
+    public void setUpdateTime(LocalDateTime updateTime) { this.updateTime = updateTime; }
     public String getUpdateUser() { return updateUser; }
+    public void setUpdateUser(String updateUser) { this.updateUser = updateUser; }
 }

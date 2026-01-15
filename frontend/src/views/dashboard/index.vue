@@ -8,7 +8,7 @@
       </div>
       <div class="header-actions">
         <el-button>Last 30 Days <el-icon class="el-icon--right"><ArrowDown /></el-icon></el-button>
-        <el-button type="primary" :icon="Download">Export Report</el-button>
+        <el-button type="primary" :icon="Download" @click="handleExport">Export Report</el-button>
       </div>
     </div>
 
@@ -20,7 +20,7 @@
         </div>
         <div class="stat-content">
           <span class="stat-label">Total Contracts</span>
-          <div class="stat-value">1,248</div>
+          <div class="stat-value">{{ stats.totalContracts }}</div>
           <div class="stat-trend positive">
             <el-icon><Top /></el-icon> 12% from last month
           </div>
@@ -33,7 +33,7 @@
         </div>
         <div class="stat-content">
           <span class="stat-label">Pending Approval</span>
-          <div class="stat-value">34</div>
+          <div class="stat-value">{{ stats.pendingApprovals }}</div>
           <div class="stat-trend negative">
             <el-icon><Top /></el-icon> 4 new today
           </div>
@@ -46,7 +46,7 @@
         </div>
         <div class="stat-content">
           <span class="stat-label">Active Value</span>
-          <div class="stat-value">$142.5M</div>
+          <div class="stat-value">${{ stats.activeValue }}</div>
           <div class="stat-trend positive">
             <el-icon><Top /></el-icon> 8.5% YoY
           </div>
@@ -59,7 +59,7 @@
         </div>
         <div class="stat-content">
           <span class="stat-label">Risk Alerts</span>
-          <div class="stat-value">12</div>
+          <div class="stat-value">{{ stats.riskAlerts }}</div>
           <div class="stat-trend negative">
             <el-icon><Top /></el-icon> 2 critical
           </div>
@@ -169,6 +169,9 @@ const myTasks = ref([
 const initCharts = () => {
   // Trend Chart
   trendChart = echarts.init(trendChartRef.value)
+  trendChart.on('click', (params) => {
+    router.push({ path: '/contract/list', query: { date: params.name } })
+  })
   trendChart.setOption({
     tooltip: { trigger: 'axis' },
     grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
@@ -285,8 +288,52 @@ const initCharts = () => {
   })
 }
 
+const stats = ref({
+  totalContracts: 0,
+  pendingApprovals: 0,
+  activeValue: 0,
+  riskAlerts: 0
+})
+
+const fetchDashboardStats = async () => {
+  try {
+    const response = await fetch('/api/dashboard/stats', {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    if (response.ok) {
+      const result = await response.json()
+      stats.value = result.data
+      updateCharts(result.data)
+    }
+  } catch (error) {
+    console.error('Failed to fetch dashboard stats', error)
+  }
+}
+
+const updateCharts = (data) => {
+  if (trendChart && data.volumeTrend) {
+    trendChart.setOption({
+      xAxis: { data: data.volumeTrend.map(d => d.date) },
+      series: [{ data: data.volumeTrend.map(d => d.count) }]
+    })
+  }
+  if (radarChart && data.riskRadar) {
+    radarChart.setOption({
+      series: [{
+        data: [{
+          value: data.riskRadar.map(r => r.value),
+          name: 'Current Portfolio'
+        }]
+      }]
+    })
+  }
+}
+
 onMounted(() => {
   initCharts()
+  fetchDashboardStats()
   window.addEventListener('resize', handleResize)
 })
 
@@ -301,6 +348,25 @@ const handleResize = () => {
   trendChart && trendChart.resize()
   radarChart && radarChart.resize()
   gaugeChart && gaugeChart.resize()
+}
+const handleExport = async () => {
+  try {
+    const response = await fetch('/api/export/contracts', {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    const blob = await response.blob()
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'contracts.csv'
+    document.body.appendChild(a)
+    a.click()
+    window.URL.revokeObjectURL(url)
+  } catch (error) {
+    console.error('Export failed', error)
+  }
 }
 </script>
 

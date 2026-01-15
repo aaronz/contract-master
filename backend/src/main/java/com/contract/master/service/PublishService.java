@@ -23,7 +23,8 @@ public class PublishService {
         DownstreamSystem system = downstreamSystemRepository.findByAccessKeyAndIsEnabledTrue(accessKey)
                 .orElseThrow(() -> new RuntimeException("Invalid or disabled access key"));
 
-        List<ContractDTO> allData = contractService.getAllContracts();
-        return allData;
+        return contractService.getAllContracts().stream()
+                .filter(c -> "PUBLISHED".equals(c.getContractStatus()))
+                .collect(Collectors.toList());
     }
 }

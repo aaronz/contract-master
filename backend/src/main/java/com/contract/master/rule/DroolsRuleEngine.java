@@ -1,5 +1,8 @@
 package com.contract.master.rule;
 
+import org.kie.api.runtime.KieContainer;
+import org.kie.api.runtime.KieSession;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,13 +10,18 @@ import java.util.List;
 @Service
 public class DroolsRuleEngine {
 
+    @Autowired
+    private KieContainer kieContainer;
+
     public List<String> validate(Object fact, String tenantId) {
         List<String> violations = new ArrayList<>();
-        if (fact instanceof com.contract.master.domain.ContractBase) {
-            com.contract.master.domain.ContractBase contract = (com.contract.master.domain.ContractBase) fact;
-            if (contract.getAmount() != null && contract.getAmount().doubleValue() > 1000000) {
-                violations.add("CRITICAL: Large contract requires manual legal review");
-            }
+        KieSession kieSession = kieContainer.newKieSession();
+        try {
+            kieSession.setGlobal("violations", violations);
+            kieSession.insert(fact);
+            kieSession.fireAllRules();
+        } finally {
+            kieSession.dispose();
         }
         return violations;
     }

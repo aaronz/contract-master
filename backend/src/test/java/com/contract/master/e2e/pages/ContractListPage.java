@@ -10,11 +10,11 @@ public class ContractListPage {
     }
 
     public void search(String contractNo) {
-        page.fill("input.contract-search", contractNo);
+        page.fill(".search-input input", contractNo);
     }
 
     public ContractDetailPage viewFirstDetail() {
-        page.click("button.action-view:nth-child(1)");
+        page.click(".el-table__row:nth-child(1) button");
         return new ContractDetailPage(page);
     }
 }

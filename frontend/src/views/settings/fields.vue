@@ -76,16 +76,34 @@ import { Check, Rank } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import Sortable from 'sortablejs'
 
-const configs = ref([
-  { fieldCode: 'contract_no', fieldAlias: 'Contract Number', apiReturn: true, frontendDisplay: true, color: '#1E293B', styles: ['bold'] },
-  { fieldCode: 'contract_name', fieldAlias: 'Contract Title', apiReturn: true, frontendDisplay: true, color: '#3B82F6', styles: ['bold'] },
-  { fieldCode: 'contract_amount', fieldAlias: 'Total Value', apiReturn: true, frontendDisplay: true, color: '#10B981', styles: [] },
-  { fieldCode: 'payment_term', fieldAlias: 'Payment Terms', apiReturn: true, frontendDisplay: true, color: '#64748B', styles: [] },
-  { fieldCode: 'renewal_notice', fieldAlias: 'Renewal Notice Days', apiReturn: true, frontendDisplay: false, color: '', styles: [] },
-  { fieldCode: 'risk_level', fieldAlias: 'Risk Level', apiReturn: false, frontendDisplay: true, color: '#EF4444', styles: ['bold'] },
-])
+const configs = ref([])
+
+const fetchFields = async () => {
+  try {
+    const response = await fetch('/api/metadata/contract-fields', {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    if (response.ok) {
+      const result = await response.json()
+      // Map metadata to config structure
+      configs.value = result.data.map(f => ({
+        fieldCode: f.fieldCode,
+        fieldAlias: f.fieldName,
+        apiReturn: true,
+        frontendDisplay: true,
+        color: '#1E293B',
+        styles: []
+      }))
+    }
+  } catch (error) {
+    console.error('Failed to fetch metadata', error)
+  }
+}
 
 onMounted(() => {
+  fetchFields()
   const tableBody = document.querySelector('.draggable-table tbody')
   Sortable.create(tableBody, {
     handle: '.drag-handle',

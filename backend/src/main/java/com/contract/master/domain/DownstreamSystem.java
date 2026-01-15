@@ -36,4 +36,8 @@ public class DownstreamSystem extends BaseTenantEntity {
     public String getSystemId() { return systemId; }
     public String getAccessKey() { return accessKey; }
     public void setAccessKey(String accessKey) { this.accessKey = accessKey; }
+    public Boolean getIsEnabled() { return isEnabled; }
+    public void setIsEnabled(Boolean isEnabled) { this.isEnabled = isEnabled; }
+    public String getSystemName() { return systemName; }
+    public void setSystemName(String systemName) { this.systemName = systemName; }
 }

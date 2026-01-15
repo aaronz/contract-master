@@ -10,9 +10,38 @@
         <el-button @click="showFilterDrawer = true">
           <el-icon><Filter /></el-icon> Filters
         </el-button>
-        <el-button type="primary" icon="Plus">New Contract</el-button>
+        <el-button type="primary" icon="Plus" @click="showNewContractDialog = true">New Contract</el-button>
       </div>
     </div>
+
+    <!-- New Contract Dialog -->
+    <el-dialog v-model="showNewContractDialog" title="Create New Contract" width="600px">
+      <el-form :model="newContractForm" :rules="rules" ref="newContractFormRef" label-position="top">
+        <div class="form-grid">
+          <el-form-item label="Contract No." prop="contractNo">
+            <el-input v-model="newContractForm.contractNo" placeholder="e.g. CON-2026-001" />
+          </el-form-item>
+          <el-form-item label="Contract Name" prop="contractName">
+            <el-input v-model="newContractForm.contractName" />
+          </el-form-item>
+        </div>
+        <div class="form-grid">
+          <el-form-item label="Party A" prop="partyAName">
+            <el-input v-model="newContractForm.partyAName" />
+          </el-form-item>
+          <el-form-item label="Party B" prop="partyBName">
+            <el-input v-model="newContractForm.partyBName" />
+          </el-form-item>
+        </div>
+        <el-form-item label="Amount" prop="amount">
+          <el-input-number v-model="newContractForm.amount" :precision="2" :step="1000" style="width: 100%" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="showNewContractDialog = false">Cancel</el-button>
+        <el-button type="primary" @click="handleCreateContract" :loading="creating">Create</el-button>
+      </template>
+    </el-dialog>
 
     <!-- Toolbar -->
     <div class="toolbar-container" :class="{ 'is-sticky': isSticky }">
@@ -116,8 +145,10 @@
         <el-pagination
           background
           layout="total, prev, pager, next"
-          :total="100"
-          :page-size="10"
+          :total="total"
+          :page-size="pageSize"
+          v-model:current-page="currentPage"
+          @current-change="handlePageChange"
         />
       </div>
     </el-card>
@@ -181,21 +212,84 @@ const searchQuery = ref('')
 const selectedRows = ref([])
 const tableRef = ref(null)
 
-const filterForm = ref({
-  dateRange: [],
-  type: '',
-  minAmount: '',
-  maxAmount: '',
-  status: []
+const showNewContractDialog = ref(false)
+const creating = ref(false)
+const newContractFormRef = ref(null)
+const total = ref(0)
+const currentPage = ref(1)
+const pageSize = ref(10)
+
+const newContractForm = ref({
+  contractNo: '',
+  contractName: '',
+  partyAName: '',
+  partyBName: '',
+  amount: 0
 })
 
-// Mock Data
-const contracts = ref([
-  { id: 1, contractNo: 'CON-2024-001', contractName: 'Enterprise License Agreement', partyAName: 'Acme Corp', partyBName: 'TechSolutions Inc', amount: 150000, status: 'Active', createTime: '2024-01-10' },
-  { id: 2, contractNo: 'CON-2024-002', contractName: 'NDA for Project X', partyAName: 'Globex', partyBName: 'TechSolutions Inc', amount: 0, status: 'Pending', createTime: '2024-01-12' },
-  { id: 3, contractNo: 'CON-2024-003', contractName: 'Service Level Agreement', partyAName: 'Soylent Corp', partyBName: 'TechSolutions Inc', amount: 50000, status: 'Draft', createTime: '2024-01-14' },
-  { id: 4, contractNo: 'CON-2024-004', contractName: 'Marketing Partnership', partyAName: 'Massive Dynamic', partyBName: 'TechSolutions Inc', amount: 750000, status: 'Active', createTime: '2024-01-08' },
-])
+const rules = {
+  contractNo: [{ required: true, message: 'Please input contract number', trigger: 'blur' }],
+  contractName: [{ required: true, message: 'Please input contract name', trigger: 'blur' }],
+  partyAName: [{ required: true, message: 'Please input Party A', trigger: 'blur' }],
+  partyBName: [{ required: true, message: 'Please input Party B', trigger: 'blur' }]
+}
+
+const fetchContracts = async () => {
+  try {
+    const response = await fetch(`/api/contracts?page=${currentPage.value - 1}&size=${pageSize.value}`, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    if (response.ok) {
+      const result = await response.json()
+      contracts.value = result.data.content
+      total.value = result.data.totalElements
+    }
+  } catch (error) {
+    console.error('Failed to fetch contracts', error)
+  }
+}
+
+const handleCreateContract = async () => {
+  if (!newContractFormRef.value) return
+  await newContractFormRef.value.validate(async (valid) => {
+    if (valid) {
+      creating.value = true
+      try {
+        const response = await fetch('/api/contracts', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          body: JSON.stringify({
+            ...newContractForm.value,
+            status: 'DRAFT'
+          })
+        })
+        if (response.ok) {
+          ElMessage.success('Contract created successfully')
+          showNewContractDialog.value = false
+          fetchContracts()
+        }
+      } catch (error) {
+        console.error('Failed to create contract', error)
+      } finally {
+        creating.value = false
+      }
+    }
+  })
+}
+
+const handlePageChange = (page) => {
+  currentPage.value = page
+  fetchContracts()
+}
+
+onMounted(() => {
+  fetchContracts()
+})
 
 const handleSelectionChange = (val) => {
   selectedRows.value = val

@@ -12,8 +12,7 @@ public class LoginPage {
     public DashboardPage login(String username, String password, String tenantId) {
         page.fill("input[name=\"username\"]", username);
         page.fill("input[name=\"password\"]", password);
-        page.fill("input[name=\"tenantId\"]", tenantId);
-        page.click("button.login-submit");
+        page.click("button.login-button");
         return new DashboardPage(page);
     }
 

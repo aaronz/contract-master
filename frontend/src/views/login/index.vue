@@ -27,14 +27,17 @@
         
         <el-form :model="loginForm" label-position="top" size="large">
           <el-form-item label="Email or Username">
-            <el-input v-model="loginForm.username" placeholder="admin@example.com">
+            <el-input v-model="loginForm.username" name="username" placeholder="admin@example.com">
               <template #prefix><el-icon><User /></el-icon></template>
             </el-input>
           </el-form-item>
           <el-form-item label="Password">
-            <el-input v-model="loginForm.password" type="password" placeholder="••••••••" show-password>
+            <el-input v-model="loginForm.password" name="password" type="password" placeholder="••••••••" show-password>
               <template #prefix><el-icon><Lock /></el-icon></template>
             </el-input>
+          </el-form-item>
+          <el-form-item label="Tenant ID">
+            <el-input v-model="loginForm.tenantId" name="tenantId" placeholder="tenant-1" />
           </el-form-item>
           
           <div class="form-actions">
@@ -76,15 +79,31 @@ const loading = ref(false)
 const rememberMe = ref(false)
 const loginForm = ref({
   username: '',
-  password: ''
+  password: '',
+  tenantId: 'tenant-1'
 })
 
-const handleLogin = () => {
+const handleLogin = async () => {
   loading.value = true
-  setTimeout(() => {
+  try {
+    const response = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(loginForm.value)
+    })
+    if (response.ok) {
+      const data = await response.json()
+      localStorage.setItem('token', data.token)
+      localStorage.setItem('tenantId', loginForm.value.tenantId)
+      router.push('/')
+    } else {
+      ElMessage.error('Invalid credentials')
+    }
+  } catch (error) {
+    ElMessage.error('Network error')
+  } finally {
     loading.value = false
-    router.push('/')
-  }, 800)
+  }
 }
 </script>
 

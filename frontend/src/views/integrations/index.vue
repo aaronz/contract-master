@@ -5,8 +5,34 @@
         <h1 class="page-title">Integrations Hub</h1>
         <p class="page-subtitle">Manage your CRM connections and data synchronization pipelines.</p>
       </div>
-      <el-button type="primary" size="large" icon="Plus">New Connection</el-button>
+      <el-button type="primary" size="large" icon="Plus" @click="handleAddConnector">New Connection</el-button>
     </div>
+
+    <!-- Connector Dialog -->
+    <el-dialog v-model="showConnectorDialog" :title="isEdit ? 'Configure Connector' : 'New Connection'" width="500px">
+      <el-form :model="connectorForm" label-position="top">
+        <el-form-item label="System Name">
+          <el-input v-model="connectorForm.systemName" placeholder="e.g. Salesforce Production" />
+        </el-form-item>
+        <el-form-item label="Endpoint URL">
+          <el-input v-model="connectorForm.endpointUrl" placeholder="https://api.salesforce.com/..." />
+        </el-form-item>
+        <el-form-item label="Auth Type">
+          <el-select v-model="connectorForm.authType" style="width: 100%">
+            <el-option label="OAuth2" value="OAUTH2" />
+            <el-option label="API Key" value="API_KEY" />
+            <el-option label="Basic Auth" value="BASIC" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="Access Key">
+          <el-input v-model="connectorForm.accessKey" placeholder="Enter access key or client ID" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="showConnectorDialog = false">Cancel</el-button>
+        <el-button type="primary" @click="handleSaveConnector" :loading="saving">Save</el-button>
+      </template>
+    </el-dialog>
 
     <!-- Stats Row -->
     <div class="stats-grid">
@@ -70,13 +96,13 @@
           </div>
         </div>
         <div class="connector-footer">
-          <el-button link type="primary">Configure</el-button>
+          <el-button link type="primary" @click="handleEditConnector(connector)">Configure</el-button>
           <el-switch v-model="connector.active" size="small" />
         </div>
       </div>
       
       <!-- Add New Card -->
-      <div class="connector-card glass-card dashed flex-center hover-scale">
+      <div class="connector-card glass-card dashed flex-center hover-scale" @click="handleAddConnector">
         <div class="text-center">
           <el-button circle size="large" class="add-btn">
             <el-icon><Plus /></el-icon>
@@ -109,9 +135,14 @@
         <el-table-column prop="duration" label="Duration" />
         <el-table-column prop="status" label="Status">
            <template #default="{ row }">
-            <span :class="['status-text', row.status === 'Success' ? 'text-green' : 'text-red']">
-              {{ row.status }}
-            </span>
+            <div class="flex items-center gap-2">
+              <span :class="['status-text', row.status === 'Success' ? 'text-green' : 'text-red']">
+                {{ row.status }}
+              </span>
+              <el-button v-if="row.status === 'Failed'" size="small" circle class="retry-btn" @click="handleRetry(row)">
+                <el-icon><Refresh /></el-icon>
+              </el-button>
+            </div>
           </template>
         </el-table-column>
         <el-table-column prop="time" label="Time" align="right" />
@@ -122,7 +153,8 @@
 
 <script setup>
 import { ref } from 'vue'
-import { Connection, Check, DataAnalysis, Warning, Plus } from '@element-plus/icons-vue'
+import { Connection, Check, DataAnalysis, Warning, Plus, Refresh } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
 
 const connectors = ref([
   { 
@@ -170,6 +202,77 @@ const activities = ref([
   { source: 'SAP ERP', color: '#0FAAFF', type: 'Scheduled', records: '0', duration: '0s', status: 'Failed', time: '09:00 AM' },
   { source: 'Salesforce', color: '#00A1E0', type: 'Incremental', records: '45', duration: '0.8s', status: 'Success', time: '08:45 AM' },
 ])
+
+const showConnectorDialog = ref(false)
+const isEdit = ref(false)
+const saving = ref(false)
+const connectorForm = ref({
+  systemId: '',
+  systemName: '',
+  endpointUrl: '',
+  authType: 'API_KEY',
+  accessKey: '',
+  isEnabled: true
+})
+
+const handleAddConnector = () => {
+  isEdit.value = false
+  connectorForm.value = {
+    systemId: '',
+    systemName: '',
+    endpointUrl: '',
+    authType: 'API_KEY',
+    accessKey: '',
+    isEnabled: true
+  }
+  showConnectorDialog.value = true
+}
+
+const handleEditConnector = (connector) => {
+  isEdit.value = true
+  connectorForm.value = {
+    systemId: connector.systemId || connector.id,
+    systemName: connector.name,
+    endpointUrl: connector.endpointUrl || '',
+    authType: connector.authType || 'API_KEY',
+    accessKey: connector.accessKey || '',
+    isEnabled: connector.active
+  }
+  showConnectorDialog.value = true
+}
+
+const handleSaveConnector = async () => {
+  saving.value = true
+  try {
+    const url = isEdit.value 
+      ? `/api/v1/settings/downstream/${connectorForm.value.systemId}`
+      : '/api/v1/settings/downstream'
+    const method = isEdit.value ? 'PUT' : 'POST'
+    
+    const response = await fetch(url, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
+      body: JSON.stringify(connectorForm.value)
+    })
+    
+    if (response.ok) {
+      ElMessage.success(isEdit.value ? 'Connector updated' : 'Connector created')
+      showConnectorDialog.value = false
+      // fetchConnectors() // Would implement this to refresh list
+    }
+  } catch (error) {
+    console.error('Failed to save connector', error)
+  } finally {
+    saving.value = false
+  }
+}
+
+const handleRetry = (row) => {
+  ElMessage.success('Retry initiated for ' + row.source)
+}
 </script>
 
 <style scoped>

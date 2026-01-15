@@ -8,7 +8,9 @@ public class US1SyncTest extends E2ETestBase {
 
     @Test
     void testCrmWebhookSync() {
-        page.navigate("http://localhost:5173/contract/list");
+        login("admin", "password");
+        page.navigate(baseUrl + "/contract/list");
+        page.waitForSelector("h1");
         assertThat(page.locator("h1")).containsText("Contracts");
     }
 }

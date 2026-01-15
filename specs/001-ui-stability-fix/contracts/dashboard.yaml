@@ -1,0 +1,39 @@
+openapi: 3.0.0
+info:
+  title: Dashboard API
+  version: 1.0.0
+paths:
+  /api/dashboard/stats:
+    get:
+      summary: Get aggregated dashboard metrics
+      responses:
+        '200':
+          description: Dashboard statistics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: {type: integer}
+                  message: {type: string}
+                  data:
+                    type: object
+                    properties:
+                      totalContracts: {type: integer}
+                      pendingApprovals: {type: integer}
+                      activeValue: {type: number}
+                      riskAlerts: {type: integer}
+                      volumeTrend:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            date: {type: string}
+                            count: {type: integer}
+                      riskRadar:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name: {type: string}
+                            value: {type: integer}

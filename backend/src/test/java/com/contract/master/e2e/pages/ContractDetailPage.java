@@ -10,7 +10,7 @@ public class ContractDetailPage {
     }
 
     public void triggerAiAnalysis() {
-        page.click("button:has-text(\"AI Analysis\")");
+        page.click("button:has-text(\"AI Analysis\")", new Page.ClickOptions().setForce(true));
     }
 
     public boolean isProgressVisible() {

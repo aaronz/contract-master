@@ -8,7 +8,8 @@ public class SecurityAuditTest extends E2ETestBase {
 
     @Test
     void testCrossTenantInjectionResistance() {
-        page.navigate("http://localhost:5173/contract/detail/1");
+        login("admin", "password", "tenant-1");
+        page.navigate(baseUrl + "/contract/detail/1");
         page.evaluate("() => localStorage.setItem('tenantId', 'tenant-evil')");
         page.reload();
         assertThat(page.locator(".tenant-name")).not().hasText("Evil Corp");

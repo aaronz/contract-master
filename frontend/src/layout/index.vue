@@ -89,6 +89,7 @@
           <div class="user-info-mini">
             <div class="user-name">Admin User</div>
             <div class="user-role">System Admin</div>
+            <div class="tenant-name" style="font-size: 10px; color: #94A3B8;">{{ tenantId }}</div>
           </div>
           <el-icon class="profile-action"><Setting /></el-icon>
         </div>
@@ -161,6 +162,7 @@ import {
 import { ref, onMounted, onUnmounted } from 'vue'
 
 const searchInput = ref(null)
+const tenantId = ref(localStorage.getItem('tenantId') || 'Default Tenant')
 
 const focusSearch = () => {
   searchInput.value?.focus()
