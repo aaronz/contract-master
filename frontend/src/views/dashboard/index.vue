@@ -155,18 +155,9 @@ let trendChart = null
 let radarChart = null
 let gaugeChart = null
 
-const recentActivities = ref([
-  { user: 'Sarah Connor', action: 'approved', target: 'NDA with Cyberdyne', time: '10 mins ago', type: 'success' },
-  { user: 'John Smith', action: 'updated', target: 'Service Agreement v2', time: '1 hour ago', type: 'info' },
-  { user: 'System', action: 'detected risk', target: 'Compliance Clause Missing', time: '2 hours ago', type: 'danger' },
-  { user: 'Mike Ross', action: 'commented on', target: 'Pearson Merger', time: '3 hours ago', type: 'warning' },
-])
+const recentActivities = ref([])
 
-const myTasks = ref([
-  { id: 1, content: 'Review IT Services Agreement', priority: 'High', completed: false },
-  { id: 2, content: 'Approve Budget Allocation', priority: 'Medium', completed: false },
-  { id: 3, content: 'Update Compliance Policy', priority: 'High', completed: true },
-])
+const myTasks = ref([])
 
 const initCharts = () => {
   // Trend Chart
@@ -308,14 +299,14 @@ const fetchDashboardStats = async () => {
     if (response.ok) {
       const result = await response.json()
       stats.value = result.data
-      updateCharts(result.data)
+      updateVisuals(result.data)
     }
   } catch (error) {
     console.error('Failed to fetch dashboard stats', error)
   }
 }
 
-const updateCharts = (data) => {
+const updateVisuals = (data) => {
   if (trendChart && data.volumeTrend) {
     trendChart.setOption({
       xAxis: { data: data.volumeTrend.map(d => d.date) },
@@ -331,6 +322,12 @@ const updateCharts = (data) => {
         }]
       }]
     })
+  }
+  if (data.recentActivities) {
+    recentActivities.value = data.recentActivities
+  }
+  if (data.myTasks) {
+    myTasks.value = data.myTasks
   }
 }
 
