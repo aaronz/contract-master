@@ -168,10 +168,10 @@
               </div>
 
               <!-- Custom Fields -->
-              <div class="form-section" v-if="customFields && customFields.length > 0">
+              <div class="form-section" v-if="contractFields && contractFields.length > 0">
                 <h3 class="section-header">Additional Information</h3>
                 <div class="form-grid">
-                  <div class="field-group" v-for="field in customFields || []" :key="field.id">
+                  <div class="field-group" v-for="field in contractFields || []" :key="field.id">
                     <label>{{ field.fieldName }}</label>
                     <el-input 
                       v-if="isEditMode" 
@@ -361,7 +361,7 @@
               action="#"
               multiple
             >
-              <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+              <el-icon class="el-icon--upload"><UploadFilled /></el-icon>
               <div class="el-upload__text">
                 Drop file here or <em>click to upload</em>
               </div>
@@ -733,7 +733,8 @@ const form = reactive({
   legalReviewFlag: true,
   legalReviewOpinion: 'Approved with standard clauses.',
   contractStatus: 'Active',
-  customData: {}
+  customData: {},
+  extendedFields: {}
 })
 
 const comments = ref([
