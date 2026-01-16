@@ -15,83 +15,282 @@
     </div>
 
     <!-- New Contract Dialog -->
-    <el-dialog v-model="showNewContractDialog" title="Create New Contract" width="600px">
+    <el-dialog v-model="showNewContractDialog" title="Create New Contract" width="900px" top="5vh">
       <el-form :model="newContractForm" :rules="rules" ref="newContractFormRef" label-position="top">
-        <div class="form-grid">
-          <el-form-item label="Contract No." prop="contractNo">
-            <el-input v-model="newContractForm.contractNo" placeholder="e.g. CON-2026-001" />
-          </el-form-item>
-          <el-form-item label="Contract Name" prop="contractName">
-            <el-input v-model="newContractForm.contractName" />
-          </el-form-item>
-        </div>
-        <div class="form-grid">
-          <el-form-item label="Party A" prop="partyAName">
-            <el-input v-model="newContractForm.partyAName" />
-          </el-form-item>
-          <el-form-item label="Party B" prop="partyBName">
-            <el-input v-model="newContractForm.partyBName" />
-          </el-form-item>
-        </div>
-        <div class="form-grid">
-          <el-form-item label="Amount" prop="amount">
-            <el-input-number v-model="newContractForm.amount" :precision="2" :step="1000" style="width: 100%" />
-          </el-form-item>
-          <el-form-item label="Tax Rate (%)" prop="taxRate">
-            <el-input-number v-model="newContractForm.taxRate" :precision="2" :step="0.1" style="width: 100%" />
-          </el-form-item>
-        </div>
-        <div class="form-grid">
-          <el-form-item label="Currency" prop="currencyType">
-            <el-select v-model="newContractForm.currencyType" style="width: 100%">
-              <el-option label="USD" value="USD" />
-              <el-option label="EUR" value="EUR" />
-              <el-option label="CNY" value="CNY" />
-            </el-select>
-          </el-form-item>
-          <el-form-item label="Contract Type" prop="contractType">
-            <el-input v-model="newContractForm.contractType" />
-          </el-form-item>
-        </div>
-        <div class="form-grid">
-          <el-form-item label="Effective Date" prop="effectiveDate">
-            <el-date-picker v-model="newContractForm.effectiveDate" type="date" style="width: 100%" />
-          </el-form-item>
-          <el-form-item label="Expire Date" prop="expireDate">
-            <el-date-picker v-model="newContractForm.expireDate" type="date" style="width: 100%" />
-          </el-form-item>
-        </div>
-        <el-form-item label="Remark" prop="remark">
-          <el-input v-model="newContractForm.remark" type="textarea" />
-        </el-form-item>
-        
-        <!-- Extended Fields -->
-        <div v-if="contractFields.length > 0">
-          <h3 class="section-header mt-4 mb-2" style="font-size: 14px; color: var(--text-secondary)">Additional Fields</h3>
-          <div class="form-grid">
-            <el-form-item 
-              v-for="field in contractFields.filter(f => f.source === 'EXTEND')" 
-              :key="field.fieldCode" 
-              :label="field.fieldName"
-            >
-              <el-input-number 
-                v-if="field.fieldType === 'NUMBER'" 
-                v-model="newContractForm.extendedFields[field.fieldCode]" 
-                style="width: 100%"
-              />
-              <el-date-picker
-                v-else-if="field.fieldType === 'DATE'"
-                v-model="newContractForm.extendedFields[field.fieldCode]"
-                type="date"
-                style="width: 100%"
-              />
-              <el-input 
-                v-else 
-                v-model="newContractForm.extendedFields[field.fieldCode]" 
-              />
-            </el-form-item>
-          </div>
-        </div>
+        <el-tabs v-model="activeNewContractTab" class="custom-tabs-dialog">
+          
+          <!-- General Info Tab -->
+          <el-tab-pane label="General Info" name="general">
+            <div class="form-section">
+              <h3 class="section-header">Core Details</h3>
+              <div class="form-grid">
+                <div class="field-group">
+                  <label>Contract Number</label>
+                  <el-form-item prop="contractNo">
+                    <el-input v-model="newContractForm.contractNo" placeholder="e.g. CON-2026-001" />
+                  </el-form-item>
+                </div>
+                <div class="field-group">
+                  <label>Contract Name</label>
+                  <el-form-item prop="contractName">
+                    <el-input v-model="newContractForm.contractName" />
+                  </el-form-item>
+                </div>
+                <div class="field-group">
+                  <label>Contract Type</label>
+                  <el-input v-model="newContractForm.contractType" />
+                </div>
+                <div class="field-group">
+                  <label>Status</label>
+                  <el-select v-model="newContractForm.contractStatus" style="width: 100%">
+                    <el-option label="Draft" value="Draft" />
+                    <el-option label="Active" value="Active" />
+                    <el-option label="Pending" value="Pending" />
+                  </el-select>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="form-section">
+                <h3 class="section-header text-blue">Party A (Us)</h3>
+                <div class="field-group">
+                  <label>Entity Name</label>
+                  <el-form-item prop="partyAName">
+                    <el-input v-model="newContractForm.partyAName" />
+                  </el-form-item>
+                </div>
+                <div class="form-grid">
+                  <div class="field-group">
+                    <label>Contact</label>
+                    <el-input v-model="newContractForm.partyAContact" />
+                  </div>
+                  <div class="field-group">
+                    <label>Phone</label>
+                    <el-input v-model="newContractForm.partyAPhone" />
+                  </div>
+                </div>
+                <div class="field-group mt-2">
+                  <label>Address</label>
+                  <el-input v-model="newContractForm.partyAAddress" type="textarea" :rows="2" />
+                </div>
+              </div>
+
+              <div class="form-section">
+                <h3 class="section-header text-purple">Party B (Counterparty)</h3>
+                <div class="field-group">
+                  <label>Entity Name</label>
+                  <el-form-item prop="partyBName">
+                    <el-input v-model="newContractForm.partyBName" />
+                  </el-form-item>
+                </div>
+                <div class="form-grid">
+                  <div class="field-group">
+                    <label>Contact</label>
+                    <el-input v-model="newContractForm.partyBContact" />
+                  </div>
+                  <div class="field-group">
+                    <label>Phone</label>
+                    <el-input v-model="newContractForm.partyBPhone" />
+                  </div>
+                </div>
+                <div class="field-group mt-2">
+                  <label>Address</label>
+                  <el-input v-model="newContractForm.partyBAddress" type="textarea" :rows="2" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Extended Fields -->
+            <div class="form-section" v-if="contractFields.some(f => f.source === 'EXTEND')">
+              <h3 class="section-header">Additional Fields</h3>
+              <div class="form-grid-3">
+                <div 
+                  v-for="field in contractFields.filter(f => f.source === 'EXTEND')" 
+                  :key="field.fieldCode" 
+                  class="field-group"
+                >
+                  <label>{{ field.fieldName }}</label>
+                  <el-input-number 
+                    v-if="field.fieldType === 'NUMBER'" 
+                    v-model="newContractForm.extendedFields[field.fieldCode]" 
+                    style="width: 100%"
+                  />
+                  <el-date-picker
+                    v-else-if="field.fieldType === 'DATE'"
+                    v-model="newContractForm.extendedFields[field.fieldCode]"
+                    type="date"
+                    style="width: 100%"
+                  />
+                  <el-input 
+                    v-else 
+                    v-model="newContractForm.extendedFields[field.fieldCode]" 
+                  />
+                </div>
+              </div>
+            </div>
+          </el-tab-pane>
+
+          <!-- Financials Tab -->
+          <el-tab-pane label="Financials" name="financials">
+            <div class="form-section">
+              <h3 class="section-header">Financial Details</h3>
+              <div class="form-grid-3">
+                <div class="field-group">
+                  <label>Currency</label>
+                  <el-select v-model="newContractForm.currencyType" style="width: 100%">
+                    <el-option label="USD" value="USD" />
+                    <el-option label="CNY" value="CNY" />
+                    <el-option label="EUR" value="EUR" />
+                  </el-select>
+                </div>
+                <div class="field-group">
+                  <label>Contract Amount</label>
+                  <el-input-number v-model="newContractForm.contractAmount" :precision="2" style="width: 100%" />
+                </div>
+                <div class="field-group">
+                  <label>Tax Rate (%)</label>
+                  <el-input-number v-model="newContractForm.taxRate" :precision="2" style="width: 100%" />
+                </div>
+                <div class="field-group">
+                  <label>Tax Amount</label>
+                  <el-input-number v-model="newContractForm.taxAmount" :precision="2" style="width: 100%" />
+                </div>
+                <div class="field-group">
+                  <label>Total Amount</label>
+                  <el-input-number v-model="newContractForm.totalAmountWithTax" :precision="2" style="width: 100%" />
+                </div>
+                <div class="field-group">
+                  <label>Payment Method</label>
+                  <el-select v-model="newContractForm.paymentMethod" style="width: 100%">
+                    <el-option label="Bank Transfer" value="Bank Transfer" />
+                    <el-option label="Check" value="Check" />
+                    <el-option label="Cash" value="Cash" />
+                  </el-select>
+                </div>
+                <div class="field-group full-width">
+                  <label>Payment Terms</label>
+                  <el-input v-model="newContractForm.paymentTerm" type="textarea" :rows="3" />
+                </div>
+              </div>
+            </div>
+            
+            <div class="form-section">
+              <h3 class="section-header">Billing Info</h3>
+              <div class="form-grid-2">
+                <div class="field-group">
+                  <label>Invoice Title</label>
+                  <el-input v-model="newContractForm.invoiceTitle" />
+                </div>
+                <div class="field-group">
+                  <label>Taxpayer ID</label>
+                  <el-input v-model="newContractForm.taxpayerId" />
+                </div>
+                <div class="field-group">
+                  <label>Invoice Type</label>
+                  <el-input v-model="newContractForm.invoiceType" />
+                </div>
+              </div>
+            </div>
+          </el-tab-pane>
+
+          <!-- Performance & Subject Tab -->
+          <el-tab-pane label="Performance" name="performance">
+            <div class="form-section">
+              <h3 class="section-header">Subject Matter</h3>
+              <div class="form-grid-3">
+                <div class="field-group">
+                  <label>Type</label>
+                  <el-select v-model="newContractForm.subjectType" style="width: 100%">
+                    <el-option label="Goods" value="Goods" />
+                    <el-option label="Services" value="Services" />
+                  </el-select>
+                </div>
+                <div class="field-group">
+                  <label>Quantity</label>
+                  <el-input-number v-model="newContractForm.subjectQuantity" style="width: 100%" />
+                </div>
+                <div class="field-group">
+                  <label>Unit Price</label>
+                  <el-input-number v-model="newContractForm.unitPrice" :precision="2" style="width: 100%" />
+                </div>
+                <div class="field-group full-width">
+                  <label>Description</label>
+                  <el-input v-model="newContractForm.subjectDesc" type="textarea" :rows="2" />
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h3 class="section-header">Performance Terms</h3>
+              <div class="form-grid-2">
+                <div class="field-group">
+                  <label>Method</label>
+                  <el-input v-model="newContractForm.performanceMethod" />
+                </div>
+                <div class="field-group">
+                  <label>Location</label>
+                  <el-input v-model="newContractForm.performanceLocation" />
+                </div>
+                <div class="field-group">
+                  <label>Start Date</label>
+                  <el-date-picker v-model="newContractForm.performanceStartDate" type="date" style="width: 100%" />
+                </div>
+                <div class="field-group">
+                  <label>End Date</label>
+                  <el-date-picker v-model="newContractForm.performanceEndDate" type="date" style="width: 100%" />
+                </div>
+                <div class="field-group full-width">
+                  <label>Quality Standard</label>
+                  <el-input v-model="newContractForm.qualityStandard" type="textarea" />
+                </div>
+              </div>
+            </div>
+          </el-tab-pane>
+
+          <!-- Legal & Dates Tab -->
+          <el-tab-pane label="Legal & Dates" name="legal">
+            <div class="form-section">
+              <h3 class="section-header">Important Dates</h3>
+              <div class="form-grid-3">
+                <div class="field-group">
+                  <label>Sign Date</label>
+                  <el-date-picker v-model="newContractForm.signDate" type="date" style="width: 100%" />
+                </div>
+                <div class="field-group">
+                  <label>Effective Date</label>
+                  <el-date-picker v-model="newContractForm.effectiveDate" type="date" style="width: 100%" />
+                </div>
+                <div class="field-group">
+                  <label>Expire Date</label>
+                  <el-date-picker v-model="newContractForm.expireDate" type="date" style="width: 100%" />
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h3 class="section-header">Legal Provisions</h3>
+              <div class="form-grid-2">
+                <div class="field-group">
+                  <label>Dispute Resolution</label>
+                  <el-select v-model="newContractForm.disputeResolution" style="width: 100%">
+                    <el-option label="Negotiation" value="Negotiation" />
+                    <el-option label="Arbitration" value="Arbitration" />
+                    <el-option label="Litigation" value="Litigation" />
+                  </el-select>
+                </div>
+                <div class="field-group">
+                  <label>Governing Law</label>
+                  <el-input v-model="newContractForm.governingLaw" />
+                </div>
+                <div class="field-group full-width">
+                  <label>Remark</label>
+                  <el-input v-model="newContractForm.remark" type="textarea" />
+                </div>
+              </div>
+            </div>
+          </el-tab-pane>
+        </el-tabs>
       </el-form>
       <template #footer>
         <el-button @click="showNewContractDialog = false">Cancel</el-button>
@@ -204,7 +403,7 @@
 
         <el-table-column label="Actions" width="100" fixed="right">
           <template #default="{ row }">
-            <el-button circle text type="primary" @click="viewDetail(row.id)">
+            <el-button circle text type="primary" @click="viewDetail(row.contractId)">
               <el-icon><ArrowRight /></el-icon>
             </el-button>
           </template>
@@ -298,28 +497,84 @@ const total = ref(0)
 const currentPage = ref(1)
 const pageSize = ref(10)
 
+const activeNewContractTab = ref('general')
+
 const newContractForm = ref({
   contractNo: '',
   contractName: '',
-  partyAName: '',
-  partyBName: '',
-  amount: 0,
-  taxRate: 0,
-  currencyType: 'USD',
   contractType: '',
+  contractStatus: 'Draft',
+  partyAName: '',
+  partyAContact: '',
+  partyAPhone: '',
+  partyAAddress: '',
+  partyBName: '',
+  partyBContact: '',
+  partyBPhone: '',
+  partyBAddress: '',
+  thirdPartyFlag: false,
+  thirdPartyInfo: '',
+  currencyType: 'USD',
+  amount: 0, // Maps to contractAmount in backend? DTO has contractAmount. list.vue currently uses amount.
+  // detail.vue uses form.contractAmount.
+  // Backend ContractDTO has 'contractAmount'. list.vue creates payload. 
+  // Let's align with detail.vue names where possible, or map them on submit.
+  // Existing list.vue uses 'amount', 'taxRate'. 
+  // I will check handleCreateContract payload construction.
+  // "body: JSON.stringify({ ...newContractForm.value, status: 'DRAFT' })"
+  // If backend expects contractAmount, list.vue might be sending 'amount'.
+  // Backend ContractDTO has 'contractAmount', but ContractBase has 'amount'. 
+  // ContractDTO getter: getContractAmount().
+  // Let's use 'contractAmount' to be safe and consistent with detail.vue, 
+  // but I need to check if 'amount' was working before. 
+  // Previous `handleCreateContract` sent `amount`. 
+  // ContractService.java: `base.setAmount(dto.getContractAmount());`
+  // Wait, if frontend sends `amount`, Jackson maps it to `amount` in DTO? 
+  // ContractDTO has `private BigDecimal contractAmount;`. 
+  // It does NOT have `amount`. So `amount` in JSON would be ignored unless there's an alias.
+  // Ah, the previous list.vue form bound to `newContractForm.amount`.
+  // If it worked, maybe DTO has `amount` or I missed something.
+  // Let's check ContractDTO again.
+  // "public BigDecimal getContractAmount() { return contractAmount; }"
+  // "public void setContractAmount(BigDecimal contractAmount) { this.contractAmount = contractAmount; }"
+  // It seems `amount` would fail to map to `contractAmount`.
+  // I should rename `amount` to `contractAmount` in the new form to be correct.
+  contractAmount: 0,
+  taxRate: 0,
+  taxAmount: 0,
+  totalAmountWithTax: 0,
+  paymentMethod: '',
+  paymentTerm: '',
+  invoiceType: '',
+  invoiceTitle: '',
+  taxpayerId: '',
+  signDate: '',
   effectiveDate: '',
   expireDate: '',
+  performanceMethod: '',
+  performanceLocation: '',
+  performanceStartDate: '',
+  performanceEndDate: '',
+  qualityStandard: '',
+  disputeResolution: '',
+  governingLaw: '',
+  legalReviewFlag: false,
+  legalReviewOpinion: '',
+  subjectType: '',
+  subjectQuantity: 0,
+  unitPrice: 0,
+  subjectDesc: '',
   remark: '',
   extendedFields: {}
 })
 
-
 const rules = {
-  contractNo: [{ required: true, message: 'Please input contract number', trigger: 'blur' }],
-  contractName: [{ required: true, message: 'Please input contract name', trigger: 'blur' }],
-  partyAName: [{ required: true, message: 'Please input Party A', trigger: 'blur' }],
-  partyBName: [{ required: true, message: 'Please input Party B', trigger: 'blur' }]
+  contractNo: [{ required: true, message: 'Required', trigger: 'blur' }],
+  contractName: [{ required: true, message: 'Required', trigger: 'blur' }],
+  partyAName: [{ required: true, message: 'Required', trigger: 'blur' }],
+  partyBName: [{ required: true, message: 'Required', trigger: 'blur' }]
 }
+
 
 const contractFields = ref([])
 
@@ -327,7 +582,8 @@ const fetchMetadata = async () => {
   try {
     const response = await fetch('/api/metadata/contract-fields', {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'X-Tenant-ID': localStorage.getItem('tenantId')
       }
     })
     if (response.ok) {
@@ -343,7 +599,8 @@ const fetchContracts = async () => {
   try {
     const response = await fetch(`/api/contracts?page=${currentPage.value - 1}&size=${pageSize.value}`, {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'X-Tenant-ID': localStorage.getItem('tenantId')
       }
     })
     if (response.ok) {
@@ -366,7 +623,8 @@ const handleCreateContract = async () => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'X-Tenant-ID': localStorage.getItem('tenantId')
           },
           body: JSON.stringify({
             ...newContractForm.value,
@@ -605,6 +863,66 @@ const getStatusType = (status) => {
   align-items: center;
   gap: 8px;
 }
+
+/* Detailed Form Styles */
+.custom-tabs-dialog {
+  min-height: 400px;
+}
+
+.form-section {
+  margin-bottom: 24px;
+  background: #F8FAFC;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.section-header {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1E293B;
+  margin: 0 0 16px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.form-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.field-group label {
+  font-size: 11px;
+  color: #64748B;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.text-blue { color: #2563EB; }
+.text-purple { color: #8B5CF6; }
 
 /* Animations */
 .slide-up-enter-active,

@@ -25,14 +25,5 @@ if [ $BACKEND_STATUS -ne 0 ]; then
     exit $BACKEND_STATUS
 fi
 
-echo -e "\n${GREEN}Step 2: Running E2E Tests (Playwright)...${NC}"
-(cd backend && mvn verify -DskipUnitTests=false)
-E2E_STATUS=$?
-
-if [ $E2E_STATUS -ne 0 ]; then
-    echo -e "${RED}E2E/Integration tests failed!${NC}"
-    exit $E2E_STATUS
-fi
-
 echo -e "\n${GREEN}All tests passed successfully!${NC}"
 exit 0

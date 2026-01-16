@@ -90,7 +90,8 @@ const fetchMetadata = async () => {
   try {
     const response = await fetch('/api/metadata/contract-fields', {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'X-Tenant-ID': localStorage.getItem('tenantId')
       }
     })
     if (response.ok) {
@@ -117,6 +118,12 @@ const handleEdit = (row) => {
 }
 
 const handleSave = () => {
+  if (form.value.id) {
+    const idx = mappings.value.findIndex(m => m.id === form.value.id)
+    mappings.value[idx] = { ...form.value }
+  } else {
+    mappings.value.push({ ...form.value, id: Date.now() })
+  }
   ElMessage.success('Mapping configuration saved')
   dialogVisible.value = false
 }

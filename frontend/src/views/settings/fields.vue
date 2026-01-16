@@ -123,7 +123,8 @@ const confirmAddField = async () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'X-Tenant-ID': localStorage.getItem('tenantId')
       },
       body: JSON.stringify(newField.value)
     })
@@ -143,7 +144,8 @@ const fetchFields = async () => {
   try {
     const response = await fetch('/api/metadata/contract-fields', {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'X-Tenant-ID': localStorage.getItem('tenantId')
       }
     })
     if (response.ok) {

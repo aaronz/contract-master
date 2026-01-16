@@ -35,7 +35,7 @@
     </el-dialog>
 
     <!-- Stats Row -->
-    <div class="stats-grid">
+    <div class="stats-grid health-metrics">
       <div class="stat-card glass-card">
         <div class="stat-icon bg-blue-100 text-blue-600">
           <el-icon><Connection /></el-icon>
@@ -253,7 +253,8 @@ const handleSaveConnector = async () => {
       method,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'X-Tenant-ID': localStorage.getItem('tenantId')
       },
       body: JSON.stringify(connectorForm.value)
     })

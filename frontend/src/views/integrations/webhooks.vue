@@ -95,6 +95,12 @@ const handleEdit = (row) => {
 }
 
 const handleSave = () => {
+  if (form.value.id) {
+    const idx = webhooks.value.findIndex(w => w.id === form.value.id)
+    webhooks.value[idx] = { ...form.value }
+  } else {
+    webhooks.value.push({ ...form.value, id: Date.now() })
+  }
   ElMessage.success('WebHook configuration saved')
   dialogVisible.value = false
 }

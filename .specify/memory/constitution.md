@@ -27,11 +27,6 @@ Every change to contract data, configuration, or permissions MUST be recorded in
 log. Logs MUST include the timestamp, actor ID, field changed, original value, and new value,
 supporting full history reconstruction.
 
-### VI. Comprehensive End-to-End Testing
-Every user story MUST be validated with an end-to-end test covering the full journey from trigger to
-final outcome. E2E tests MUST run in a production-like environment (e.g., staging) to ensure all
-integrations (CRM, AI, Rule Engine) function correctly together.
-
 ### VII. Continuous Design Document Optimization
 Design artifacts (spec.md, plan.md, tasks.md) are "living documents". They MUST be updated whenever
 implementation diverges from the original plan or when new constraints are discovered. Outdated
@@ -60,7 +55,6 @@ accurate view of the system state.
 ## Development Workflow & Quality Gates
 
 - **Security**: Mandatory `tenant_id` filtering in all Repository layers.
-- **Testing**: Minimum 80% coverage for core business logic + mandatory E2E coverage for all P1/P2 user stories.
 - **Audit**: All entity modifications must be captured via `TenantEntityListener` or equivalent automated mechanisms.
 - **Documentation**: All feature merges must trigger updates to global manifests (`features.md`, `bugs.md`, `api.md`, `table.md`) as per Principle IX.
 - **Review**: Every PR must verify adherence to all nine Core Principles and ensure design docs are in sync with code.

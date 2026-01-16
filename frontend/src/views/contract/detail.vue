@@ -94,121 +94,6 @@
                 </div>
               </div>
 
-              <div class="form-section">
-                <h3 class="section-header">Financials</h3>
-                <div class="form-grid">
-                  <div class="field-group">
-                    <label>Amount</label>
-                    <el-input-number v-if="isEditMode" v-model="form.contractAmount" :precision="2" style="width: 100%" />
-                    <div v-else class="display-val amount">{{ formatCurrency(form.contractAmount) }}</div>
-                  </div>
-                  <div class="field-group">
-                    <label>Tax Rate (%)</label>
-                    <el-input-number v-if="isEditMode" v-model="form.taxRate" :precision="2" style="width: 100%" />
-                    <div v-else class="display-val">{{ form.taxRate }}%</div>
-                  </div>
-                  <div class="field-group">
-                    <label>Currency</label>
-                    <el-select v-if="isEditMode" v-model="form.currencyType" style="width: 100%">
-                      <el-option label="USD" value="USD" />
-                      <el-option label="EUR" value="EUR" />
-                      <el-option label="CNY" value="CNY" />
-                    </el-select>
-                    <div v-else class="display-val">{{ form.currencyType }}</div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="form-section">
-                <h3 class="section-header">Performance & Quality</h3>
-                <div class="form-grid">
-                  <div class="field-group">
-                    <label>Performance Location</label>
-                    <el-input v-if="isEditMode" v-model="form.performanceLocation" />
-                    <div v-else class="display-val">{{ form.performanceLocation }}</div>
-                  </div>
-                  <div class="field-group">
-                    <label>Performance Method</label>
-                    <el-input v-if="isEditMode" v-model="form.performanceMethod" />
-                    <div v-else class="display-val">{{ form.performanceMethod }}</div>
-                  </div>
-                  <div class="field-group">
-                    <label>Quality Standard</label>
-                    <el-input v-if="isEditMode" v-model="form.qualityStandard" type="textarea" />
-                    <div v-else class="display-val">{{ form.qualityStandard }}</div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="form-section">
-                <h3 class="section-header">Legal & Compliance</h3>
-                <div class="form-grid">
-                  <div class="field-group">
-                    <label>Governing Law</label>
-                    <el-input v-if="isEditMode" v-model="form.governingLaw" />
-                    <div v-else class="display-val">{{ form.governingLaw }}</div>
-                  </div>
-                  <div class="field-group">
-                    <label>Dispute Resolution</label>
-                    <el-input v-if="isEditMode" v-model="form.disputeResolution" />
-                    <div v-else class="display-val">{{ form.disputeResolution }}</div>
-                  </div>
-                  <div class="field-group">
-                    <label>Legal Review</label>
-                    <el-switch v-if="isEditMode" v-model="form.legalReviewFlag" />
-                    <el-tag v-else :type="form.legalReviewFlag ? 'success' : 'info'">{{ form.legalReviewFlag ? 'Reviewed' : 'Pending' }}</el-tag>
-                  </div>
-                </div>
-                <div class="field-group mt-4" v-if="form.legalReviewFlag">
-                  <label>Legal Opinion</label>
-                  <el-input v-if="isEditMode" v-model="form.legalReviewOpinion" type="textarea" />
-                  <div v-else class="display-val">{{ form.legalReviewOpinion }}</div>
-                </div>
-              </div>
-
-              <div class="form-section">
-                <h3 class="section-header">Billing & Invoicing</h3>
-                <div class="form-grid">
-                  <div class="field-group">
-                    <label>Invoice Title</label>
-                    <el-input v-if="isEditMode" v-model="form.invoiceTitle" />
-                    <div v-else class="display-val">{{ form.invoiceTitle }}</div>
-                  </div>
-                  <div class="field-group">
-                    <label>Taxpayer ID</label>
-                    <el-input v-if="isEditMode" v-model="form.taxpayerId" />
-                    <div v-else class="display-val">{{ form.taxpayerId }}</div>
-                  </div>
-                  <div class="field-group">
-                    <label>Invoice Type</label>
-                    <el-input v-if="isEditMode" v-model="form.invoiceType" />
-                    <div v-else class="display-val">{{ form.invoiceType }}</div>
-                  </div>
-                </div>
-              </div>
-
-                  <div class="field-group">
-                    <label>Contract No.</label>
-                    <el-input v-if="isEditMode" v-model="form.contractNo" disabled />
-                    <div v-else class="display-val mono">{{ form.contractNo }}</div>
-                  </div>
-                  <div class="field-group">
-                    <label>Contract Type</label>
-                    <el-select v-if="isEditMode" v-model="form.contractType" style="width: 100%">
-                      <el-option label="Framework Agreement" value="Framework" />
-                      <el-option label="Sales Contract" value="Sales" />
-                      <el-option label="Service Agreement" value="Service" />
-                    </el-select>
-                    <div v-else class="display-val">{{ form.contractType }}</div>
-                  </div>
-                  <div class="field-group">
-                    <label>CRM ID</label>
-                    <el-input v-if="isEditMode" v-model="form.crmContractId" disabled />
-                    <div v-else class="display-val mono">{{ form.crmContractId }}</div>
-                  </div>
-                </div>
-              </div>
-
               <!-- Parties -->
               <div class="parties-wrapper">
                 <div class="form-section party-card">
@@ -270,23 +155,23 @@
 
               <!-- Third Party -->
               <div class="form-section">
-                 <div class="field-group">
-                    <label>Has Third Party?</label>
-                    <el-switch v-if="isEditMode" v-model="form.thirdPartyFlag" />
-                    <div v-else class="display-val">{{ form.thirdPartyFlag ? 'Yes' : 'No' }}</div>
-                 </div>
-                 <div class="field-group mt-4" v-if="form.thirdPartyFlag">
-                   <label>Third Party Info</label>
-                   <el-input v-if="isEditMode" v-model="form.thirdPartyInfo" type="textarea" />
-                   <div v-else class="display-val">{{ form.thirdPartyInfo }}</div>
-                 </div>
+                  <div class="field-group">
+                     <label>Has Third Party?</label>
+                     <el-switch v-if="isEditMode" v-model="form.thirdPartyFlag" />
+                     <div v-else class="display-val">{{ form.thirdPartyFlag ? 'Yes' : 'No' }}</div>
+                  </div>
+                  <div class="field-group mt-4" v-if="form.thirdPartyFlag">
+                    <label>Third Party Info</label>
+                    <el-input v-if="isEditMode" v-model="form.thirdPartyInfo" type="textarea" />
+                    <div v-else class="display-val">{{ form.thirdPartyInfo }}</div>
+                  </div>
               </div>
 
               <!-- Custom Fields -->
-              <div class="form-section" v-if="customFields.length > 0">
+              <div class="form-section" v-if="customFields && customFields.length > 0">
                 <h3 class="section-header">Additional Information</h3>
                 <div class="form-grid">
-                  <div class="field-group" v-for="field in customFields" :key="field.id">
+                  <div class="field-group" v-for="field in customFields || []" :key="field.id">
                     <label>{{ field.fieldName }}</label>
                     <el-input 
                       v-if="isEditMode" 
@@ -592,10 +477,12 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
-import { ArrowLeft, Cpu, Check, ChatDotRound, UploadFilled, Document, Close } from '@element-plus/icons-vue'
+import { ref, reactive, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { ArrowLeft, Cpu, Check, ChatDotRound, UploadFilled, Document, Close, Postcard } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 
+const router = useRouter()
 const activeTab = ref('general')
 const showSidePanel = ref(true)
 const panelTab = ref('comments')
@@ -614,7 +501,8 @@ const fetchMetadata = async () => {
   try {
     const response = await fetch('/api/metadata/contract-fields', {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'X-Tenant-ID': localStorage.getItem('tenantId')
       }
     })
     if (response.ok) {
@@ -648,7 +536,8 @@ const fetchContractDetail = async () => {
   try {
     const response = await fetch(`/api/contracts/${contractId}`, {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'X-Tenant-ID': localStorage.getItem('tenantId')
       }
     })
     if (response.ok) {
@@ -666,6 +555,7 @@ onMounted(() => {
 })
 
 const form = reactive({
+  contractId: '',
   contractNo: 'CON-2024-001',
   contractName: 'Strategic Partnership Agreement',
   contractType: 'Framework',
@@ -710,9 +600,7 @@ const form = reactive({
   legalReviewFlag: true,
   legalReviewOpinion: 'Approved with standard clauses.',
   contractStatus: 'Active',
-  customData: {
-    '1': 'AI Suggested Value'
-  }
+  customData: {}
 })
 
 const comments = ref([
@@ -750,14 +638,15 @@ const saveContract = async () => {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'X-Tenant-ID': localStorage.getItem('tenantId')
       },
       body: JSON.stringify(form)
     })
     if (response.ok) {
       isEditMode.value = false
       ElMessage.success('Contract updated successfully')
-      fetchContractDetail() // Refresh after save
+      fetchContractDetail()
     }
   } catch (error) {
     console.error('Update failed', error)
@@ -787,8 +676,14 @@ const getStatusType = (status) => {
 }
 
 const formatCurrency = (val, currency) => {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(val)
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: currency || 'USD' }).format(val)
 }
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return 'N/A'
+  return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+}
+
 const confirmAiSuggestions = () => {
   form.contractStatus = 'VERIFIED'
   ElMessage.success('Suggestions confirmed')
@@ -804,7 +699,7 @@ const publishContract = () => {
 .contract-detail-page {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 80px); /* Adjust based on global header */
+  height: calc(100vh - 80px);
 }
 
 .detail-header {

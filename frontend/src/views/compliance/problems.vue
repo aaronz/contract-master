@@ -203,7 +203,8 @@ const handleResolve = async () => {
     const response = await fetch(`/api/problems/${numericId}/resolve`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'X-Tenant-ID': localStorage.getItem('tenantId')
       }
     })
     if (response.ok) {

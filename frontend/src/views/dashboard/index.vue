@@ -301,7 +301,8 @@ const fetchDashboardStats = async () => {
   try {
     const response = await fetch('/api/dashboard/stats', {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'X-Tenant-ID': localStorage.getItem('tenantId')
       }
     })
     if (response.ok) {
@@ -355,7 +356,8 @@ const handleExport = async () => {
   try {
     const response = await fetch('/api/export/contracts', {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'X-Tenant-ID': localStorage.getItem('tenantId')
       }
     })
     const blob = await response.blob()
