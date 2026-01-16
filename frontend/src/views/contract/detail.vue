@@ -454,17 +454,62 @@
         
         <div class="card-preview mt-8">
           <h4 class="mb-4">Preview</h4>
-          <div class="contract-card-visual">
-            <div class="card-header">
-              <div class="card-title">{{ form.contractName }}</div>
-              <div class="card-subtitle">{{ form.contractNo }}</div>
+          <div class="contract-card-visual" :style="cardStyles.container">
+            <div class="card-header" :style="cardStyles.header">
+              <div class="card-title" :style="cardStyles.title">{{ form.contractName }}</div>
+              <div class="card-subtitle" :style="cardStyles.subtitle">{{ form.contractNo }}</div>
             </div>
-            <div class="card-body">
-              <div v-for="code in cardConfig.selectedFields" :key="code" class="card-field">
-                <div class="card-label">{{ cardConfig.customLabels[code] || getFieldName(code) }}</div>
-                <div class="card-value">{{ getFieldValue(code) }}</div>
+            
+            <div class="card-section" v-if="hasFieldsInGroup('general')">
+              <div class="section-title" :style="cardStyles.sectionTitle">General Info</div>
+              <div class="card-grid" :style="cardStyles.grid">
+                <div v-for="field in getFieldsInGroup('general')" :key="field.fieldCode" class="card-field" :style="cardStyles.field">
+                  <div class="card-label" :style="cardStyles.label">{{ cardConfig.customLabels[field.fieldCode] || field.fieldName }}</div>
+                  <div class="card-value" :style="cardStyles.value">{{ getFieldValue(field.fieldCode) }}</div>
+                </div>
               </div>
             </div>
+
+            <div class="card-section" v-if="hasFieldsInGroup('financials')">
+              <div class="section-title" :style="cardStyles.sectionTitle">Financials</div>
+              <div class="card-grid" :style="cardStyles.grid">
+                <div v-for="field in getFieldsInGroup('financials')" :key="field.fieldCode" class="card-field" :style="cardStyles.field">
+                  <div class="card-label" :style="cardStyles.label">{{ cardConfig.customLabels[field.fieldCode] || field.fieldName }}</div>
+                  <div class="card-value" :style="cardStyles.value">{{ getFieldValue(field.fieldCode) }}</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-section" v-if="hasFieldsInGroup('performance')">
+              <div class="section-title" :style="cardStyles.sectionTitle">Performance</div>
+              <div class="card-grid" :style="cardStyles.grid">
+                <div v-for="field in getFieldsInGroup('performance')" :key="field.fieldCode" class="card-field" :style="cardStyles.field">
+                  <div class="card-label" :style="cardStyles.label">{{ cardConfig.customLabels[field.fieldCode] || field.fieldName }}</div>
+                  <div class="card-value" :style="cardStyles.value">{{ getFieldValue(field.fieldCode) }}</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-section" v-if="hasFieldsInGroup('legal')">
+              <div class="section-title" :style="cardStyles.sectionTitle">Legal</div>
+              <div class="card-grid" :style="cardStyles.grid">
+                <div v-for="field in getFieldsInGroup('legal')" :key="field.fieldCode" class="card-field" :style="cardStyles.field">
+                  <div class="card-label" :style="cardStyles.label">{{ cardConfig.customLabels[field.fieldCode] || field.fieldName }}</div>
+                  <div class="card-value" :style="cardStyles.value">{{ getFieldValue(field.fieldCode) }}</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-section" v-if="hasFieldsInGroup('extended')">
+              <div class="section-title" :style="cardStyles.sectionTitle">Additional</div>
+              <div class="card-grid" :style="cardStyles.grid">
+                <div v-for="field in getFieldsInGroup('extended')" :key="field.fieldCode" class="card-field" :style="cardStyles.field">
+                  <div class="card-label" :style="cardStyles.label">{{ cardConfig.customLabels[field.fieldCode] || field.fieldName }}</div>
+                  <div class="card-value" :style="cardStyles.value">{{ getFieldValue(field.fieldCode) }}</div>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
@@ -496,6 +541,94 @@ const cardConfig = ref({
   selectedFields: ['contractNo', 'partyAName', 'partyBName', 'amount'],
   customLabels: {}
 })
+
+// Unified visual styles to match detail page
+const cardStyles = {
+  container: {
+    background: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: '16px',
+    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+    padding: '32px',
+    maxWidth: '450px',
+    border: '1px solid rgba(255, 255, 255, 0.5)',
+    backdropFilter: 'blur(12px)',
+    borderTop: '6px solid var(--primary-color)'
+  },
+  header: {
+    marginBottom: '24px',
+    borderBottom: '1px solid rgba(0,0,0,0.05)',
+    paddingBottom: '16px'
+  },
+  title: {
+    fontSize: '20px',
+    fontWeight: '700',
+    color: '#1E293B',
+    marginBottom: '8px',
+    letterSpacing: '-0.5px'
+  },
+  subtitle: {
+    fontFamily: "'Fira Code', monospace",
+    fontSize: '12px',
+    color: '#64748B'
+  },
+  sectionTitle: {
+    fontSize: '14px',
+    fontWeight: '600',
+    color: '#475569',
+    borderBottom: '1px solid rgba(0,0,0,0.05)',
+    paddingBottom: '4px',
+    marginTop: '16px',
+    marginBottom: '8px',
+    textTransform: 'uppercase',
+    letterSpacing: '0.5px'
+  },
+  grid: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr',
+    gap: '12px',
+    marginBottom: '12px'
+  },
+  field: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '4px',
+    padding: '4px 0'
+  },
+  label: {
+    fontSize: '10px',
+    color: '#94A3B8',
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: '0.5px'
+  },
+  value: {
+    fontSize: '13px',
+    fontWeight: '500',
+    color: '#334155',
+    wordBreak: 'break-word'
+  }
+}
+
+// Field Groups for Card Layout
+const fieldGroups = {
+  general: ['contractNo', 'contractName', 'contractType', 'contractStatus', 'crmContractId', 'partyAName', 'partyAContact', 'partyAPhone', 'partyAAddress', 'partyBName', 'partyBContact', 'partyBPhone', 'partyBAddress'],
+  financials: ['contractAmount', 'taxRate', 'taxAmount', 'totalAmountWithTax', 'currencyType', 'paymentMethod', 'paymentTerm', 'invoiceTitle', 'invoiceType', 'taxpayerId'],
+  performance: ['subjectType', 'subjectDesc', 'subjectQuantity', 'unitPrice', 'performanceMethod', 'performanceLocation', 'performanceStartDate', 'performanceEndDate', 'qualityStandard'],
+  legal: ['signDate', 'effectiveDate', 'expireDate', 'disputeResolution', 'governingLaw', 'legalReviewFlag', 'legalReviewOpinion', 'remark', 'createUser', 'createTime']
+}
+
+const getFieldsInGroup = (group) => {
+  const selected = cardConfig.value.selectedFields
+  if (group === 'extended') {
+    return contractFields.value.filter(f => f.source === 'EXTEND' && selected.includes(f.fieldCode))
+  }
+  const groupFields = fieldGroups[group] || []
+  return contractFields.value.filter(f => groupFields.includes(f.fieldCode) && selected.includes(f.fieldCode))
+}
+
+const hasFieldsInGroup = (group) => {
+  return getFieldsInGroup(group).length > 0
+}
 
 const fetchMetadata = async () => {
   try {

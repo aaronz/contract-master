@@ -706,7 +706,7 @@ const applyFilters = () => {
 
 // Helpers
 const formatCurrency = (val) => {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(val)
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(val || 0)
 }
 
 const formatDate = (dateStr) => {
