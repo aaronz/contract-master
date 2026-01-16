@@ -107,12 +107,6 @@
           </div>
           
           <div class="header-actions">
-            <div class="search-bar glass-input" @click="focusSearch">
-              <el-icon class="search-icon"><Search /></el-icon>
-              <input ref="searchInput" type="text" placeholder="Search..." />
-              <div class="shortcut-hint">⌘K</div>
-            </div>
-            
             <el-divider direction="vertical" />
             
             <el-dropdown trigger="click" popper-class="notification-popper">
@@ -156,32 +150,10 @@
 
 <script setup>
 import { 
-  DataLine, Document, Setting, Bell, Search, InfoFilled, 
+  DataLine, Document, Setting, Bell, InfoFilled, 
   Warning, Connection, Hide, DocumentChecked, Operation, Tools 
 } from '@element-plus/icons-vue'
-import { ref, onMounted, onUnmounted } from 'vue'
-
-const searchInput = ref(null)
-const tenantId = ref(localStorage.getItem('tenantId') || 'Default Tenant')
-
-const focusSearch = () => {
-  searchInput.value?.focus()
-}
-
-const handleKeydown = (e) => {
-  if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-    e.preventDefault()
-    focusSearch()
-  }
-}
-
-onMounted(() => {
-  window.addEventListener('keydown', handleKeydown)
-})
-
-onUnmounted(() => {
-  window.removeEventListener('keydown', handleKeydown)
-})
+import { ref } from 'vue'
 </script>
 
 <style scoped>
@@ -362,48 +334,6 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-}
-
-.glass-input {
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(203, 213, 225, 0.6);
-  backdrop-filter: blur(4px);
-}
-
-.search-bar {
-  display: flex;
-  align-items: center;
-  padding: 8px 16px;
-  border-radius: 12px;
-  width: 300px;
-  transition: all 0.2s;
-}
-
-.search-bar:focus-within {
-  background: #fff;
-  border-color: #3B82F6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-  transform: scale(1.02);
-}
-
-.search-bar input {
-  border: none;
-  outline: none;
-  background: transparent;
-  margin-left: 10px;
-  flex: 1;
-  font-size: 14px;
-  color: #1E293B;
-}
-
-.shortcut-hint {
-  font-size: 11px;
-  font-weight: 600;
-  color: #94A3B8;
-  background: #F1F5F9;
-  padding: 4px 6px;
-  border-radius: 6px;
-  border: 1px solid #E2E8F0;
 }
 
 .main-content-wrapper {
