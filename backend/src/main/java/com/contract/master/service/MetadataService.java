@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map; // Add this import
 import java.util.stream.Collectors;
 
 @Service
@@ -22,6 +23,8 @@ public class MetadataService {
 
     @Autowired
     private FieldConfigRepository fieldConfigRepository;
+
+    private final Map<String, List<FieldConfig>> fieldConfigCache = new java.util.concurrent.ConcurrentHashMap<>();
 
     public List<FieldMetadataDTO> getContractFields() {
         String tenantId = TenantContext.getCurrentTenant();
@@ -106,5 +109,9 @@ public class MetadataService {
             }
         }
         return result.toString();
+    }
+
+    public void clearFieldConfigCache() {
+        fieldConfigCache.clear();
     }
 }

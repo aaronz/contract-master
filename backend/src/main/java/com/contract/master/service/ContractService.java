@@ -12,6 +12,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.beans.BeanWrapper; // Moved import
+import org.springframework.beans.BeanWrapperImpl; // Moved import
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -253,6 +255,9 @@ public class ContractService {
         dto.setPartyAName(base.getPartyAName());
         dto.setPartyBName(base.getPartyBName());
 
+        // Apply masking to partyAPhone if it exists
+        dto.setPartyAPhone(maskPhoneNumber(base.getPartyAPhone()));
+
         dto.setContractAmount(base.getAmount());
         dto.setTaxRate(base.getTaxRate());
         dto.setTaxAmount(base.getTaxAmount());
@@ -317,6 +322,13 @@ public class ContractService {
         return dto;
     }
 
+    private String maskPhoneNumber(String phoneNumber) {
+        if (phoneNumber == null || phoneNumber.length() < 11) {
+            return phoneNumber; // Or throw an exception, depending on requirements
+        }
+        return phoneNumber.substring(0, 3) + "****" + phoneNumber.substring(7);
+    }
+
     private void filterFields(ContractDTO dto) {
         String tenantId = dto.getTenantId();
         if (tenantId == null) {
@@ -333,7 +345,8 @@ public class ContractService {
     }
 
     private void filterStandardFields(ContractDTO dto, List<FieldConfig> configs) {
-        Class<?> dtoClass = dto.getClass();
+        // Use BeanWrapper for more robust property setting
+        BeanWrapper src = new BeanWrapperImpl(dto);
         
         for (FieldConfig config : configs) {
             if (isFieldAccessible(config)) {
@@ -342,15 +355,10 @@ public class ContractService {
             
             String camelCaseField = snakeToCamelCase(config.getFieldCode());
             
-            try {
-                java.lang.reflect.Field field = dtoClass.getDeclaredField(camelCaseField);
-                field.setAccessible(true);
-                field.set(dto, null);
-            } catch (NoSuchFieldException e) {
-                // Ignore fields not in DTO (might be extended only)
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException("Failed to filter field: " + camelCaseField, e);
+            if (src.isWritableProperty(camelCaseField)) {
+                src.setPropertyValue(camelCaseField, null);
             }
+            // else ignore if not a writable property, or handle extended fields separately
         }
     }
 

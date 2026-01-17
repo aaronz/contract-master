@@ -2,6 +2,8 @@ package com.contract.master.service;
 
 import com.contract.master.domain.ContractExtendField;
 import com.contract.master.domain.ContractExtendFieldRepository;
+import com.contract.master.domain.FieldConfig; // Add this import
+import com.contract.master.domain.FieldConfigRepository;
 import com.contract.master.dto.FieldMetadataDTO;
 import com.contract.master.security.TenantContext;
 import org.junit.jupiter.api.AfterEach;
@@ -23,6 +25,8 @@ public class MetadataServiceTest {
 
     @Mock
     private ContractExtendFieldRepository extendFieldRepository;
+    @Mock
+    private FieldConfigRepository fieldConfigRepository; // Add this mock
 
     @InjectMocks
     private MetadataService metadataService;
@@ -47,12 +51,20 @@ public class MetadataServiceTest {
         when(extendFieldRepository.findByTenantId("tenant-1"))
                 .thenReturn(Collections.singletonList(field));
 
+        // Mock fieldConfigRepository to return a FieldConfig for "contractNo"
+        FieldConfig contractNoConfig = new FieldConfig();
+        contractNoConfig.setFieldCode("contract_no"); // Corrected to snake_case
+        contractNoConfig.setFieldAlias("Contract No");
+        contractNoConfig.setConfigType("CONTRACT");
+        when(fieldConfigRepository.findByTenantId("tenant-1"))
+                .thenReturn(Collections.singletonList(contractNoConfig));
+
         List<FieldMetadataDTO> result = metadataService.getContractFields();
 
         assertNotNull(result);
         assertFalse(result.isEmpty());
         
-        assertTrue(result.stream().anyMatch(f -> "contractNo".equals(f.getFieldCode())));
+        assertTrue(result.stream().anyMatch(f -> "contract_no".equals(f.getFieldCode()))); // Corrected to snake_case
         
         assertTrue(result.stream().anyMatch(f -> "custom_1".equals(f.getFieldCode())));
         

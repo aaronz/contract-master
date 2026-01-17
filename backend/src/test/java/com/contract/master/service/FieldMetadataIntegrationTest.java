@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.AfterEach; // Import AfterEach
 
 @SpringBootTest
 @Transactional
@@ -29,18 +30,31 @@ public class FieldMetadataIntegrationTest {
     @Autowired
     private ContractExtendFieldRepository extendFieldRepository;
 
+    @Autowired
+    private ContractService contractService; // Inject ContractService
+
     @BeforeEach
     void setUp() {
         TenantContext.setCurrentTenant("test-tenant");
+        metadataService.clearFieldConfigCache(); // Clear MetadataService cache
     }
+
+    @AfterEach
+    void tearDown() {
+        // This is an integration test, so no need to clear the contractService cache here.
+        // It's the responsibility of ContractServiceTest or a broader integration test
+        // to manage its cache.
+    }
+
 
     @Test
     void testUnifiedMetadataWithConfigs() {
         FieldConfig config = new FieldConfig();
-        config.setFieldCode("contractNo");
+        config.setFieldCode("contract_no"); // Corrected to snake_case
         config.setFieldAlias("Custom Contract No");
         config.setIsVisible(false);
         config.setTenantId("test-tenant");
+        config.setConfigType("CONTRACT"); // Add configType
         fieldConfigRepository.save(config);
 
         ContractExtendField extendField = new ContractExtendField();
@@ -54,9 +68,9 @@ public class FieldMetadataIntegrationTest {
         List<FieldMetadataDTO> fields = metadataService.getContractFields();
 
         FieldMetadataDTO contractNoField = fields.stream()
-                .filter(f -> f.getFieldCode().equals("contractNo"))
+                .filter(f -> f.getFieldCode().equals("contract_no"))
                 .findFirst().orElseThrow();
-        assertThat(contractNoField.getFieldName()).isEqualTo("Custom Contract No");
+        assertThat(contractNoField.getFieldName()).isEqualTo("Custom Contract No"); // Corrected back to getFieldName()
         assertThat(contractNoField.getIsVisible()).isFalse();
 
         FieldMetadataDTO projectCodeField = fields.stream()
