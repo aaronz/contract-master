@@ -1,5 +1,7 @@
-package com.contract.master.domain;
+package com.contract.master.integration.domain.model;
 
+import com.contract.master.domain.BaseTenantEntity;
+import com.contract.master.domain.TenantEntityListener;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

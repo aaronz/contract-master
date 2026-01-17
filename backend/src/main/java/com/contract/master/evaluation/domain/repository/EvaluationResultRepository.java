@@ -1,6 +1,6 @@
-package com.contract.master.evaluation.repository;
+package com.contract.master.evaluation.domain.repository;
 
-import com.contract.master.evaluation.model.EvaluationResult;
+import com.contract.master.evaluation.domain.model.EvaluationResult;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

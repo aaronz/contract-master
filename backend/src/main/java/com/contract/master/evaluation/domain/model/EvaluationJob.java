@@ -1,4 +1,4 @@
-package com.contract.master.evaluation.model;
+package com.contract.master.evaluation.domain.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;

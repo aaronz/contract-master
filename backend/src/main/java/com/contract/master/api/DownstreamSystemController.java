@@ -1,7 +1,7 @@
 package com.contract.master.api;
 
-import com.contract.master.domain.DownstreamSystem;
-import com.contract.master.domain.DownstreamSystemRepository;
+import com.contract.master.integration.domain.model.DownstreamSystem;
+import com.contract.master.integration.domain.repository.DownstreamSystemRepository;
 import com.contract.master.security.TenantContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

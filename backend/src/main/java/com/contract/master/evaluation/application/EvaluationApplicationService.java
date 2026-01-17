@@ -1,31 +1,32 @@
-package com.contract.master.evaluation.service;
+package com.contract.master.evaluation.application;
 
-import com.contract.master.evaluation.model.EvaluationJob;
-import com.contract.master.evaluation.model.EvaluationResult;
-import com.contract.master.evaluation.repository.EvaluationJobRepository;
-import com.contract.master.evaluation.repository.EvaluationResultRepository;
+import com.contract.master.evaluation.domain.model.EvaluationJob;
+import com.contract.master.evaluation.domain.model.EvaluationResult;
+import com.contract.master.evaluation.domain.repository.EvaluationJobRepository;
+import com.contract.master.evaluation.domain.repository.EvaluationResultRepository;
+import com.contract.master.evaluation.infrastructure.messaging.KafkaProducerService;
 import com.contract.master.service.AuditService;
 import com.contract.master.dto.ContractDTO;
 import com.contract.master.service.ContractService;
 import com.contract.master.service.RuleEngineService;
-import com.contract.master.security.TenantContext; // Import TenantContext
+import com.contract.master.security.TenantContext;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional; // Import Transactional
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Arrays; // Needed for List.of
-import java.util.Optional; // Needed for findById
+import java.util.Arrays;
+import java.util.Optional;
 
 @Service
-public class EvaluationService {
+public class EvaluationApplicationService {
 
-    private static final Logger logger = LoggerFactory.getLogger(EvaluationService.class);
+    private static final Logger logger = LoggerFactory.getLogger(EvaluationApplicationService.class);
 
     private final EvaluationJobRepository jobRepository;
     private final EvaluationResultRepository resultRepository;
@@ -35,13 +36,13 @@ public class EvaluationService {
     private final ContractService contractService;
     private final ObjectMapper objectMapper;
 
-    public EvaluationService(EvaluationJobRepository jobRepository,
-                             EvaluationResultRepository resultRepository,
-                             KafkaProducerService kafkaProducerService,
-                             AuditService auditService,
-                             RuleEngineService ruleEngineService,
-                             ContractService contractService,
-                             ObjectMapper objectMapper) {
+    public EvaluationApplicationService(EvaluationJobRepository jobRepository,
+                                     EvaluationResultRepository resultRepository,
+                                     KafkaProducerService kafkaProducerService,
+                                     AuditService auditService,
+                                     RuleEngineService ruleEngineService,
+                                     ContractService contractService,
+                                     ObjectMapper objectMapper) {
         this.jobRepository = jobRepository;
         this.resultRepository = resultRepository;
         this.kafkaProducerService = kafkaProducerService;
@@ -131,16 +132,13 @@ public class EvaluationService {
 
     @Transactional
     public String triggerReEvaluationForSingleContract(String contractId, List<String> ruleIds, String triggeredBy) {
-        String tenantId = com.contract.master.security.TenantContext.getCurrentTenant();
+        String tenantId = TenantContext.getCurrentTenant();
 
-        // 1. Validate contract existence
-        contractService.getContractById(contractId); // Throws exception if not found
+        contractService.getContractById(contractId);
 
-        // 2. Check for existing in-progress evaluations for the contract
-        // Construct JSON-like string for query
         String contractIdJson;
         try {
-            contractIdJson = objectMapper.writeValueAsString(List.of(contractId)); // Ensures exact match for single item array
+            contractIdJson = objectMapper.writeValueAsString(List.of(contractId));
         } catch (Exception e) {
             logger.error("Failed to serialize contractId for conflict check", e);
             throw new RuntimeException("Re-evaluation failed due to internal error.");
@@ -153,11 +151,8 @@ public class EvaluationService {
             throw new IllegalStateException("An evaluation for this contract is already in progress.");
         }
 
-        // 3. Use the existing createAndPublishEvaluationJob
         EvaluationJob job = createAndPublishEvaluationJob(ruleIds, List.of(contractId), tenantId, triggeredBy);
         
-        // 4. Record audit log entry (FR-008) - createAndPublishEvaluationJob already logs a generic CREATE event.
-        //    For a more specific "RE_EVALUATION_TRIGGERED" audit event, add it here.
         auditService.logReEvaluationTriggered(contractId, String.join(",", ruleIds), triggeredBy);
 
         return job.getId();

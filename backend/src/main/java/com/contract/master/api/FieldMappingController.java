@@ -1,7 +1,7 @@
 package com.contract.master.api;
 
-import com.contract.master.domain.FieldMapping;
-import com.contract.master.domain.FieldMappingRepository;
+import com.contract.master.integration.domain.model.FieldMapping;
+import com.contract.master.integration.domain.repository.FieldMappingRepository;
 import com.contract.master.security.TenantContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

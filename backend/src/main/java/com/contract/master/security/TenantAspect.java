@@ -15,7 +15,7 @@ public class TenantAspect {
     @Autowired
     private EntityManager entityManager;
 
-    @Pointcut("execution(* com.contract.master.domain..*(..))")
+    @Pointcut("execution(* com.contract.master..domain..*(..))")
     public void repositoryMethods() {}
 
     @Before("repositoryMethods()")

@@ -1,4 +1,4 @@
-package com.contract.master.integration;
+package com.contract.master.integration.interfaces.rest;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;

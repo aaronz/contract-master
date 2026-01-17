@@ -1,6 +1,6 @@
-package com.contract.master.evaluation.repository;
+package com.contract.master.evaluation.domain.repository;
 
-import com.contract.master.evaluation.model.EvaluationJob;
+import com.contract.master.evaluation.domain.model.EvaluationJob;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

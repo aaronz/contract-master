@@ -1,9 +1,9 @@
 package com.contract.master.api;
 
-import com.contract.master.domain.WebHookConfig;
-import com.contract.master.domain.WebHookConfigRepository;
+import com.contract.master.integration.domain.model.WebHookConfig;
+import com.contract.master.integration.domain.repository.WebHookConfigRepository;
 import com.contract.master.security.TenantContext;
-import com.contract.master.service.CrmIntegrationService;
+import com.contract.master.integration.application.CrmIntegrationApplicationService;
 import com.contract.master.service.RateLimiterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,7 +19,7 @@ import java.util.Map;
 public class WebHookController {
 
     @Autowired
-    private CrmIntegrationService crmIntegrationService;
+    private CrmIntegrationApplicationService crmIntegrationService;
 
     @Autowired
     private WebHookConfigRepository configRepository;
