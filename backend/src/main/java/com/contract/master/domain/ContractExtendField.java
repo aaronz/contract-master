@@ -11,6 +11,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+
 @Entity
 @Table(name = "contract_extend_field")
 @Data
@@ -24,12 +27,16 @@ public class ContractExtendField extends BaseTenantEntity {
     @Column(name = "field_id", length = 64)
     private String fieldId;
 
+    @NotBlank(message = "Field name is required")
     @Column(name = "field_name", length = 64)
     private String fieldName;
 
+    @NotBlank(message = "Field code is required")
+    @Pattern(regexp = "^[a-zA-Z0-9_]+$", message = "Field code must be alphanumeric or underscore")
     @Column(name = "field_code", length = 64)
     private String fieldCode;
 
+    @NotBlank(message = "Field type is required")
     @Column(name = "field_type", length = 32)
     private String fieldType;
 

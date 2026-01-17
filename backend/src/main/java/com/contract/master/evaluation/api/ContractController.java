@@ -1,4 +1,4 @@
-package com.contractmaster.evaluation.api;
+package com.contract.master.evaluation.api;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,8 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-@RestController
-@RequestMapping("/api/contracts")
+@RestController("evaluationContractController")
+@RequestMapping("/api/evaluation/contracts")
 public class ContractController {
 
     // Placeholder for a Contract DTO

@@ -73,9 +73,9 @@
         <div class="card-header">
           <span>Contract Volume Trend</span>
           <el-radio-group v-model="chartPeriod" size="small">
-            <el-radio-button label="Week" />
-            <el-radio-button label="Month" />
-            <el-radio-button label="Year" />
+            <el-radio-button value="Week">Week</el-radio-button>
+            <el-radio-button value="Month">Month</el-radio-button>
+            <el-radio-button value="Year">Year</el-radio-button>
           </el-radio-group>
         </div>
         <div ref="trendChartRef" class="chart-container"></div>
@@ -144,6 +144,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { Document, Timer, Money, Warning, Top, Download, ArrowDown } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
 import * as echarts from 'echarts'
 
 const router = useRouter()
@@ -163,7 +164,7 @@ const initCharts = () => {
   // Trend Chart
   trendChart = echarts.init(trendChartRef.value)
   trendChart.on('click', (params) => {
-    router.push({ path: '/contract/list', query: { date: params.name } })
+    router.push({ path: '/contracts', query: { date: params.name } })
   })
   trendChart.setOption({
     tooltip: { trigger: 'axis' },
@@ -303,6 +304,7 @@ const fetchDashboardStats = async () => {
     }
   } catch (error) {
     console.error('Failed to fetch dashboard stats', error)
+    ElMessage.error('Failed to load dashboard statistics')
   }
 }
 
@@ -367,6 +369,7 @@ const handleExport = async () => {
     window.URL.revokeObjectURL(url)
   } catch (error) {
     console.error('Export failed', error)
+    ElMessage.error('Failed to export report')
   }
 }
 </script>

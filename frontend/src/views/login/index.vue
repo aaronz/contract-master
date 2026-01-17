@@ -74,6 +74,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { User, Lock, Check } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+import request from '@/utils/request'
 
 const router = useRouter()
 const loading = ref(false)
@@ -87,24 +88,24 @@ const loginForm = ref({
 const handleLogin = async () => {
   loading.value = true
   try {
-    const response = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'X-Tenant-ID': loginForm.value.tenantId
-      },
-      body: JSON.stringify(loginForm.value)
-    })
-    if (response.ok) {
-      const data = await response.json()
+    const response = await request.post('/auth/login', loginForm.value)
+    
+    // Check if login was successful
+    if (response.data && response.data.token) {
+      const data = response.data
       localStorage.setItem('token', data.token)
       localStorage.setItem('tenantId', loginForm.value.tenantId)
       router.push('/')
+    } else if (response.data.status === 200 && response.data.data) {
+       // Handle wrapped response if auth controller follows ApiResponse
+       localStorage.setItem('token', response.data.data.token)
+       localStorage.setItem('tenantId', loginForm.value.tenantId)
+       router.push('/')
     } else {
       ElMessage.error('Invalid credentials')
     }
   } catch (error) {
-    ElMessage.error('Network error')
+    console.error('Login error', error)
   } finally {
     loading.value = false
   }

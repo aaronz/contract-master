@@ -44,7 +44,7 @@ const handleContractSelection = async (contractIds) => {
   try {
     // Assuming a single rule is being edited, so we send a single ruleId
     const response = await evaluationApi.triggerEvaluation([selectedRuleId.value], contractIds);
-    ElMessage.success(`Evaluation job ${response.data.job_id} started.`);
+    ElMessage.success(`Evaluation job ${response.data.id} started.`);
   } catch (error) {
     ElMessage.error('Failed to trigger evaluation.');
     console.error('Error triggering evaluation:', error);

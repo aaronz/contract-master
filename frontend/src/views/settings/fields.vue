@@ -83,7 +83,7 @@
           <template #default="{ row }">
              <div class="visibility-toggles">
                <el-tooltip content="Show in Frontend">
-                 <el-switch v-model="row.frontendDisplay" active-text="UI" inline-prompt />
+                 <el-switch v-model="row.isVisible" active-text="UI" inline-prompt />
                </el-tooltip>
                <el-tooltip content="Return in API">
                  <el-switch v-model="row.apiReturn" active-text="API" inline-prompt />
@@ -101,7 +101,10 @@ import { ref, onMounted } from 'vue'
 import { Check, Rank, Plus } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import Sortable from 'sortablejs'
+import request from '@/utils/request'
+import { useFieldStore } from '@/stores/fieldStore'
 
+const fieldStore = useFieldStore()
 const configs = ref([])
 const showAddDialog = ref(false)
 const adding = ref(false)
@@ -116,25 +119,52 @@ const handleAddField = () => {
   showAddDialog.value = true
 }
 
+const saveConfig = async () => {
+  try {
+    const payload = configs.value.map(c => ({
+      ...c,
+      fieldStyles: c.styles.join(','),
+      fieldColor: c.fieldColor
+    }))
+
+    const response = await request.post('/settings/fields/batch', payload)
+
+    if (response.data.status === 200 || response.status === 200) {
+      ElMessage.success('Field configuration saved successfully.')
+      await fetchFields() 
+      // Force refresh of the global store
+      await fieldStore.fetchFieldConfigs()
+    } else {
+      ElMessage.error(response.data.message || 'Failed to save configurations')
+    }
+  } catch (error) {
+    console.error('Save failed', error)
+  }
+}
+
 const confirmAddField = async () => {
   adding.value = true
   try {
-    const response = await fetch('/api/settings/extend-fields', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        'X-Tenant-ID': localStorage.getItem('tenantId')
-      },
-      body: JSON.stringify(newField.value)
-    })
-    if (response.ok) {
+    const response = await request.post('/settings/extend-fields', newField.value)
+    
+    // axios request util handles unwrapping or error throwing
+    // But since request.js response interceptor returns 'response', 
+    // and ApiResponse structure is {status, message, data}, 
+    // we need to check response.data.status if using custom wrapper, or just check standard HTTP status
+    
+    // Based on GlobalExceptionHandler, success returns 200 with data.
+    // request.js returns 'response', so we access response.data
+    
+    if (response.data.status === 200 || response.status === 200) {
       ElMessage.success('Field added successfully')
       showAddDialog.value = false
-      fetchFields()
+      await fetchFields()
+    } else {
+      ElMessage.error(response.data.message || 'Failed to add extended field')
     }
   } catch (error) {
     console.error('Failed to add field', error)
+    // Error is already handled by request interceptor (ElMessage)
   } finally {
     adding.value = false
   }
@@ -142,24 +172,22 @@ const confirmAddField = async () => {
 
 const fetchFields = async () => {
   try {
-    const response = await fetch('/api/metadata/contract-fields', {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        'X-Tenant-ID': localStorage.getItem('tenantId')
-      }
-    })
-    if (response.ok) {
-      const result = await response.json()
-      // Use result.data since the backend response is wrapped in ApiResponse
-      const fieldList = result.data || []
+    const response = await request.get('/metadata/contract-fields')
+    if (response.data.status === 200) {
+      const fieldList = response.data.data || []
       configs.value = fieldList.map(f => ({
-        fieldCode: f.fieldCode,
-        fieldAlias: f.fieldName,
-        apiReturn: true,
-        frontendDisplay: true,
-        color: '#1E293B',
-        styles: []
-      }))
+        id: f.id,
+        fieldCode: f.fieldCode, // Metadata is now standardized to snake_case by backend
+        fieldAlias: f.fieldName, // This comes merged with config alias if present
+        isVisible: f.isVisible,
+        apiReturn: f.apiReturn,
+        fieldColor: f.fieldColor || '#1E293B',
+        styles: f.fieldStyles ? f.fieldStyles.split(',') : [],
+        displayOrder: f.displayOrder,
+        configType: 'CONTRACT'
+      })).sort((a, b) => a.displayOrder - b.displayOrder)
+    } else {
+      ElMessage.error('Failed to load field configurations')
     }
   } catch (error) {
     console.error('Failed to fetch metadata', error)
@@ -176,18 +204,18 @@ onMounted(async () => {
       onEnd: ({ newIndex, oldIndex }) => {
         const targetRow = configs.value.splice(oldIndex, 1)[0]
         configs.value.splice(newIndex, 0, targetRow)
+        // Update display order based on new index
+        configs.value.forEach((row, index) => {
+          row.displayOrder = index
+        })
       }
     })
   }
 })
 
-const saveConfig = () => {
-  ElMessage.success('Field configuration saved successfully.')
-}
-
 const getPreviewStyle = (row) => {
   return {
-    color: row.color,
+    color: row.fieldColor,
     fontWeight: row.styles.includes('bold') ? 'bold' : 'normal',
     fontStyle: row.styles.includes('italic') ? 'italic' : 'normal',
   }

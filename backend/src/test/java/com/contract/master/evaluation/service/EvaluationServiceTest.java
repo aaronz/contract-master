@@ -1,14 +1,20 @@
-package com.contractmaster.evaluation.service;
+package com.contract.master.evaluation.service;
 
-import com.contractmaster.evaluation.model.EvaluationJob;
-import com.contractmaster.evaluation.model.EvaluationResult;
-import com.contractmaster.evaluation.repository.EvaluationJobRepository;
-import com.contractmaster.evaluation.repository.EvaluationResultRepository;
+import com.contract.master.evaluation.model.EvaluationJob;
+import com.contract.master.evaluation.model.EvaluationResult;
+import com.contract.master.evaluation.repository.EvaluationJobRepository;
+import com.contract.master.evaluation.repository.EvaluationResultRepository;
+import com.contract.master.service.AuditService;
+import com.contract.master.service.ContractService;
+import com.contract.master.service.RuleEngineService;
+import com.contract.master.dto.ContractDTO;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.kafka.core.KafkaTemplate;
 
@@ -16,9 +22,12 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,7 +38,15 @@ class EvaluationServiceTest {
     @Mock
     private EvaluationResultRepository resultRepository;
     @Mock
-    private KafkaProducerService kafkaProducerService; // Mock the KafkaProducerService
+    private KafkaProducerService kafkaProducerService;
+    @Mock
+    private AuditService auditService;
+    @Mock
+    private RuleEngineService ruleEngineService;
+    @Mock
+    private ContractService contractService;
+    @Spy
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     @InjectMocks
     private EvaluationService evaluationService;
@@ -48,7 +65,6 @@ class EvaluationServiceTest {
         contractIds = Arrays.asList("contract1", "contract2");
 
         testJob = new EvaluationJob(tenantId, EvaluationJob.JobStatus.PENDING, EvaluationJob.TriggerType.MANUAL, LocalDateTime.now(), triggeredBy);
-
     }
 
     @Test
@@ -68,24 +84,38 @@ class EvaluationServiceTest {
 
         verify(jobRepository, times(1)).save(any(EvaluationJob.class));
         verify(kafkaProducerService, times(1)).sendMessage("job-123-generated");
+        
+        verify(auditService, times(1)).logChange(
+            eq("JOB-job-123-generated"), 
+            eq("EvaluationJob"), 
+            isNull(), 
+            eq("Created"), 
+            eq("CREATE"), 
+            eq(triggeredBy)
+        );
     }
 
     @Test
-    void testListen_jobCompletion() {
+    void testListen_jobCompletion() throws Exception {
         // For testListen, the mock should return a job that already has an ID
         EvaluationJob existingJob = new EvaluationJob(tenantId, EvaluationJob.JobStatus.PENDING, EvaluationJob.TriggerType.MANUAL, LocalDateTime.now(), triggeredBy);
-        existingJob.setId("job-123"); // Set a specific ID for this test case
+        existingJob.setId("job-123");
+        existingJob.setTargetRules(objectMapper.writeValueAsString(ruleIds));
+        existingJob.setTargetContracts(objectMapper.writeValueAsString(contractIds));
 
         when(jobRepository.findById(existingJob.getId())).thenReturn(Optional.of(existingJob));
-        when(jobRepository.save(any(EvaluationJob.class))).thenReturn(existingJob); // Return the same instance for updates
+        when(jobRepository.save(any(EvaluationJob.class))).thenReturn(existingJob);
         when(resultRepository.save(any(EvaluationResult.class))).thenReturn(new EvaluationResult());
+        when(contractService.getContractById(anyString())).thenReturn(new ContractDTO()); // Return a dummy contract
+        when(ruleEngineService.validate(any(ContractDTO.class))).thenReturn(Collections.emptyList()); // Simulate validation passing
 
         evaluationService.listen(existingJob.getId());
 
         assertEquals(EvaluationJob.JobStatus.COMPLETED, existingJob.getStatus());
         assertNotNull(existingJob.getCompletedAt());
         verify(jobRepository, times(2)).save(any(EvaluationJob.class)); // Once for IN_PROGRESS, once for COMPLETED
-        verify(resultRepository, times(1)).save(any(EvaluationResult.class));
+        // Expect resultRepository to be saved twice (once for each contract in contractIds)
+        verify(resultRepository, times(2)).save(any(EvaluationResult.class));
     }
 
     @Test

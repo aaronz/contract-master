@@ -6,8 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
+import jakarta.validation.Valid;
+
 @RestController
-@RequestMapping("/api/configs")
+@RequestMapping("/api/settings/fields")
 public class FieldConfigController {
 
     @Autowired
@@ -19,8 +21,14 @@ public class FieldConfigController {
     }
 
     @PostMapping
-    public GlobalExceptionHandler.ApiResponse<Void> saveConfig(@RequestBody FieldConfig config) {
+    public GlobalExceptionHandler.ApiResponse<Void> saveConfig(@Valid @RequestBody FieldConfig config) {
         fieldConfigService.saveConfig(config);
+        return GlobalExceptionHandler.ApiResponse.success(null);
+    }
+
+    @PostMapping("/batch")
+    public GlobalExceptionHandler.ApiResponse<Void> saveConfigs(@Valid @RequestBody List<FieldConfig> configs) {
+        fieldConfigService.saveConfigs(configs);
         return GlobalExceptionHandler.ApiResponse.success(null);
     }
 }

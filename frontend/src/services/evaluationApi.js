@@ -1,57 +1,52 @@
 // frontend/src/services/evaluationApi.js
 
-import axios from 'axios';
+import request from '@/utils/request';
 
-const API_BASE_URL = '/api'; // Adjust if your API is on a different base path
+const API_BASE_URL = '';
 
 export default {
-  /**
-   * Triggers a manual rule evaluation.
-   * @param {Array<string>} ruleIds - Array of rule IDs.
-   * @param {Array<string>} contractIds - Array of contract IDs.
-   * @returns {Promise<Object>} - The response containing the job ID.
-   */
   triggerEvaluation(ruleIds, contractIds) {
-    return axios.post(`${API_BASE_URL}/evaluations`, {
-      rule_ids: ruleIds,
-      contract_ids: contractIds,
+    return request.post(`/evaluations`, {
+      ruleIds: ruleIds,
+      contractIds: contractIds,
     });
   },
 
-  /**
-   * Fetches a paginated list of evaluation jobs for the Problem Center.
-   * @param {number} page - Page number (0-indexed).
-   * @param {number} size - Number of items per page.
-   * @returns {Promise<Array<Object>>} - Array of evaluation jobs.
-   */
   getEvaluationJobs(page = 0, size = 20) {
-    return axios.get(`${API_BASE_URL}/problem-center/evaluation-jobs`, {
+    return request.get(`/problem-center/evaluation-jobs`, {
       params: { page, size },
     });
   },
 
-  /**
-   * Fetches detailed results for a specific evaluation job.
-   * @param {string} jobId - The ID of the evaluation job.
-   * @returns {Promise<Array<Object>>} - Array of evaluation results.
-   */
   getEvaluationResults(jobId) {
-    return axios.get(`${API_BASE_URL}/problem-center/evaluation-jobs/${jobId}/results`);
+    return request.get(`/problem-center/evaluation-jobs/${jobId}/results`);
   },
 
-  /**
-   * Fetches a list of available contracts.
-   * @returns {Promise<Array<Object>>} - Array of contracts.
-   */
   getContracts() {
-    return axios.get(`${API_BASE_URL}/contracts`);
+    return request.get(`/contracts`);
   },
 
-  /**
-   * Fetches automatic rule trigger scenarios.
-   * @returns {Promise<Object>} - Object containing trigger scenarios.
-   */
   getTriggerScenarios() {
-    return axios.get(`${API_BASE_URL}/rules/trigger-scenarios`);
+    return request.get(`/rules/trigger-scenarios`);
+  },
+
+  getRules() {
+    return request.get(`/rules`);
+  },
+
+  getRule(id) {
+    return request.get(`/rules/${id}`);
+  },
+
+  createRule(rule) {
+    return request.post(`/rules`, rule);
+  },
+
+  updateRule(id, rule) {
+    return request.put(`/rules/${id}`, rule);
+  },
+
+  batchUpdateRules(rules) {
+    return request.put(`/rules/batch`, rules);
   },
 };

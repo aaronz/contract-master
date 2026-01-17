@@ -14,6 +14,7 @@ public interface ContractBaseRepository extends JpaRepository<ContractBase, Stri
     Optional<ContractBase> findByContractNo(String contractNo);
     Optional<ContractBase> findByCrmId(String crmId);
     Page<ContractBase> findByTenantId(String tenantId, Pageable pageable);
+    java.util.List<ContractBase> findByTenantId(String tenantId);
 
     @Query("SELECT COUNT(c) FROM ContractBase c WHERE c.tenantId = :tenantId")
     Long countByTenantId(String tenantId);

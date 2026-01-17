@@ -52,9 +52,26 @@ public class ContractBase extends BaseTenantEntity {
     private String partyAId;
     @Column(name = "party_a_name", length = 128)
     private String partyAName;
+    @Column(name = "party_a_contact", length = 64)
+    private String partyAContact;
+    @Column(name = "party_a_phone", length = 32)
+    private String partyAPhone;
+    @Column(name = "party_a_address", length = 512)
+    private String partyAAddress;
 
     @Column(name = "party_b_name", length = 128)
     private String partyBName;
+    @Column(name = "party_b_contact", length = 64)
+    private String partyBContact;
+    @Column(name = "party_b_phone", length = 32)
+    private String partyBPhone;
+    @Column(name = "party_b_address", length = 512)
+    private String partyBAddress;
+
+    @Column(name = "third_party_flag")
+    private Boolean thirdPartyFlag;
+    @Column(name = "third_party_info", columnDefinition = "TEXT")
+    private String thirdPartyInfo;
 
     @Column(name = "amount", precision = 18, scale = 2)
     private BigDecimal amount;
@@ -243,4 +260,23 @@ public class ContractBase extends BaseTenantEntity {
     public void setArchiveFlag(Boolean archiveFlag) { this.archiveFlag = archiveFlag; }
     public LocalDateTime getArchiveTime() { return archiveTime; }
     public void setArchiveTime(LocalDateTime archiveTime) { this.archiveTime = archiveTime; }
+
+    public String getPartyAContact() { return partyAContact; }
+    public void setPartyAContact(String partyAContact) { this.partyAContact = partyAContact; }
+    public String getPartyAPhone() { return partyAPhone; }
+    public void setPartyAPhone(String partyAPhone) { this.partyAPhone = partyAPhone; }
+    public String getPartyAAddress() { return partyAAddress; }
+    public void setPartyAAddress(String partyAAddress) { this.partyAAddress = partyAAddress; }
+
+    public String getPartyBContact() { return partyBContact; }
+    public void setPartyBContact(String partyBContact) { this.partyBContact = partyBContact; }
+    public String getPartyBPhone() { return partyBPhone; }
+    public void setPartyBPhone(String partyBPhone) { this.partyBPhone = partyBPhone; }
+    public String getPartyBAddress() { return partyBAddress; }
+    public void setPartyBAddress(String partyBAddress) { this.partyBAddress = partyBAddress; }
+
+    public Boolean getThirdPartyFlag() { return thirdPartyFlag; }
+    public void setThirdPartyFlag(Boolean thirdPartyFlag) { this.thirdPartyFlag = thirdPartyFlag; }
+    public String getThirdPartyInfo() { return thirdPartyInfo; }
+    public void setThirdPartyInfo(String thirdPartyInfo) { this.thirdPartyInfo = thirdPartyInfo; }
 }

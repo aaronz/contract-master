@@ -2,6 +2,8 @@ package com.contract.master;
 
 import com.contract.master.domain.ContractBase;
 import com.contract.master.domain.ContractBaseRepository;
+import com.contract.master.domain.RuleConfig;
+import com.contract.master.domain.RuleConfigRepository;
 import com.contract.master.domain.User;
 import com.contract.master.domain.UserRepository;
 import org.springframework.boot.CommandLineRunner;
@@ -23,7 +25,7 @@ public class ContractManagementApplication {
     }
 
     @Bean
-    public CommandLineRunner initData(UserRepository userRepository, ContractBaseRepository contractRepository, PasswordEncoder passwordEncoder) {
+    public CommandLineRunner initData(UserRepository userRepository, ContractBaseRepository contractRepository, RuleConfigRepository ruleRepository, PasswordEncoder passwordEncoder) {
         return args -> {
             System.out.println(">>> CHECKING ADMIN USER...");
             if (userRepository.findByUserName("admin").isEmpty()) {
@@ -79,6 +81,35 @@ public class ContractManagementApplication {
                 contractRepository.save(c3);
                 
                 System.out.println(">>> SAMPLE CONTRACTS CREATED SUCCESSFULLY.");
+            }
+
+            System.out.println(">>> CHECKING RULES...");
+            if (ruleRepository.count() == 0) {
+                System.out.println(">>> CREATING DEFAULT RULES...");
+                RuleConfig rule1 = new RuleConfig();
+                rule1.setRuleId(UUID.randomUUID().toString());
+                rule1.setRuleName("High Value Contract Review");
+                rule1.setRuleType("RISK_CHECK");
+                rule1.setRuleLevel("HIGH");
+                rule1.setTriggerTime("BEFORE_APPROVAL");
+                rule1.setRuleCondition("amount > 1000000");
+                rule1.setExecutionActions("REQUIRE_LEGAL_REVIEW");
+                rule1.setIsEnabled(true);
+                rule1.setTenantId("tenant-1");
+                ruleRepository.save(rule1);
+
+                RuleConfig rule2 = new RuleConfig();
+                rule2.setRuleId(UUID.randomUUID().toString());
+                rule2.setRuleName("Missing Attachment Check");
+                rule2.setRuleType("COMPLIANCE");
+                rule2.setRuleLevel("MEDIUM");
+                rule2.setTriggerTime("BEFORE_SUBMIT");
+                rule2.setRuleCondition("attachmentCount == 0");
+                rule2.setExecutionActions("BLOCK_SUBMISSION");
+                rule2.setIsEnabled(true);
+                rule2.setTenantId("tenant-1");
+                ruleRepository.save(rule2);
+                System.out.println(">>> DEFAULT RULES CREATED SUCCESSFULLY.");
             }
         };
     }

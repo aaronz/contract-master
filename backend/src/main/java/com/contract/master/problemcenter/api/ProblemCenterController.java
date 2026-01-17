@@ -1,9 +1,9 @@
-package com.contractmaster.problemcenter.api;
+package com.contract.master.problemcenter.api;
 
-import com.contractmaster.evaluation.model.EvaluationJob;
-import com.contractmaster.evaluation.model.EvaluationResult; // Import EvaluationResult
-import com.contractmaster.evaluation.repository.EvaluationJobRepository;
-import com.contractmaster.evaluation.repository.EvaluationResultRepository; // Import EvaluationResultRepository
+import com.contract.master.evaluation.model.EvaluationJob;
+import com.contract.master.evaluation.model.EvaluationResult; // Import EvaluationResult
+import com.contract.master.evaluation.repository.EvaluationJobRepository;
+import com.contract.master.evaluation.repository.EvaluationResultRepository; // Import EvaluationResultRepository
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -30,11 +30,15 @@ public class ProblemCenterController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
 
+        if (size < 1) {
+            throw new IllegalArgumentException("Page size must not be less than one");
+        }
+
         // Placeholder for tenantId, to be fetched from security context
         String tenantId = "default-tenant"; // Replace with actual tenant ID from security context
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<EvaluationJob> evaluationJobs = evaluationJobRepository.findByTenantIdOrderByCreatedAtDesc(tenantId, pageable);
+        Page<EvaluationJob> evaluationJobs = evaluationJobRepository.findByTenantId(tenantId, pageable);
 
         return ResponseEntity.ok(evaluationJobs.getContent());
     }

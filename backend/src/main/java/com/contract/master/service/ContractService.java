@@ -38,10 +38,57 @@ public class ContractService {
     @Autowired
     private AuditService auditService;
 
+    private final Map<String, List<FieldConfig>> fieldConfigCache = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final String FIELD_CONFIG_TYPE_CONTRACT = "CONTRACT";
+
     public List<ContractDTO> getAllContracts() {
-        return contractBaseRepository.findAll().stream()
+        String tenantId = TenantContext.getCurrentTenant();
+        return contractBaseRepository.findByTenantId(tenantId).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void saveExtendedData(String contractId, Map<String, Object> data) {
+        String tenantId = TenantContext.getCurrentTenant();
+        List<ContractExtendField> tenantExtendFields = extendFieldRepository.findByTenantId(tenantId);
+        List<ContractExtendData> existingData = extendDataRepository.findByContractId(contractId);
+
+        data.forEach((fieldCode, value) -> {
+            tenantExtendFields.stream()
+                .filter(f -> f.getFieldCode().equals(fieldCode))
+                .findFirst()
+                .ifPresent(field -> {
+                    String newVal = value != null ? value.toString() : null;
+                    boolean isVerifying = fieldCode.endsWith("_verified") && value instanceof Boolean && (Boolean)value;
+                    
+                    Optional<ContractExtendData> existing = existingData.stream()
+                            .filter(d -> d.getFieldId().equals(field.getFieldId()))
+                            .findFirst();
+
+                    if (existing.isPresent()) {
+                        if (isVerifying) {
+                            existing.get().setVerificationStatus("VERIFIED");
+                            extendDataRepository.save(existing.get());
+                        } else if (!Objects.equals(existing.get().getFieldValue(), newVal)) {
+                            auditService.logChange(contractId, fieldCode, existing.get().getFieldValue(), newVal, "MANUAL", "admin");
+                            existing.get().setFieldValue(newVal);
+                            existing.get().setFillType("MANUAL");
+                            existing.get().setVerificationStatus("VERIFIED");
+                            extendDataRepository.save(existing.get());
+                        }
+                    } else if (!isVerifying) {
+                        auditService.logChange(contractId, fieldCode, null, newVal, "MANUAL", "admin");
+                        ContractExtendData extendData = new ContractExtendData();
+                        extendData.setContractId(contractId);
+                        extendData.setFieldId(field.getFieldId());
+                        extendData.setFieldValue(newVal);
+                        extendData.setFillType("MANUAL");
+                        extendData.setVerificationStatus("VERIFIED");
+                        extendDataRepository.save(extendData);
+                    }
+                });
+        });
     }
 
     public Page<ContractDTO> searchContracts(Pageable pageable) {
@@ -84,7 +131,15 @@ public class ContractService {
             existing.setContractType(dto.getContractType());
             existing.setPartyAId(dto.getPartyAId());
             existing.setPartyAName(dto.getPartyAName());
+            existing.setPartyAContact(dto.getPartyAContact());
+            existing.setPartyAPhone(dto.getPartyAPhone());
+            existing.setPartyAAddress(dto.getPartyAAddress());
             existing.setPartyBName(dto.getPartyBName());
+            existing.setPartyBContact(dto.getPartyBContact());
+            existing.setPartyBPhone(dto.getPartyBPhone());
+            existing.setPartyBAddress(dto.getPartyBAddress());
+            existing.setThirdPartyFlag(dto.getThirdPartyFlag());
+            existing.setThirdPartyInfo(dto.getThirdPartyInfo());
             existing.setAmount(dto.getContractAmount());
             existing.setTaxRate(dto.getTaxRate());
             existing.setTaxAmount(dto.getTaxAmount());
@@ -134,7 +189,15 @@ public class ContractService {
         base.setContractType(dto.getContractType());
         base.setPartyAId(dto.getPartyAId());
         base.setPartyAName(dto.getPartyAName());
+        base.setPartyAContact(dto.getPartyAContact());
+        base.setPartyAPhone(dto.getPartyAPhone());
+        base.setPartyAAddress(dto.getPartyAAddress());
         base.setPartyBName(dto.getPartyBName());
+        base.setPartyBContact(dto.getPartyBContact());
+        base.setPartyBPhone(dto.getPartyBPhone());
+        base.setPartyBAddress(dto.getPartyBAddress());
+        base.setThirdPartyFlag(dto.getThirdPartyFlag());
+        base.setThirdPartyInfo(dto.getThirdPartyInfo());
         base.setAmount(dto.getContractAmount());
         base.setTaxRate(dto.getTaxRate());
         base.setTaxAmount(dto.getTaxAmount());
@@ -176,46 +239,6 @@ public class ContractService {
         
         auditService.logChange(saved.getContractId(), "contract_base", null, "CREATED", "MANUAL", "admin");
         return convertToDTO(saved);
-    }
-
-    @Transactional
-    public void saveExtendedData(String contractId, Map<String, Object> data) {
-        data.forEach((fieldCode, value) -> {
-            extendFieldRepository.findAll().stream()
-                .filter(f -> f.getFieldCode().equals(fieldCode))
-                .findFirst()
-                .ifPresent(field -> {
-                    String newVal = value != null ? value.toString() : null;
-                    boolean isVerifying = fieldCode.endsWith("_verified") && value instanceof Boolean && (Boolean)value;
-                    String targetFieldCode = isVerifying ? fieldCode.replace("_verified", "") : fieldCode;
-
-                    Optional<ContractExtendData> existing = extendDataRepository.findByContractId(contractId).stream()
-                            .filter(d -> d.getFieldId().equals(field.getFieldId()))
-                            .findFirst();
-
-                    if (existing.isPresent()) {
-                        if (isVerifying) {
-                            existing.get().setVerificationStatus("VERIFIED");
-                            extendDataRepository.save(existing.get());
-                        } else if (!Objects.equals(existing.get().getFieldValue(), newVal)) {
-                            auditService.logChange(contractId, fieldCode, existing.get().getFieldValue(), newVal, "MANUAL", "admin");
-                            existing.get().setFieldValue(newVal);
-                            existing.get().setFillType("MANUAL");
-                            existing.get().setVerificationStatus("VERIFIED");
-                            extendDataRepository.save(existing.get());
-                        }
-                    } else if (!isVerifying) {
-                        auditService.logChange(contractId, fieldCode, null, newVal, "MANUAL", "admin");
-                        ContractExtendData extendData = new ContractExtendData();
-                        extendData.setContractId(contractId);
-                        extendData.setFieldId(field.getFieldId());
-                        extendData.setFieldValue(newVal);
-                        extendData.setFillType("MANUAL");
-                        extendData.setVerificationStatus("VERIFIED");
-                        extendDataRepository.save(extendData);
-                    }
-                });
-        });
     }
 
     private ContractDTO convertToDTO(ContractBase base) {
@@ -289,7 +312,95 @@ public class ContractService {
         }
         dto.setExtendedFields(extendedFields);
 
+        filterFields(dto);
+
         return dto;
+    }
+
+    private void filterFields(ContractDTO dto) {
+        String tenantId = dto.getTenantId();
+        if (tenantId == null) {
+            return;
+        }
+        
+        List<FieldConfig> configs = fieldConfigCache.computeIfAbsent(tenantId, 
+            tid -> fieldConfigRepository.findByTenantId(tid).stream()
+                .collect(Collectors.toList())
+        );
+        
+        filterStandardFields(dto, configs);
+        filterExtendedFields(dto, configs);
+    }
+
+    private void filterStandardFields(ContractDTO dto, List<FieldConfig> configs) {
+        Class<?> dtoClass = dto.getClass();
+        
+        for (FieldConfig config : configs) {
+            if (isFieldAccessible(config)) {
+                continue;
+            }
+            
+            String camelCaseField = snakeToCamelCase(config.getFieldCode());
+            
+            try {
+                java.lang.reflect.Field field = dtoClass.getDeclaredField(camelCaseField);
+                field.setAccessible(true);
+                field.set(dto, null);
+            } catch (NoSuchFieldException e) {
+                // Ignore fields not in DTO (might be extended only)
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException("Failed to filter field: " + camelCaseField, e);
+            }
+        }
+    }
+
+    private void filterExtendedFields(ContractDTO dto, List<FieldConfig> configs) {
+        if (dto.getExtendedFields() == null || dto.getExtendedFields().isEmpty()) {
+            return;
+        }
+        
+        Map<String, Object> extendedFields = dto.getExtendedFields();
+        Set<String> hiddenFieldCodes = configs.stream()
+            .filter(config -> !isFieldAccessible(config))
+            .map(FieldConfig::getFieldCode)
+            .collect(Collectors.toSet());
+        
+        extendedFields.keySet().removeAll(hiddenFieldCodes);
+    }
+
+    private String snakeToCamelCase(String snakeCase) {
+        if (snakeCase == null || snakeCase.isEmpty()) {
+            return snakeCase;
+        }
+        
+        StringBuilder result = new StringBuilder();
+        boolean nextUpper = false;
+        
+        for (char c : snakeCase.toCharArray()) {
+            if (c == '_') {
+                nextUpper = true;
+            } else {
+                if (nextUpper) {
+                    result.append(Character.toUpperCase(c));
+                    nextUpper = false;
+                } else {
+                    result.append(Character.toLowerCase(c));
+                }
+            }
+        }
+        
+        return result.toString();
+    }
+
+    private boolean isFieldAccessible(FieldConfig config) {
+        if (config.getApiReturn() != null && !config.getApiReturn()) {
+            return false;
+        }
+        return checkFieldRole(config);
+    }
+
+    public void clearFieldConfigCache() {
+        fieldConfigCache.clear();
     }
 
     private boolean checkFieldRole(FieldConfig config) {

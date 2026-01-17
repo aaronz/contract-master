@@ -70,19 +70,9 @@ const routes = [
 
       // Configuration & Tools
       {
-        path: 'rules/builder',
-        name: 'RuleBuilder',
-        component: () => import('@/views/rules/builder.vue'),
-      },
-      {
-        path: 'rules/editor', // New route for RuleEditor
-        name: 'RuleEditor',
-        component: () => import('@/pages/RuleEditor.vue'), // New component
-      },
-      {
-        path: 'rules/list', // New route for RuleList
+        path: 'rules/list',
         name: 'RuleList',
-        component: () => import('@/pages/RuleList.vue'), // New component
+        component: () => import('@/pages/RuleList.vue'),
       },
       {
         path: 'settings/permissions',

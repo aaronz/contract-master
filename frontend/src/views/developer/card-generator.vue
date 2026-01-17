@@ -137,9 +137,9 @@
 
             <el-form-item label="Card Size">
               <el-radio-group v-model="config.size" class="w-full">
-                <el-radio-button label="small">S</el-radio-button>
-                <el-radio-button label="medium">M</el-radio-button>
-                <el-radio-button label="large">L</el-radio-button>
+                <el-radio-button value="small">S</el-radio-button>
+                <el-radio-button value="medium">M</el-radio-button>
+                <el-radio-button value="large">L</el-radio-button>
               </el-radio-group>
             </el-form-item>
 
@@ -150,7 +150,7 @@
               <div class="field-list-scrollable">
                 <el-checkbox-group v-model="config.selectedFields">
                   <div class="field-item" v-for="field in filteredFields" :key="field.fieldCode">
-                    <el-checkbox :label="field.fieldCode">
+                    <el-checkbox :value="field.fieldCode">
                       {{ field.fieldName }}
                     </el-checkbox>
                   </div>
@@ -201,9 +201,12 @@ const fetchMetadata = async () => {
     if (response.ok) {
       const result = await response.json()
       contractFields.value = result.data
+    } else {
+      ElMessage.error('Failed to load available fields')
     }
   } catch (error) {
     console.error('Failed to fetch metadata', error)
+    ElMessage.error('Network error loading card fields')
   }
 }
 

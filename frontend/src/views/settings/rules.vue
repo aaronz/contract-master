@@ -5,11 +5,36 @@
         <h1 class="page-title">Rule Engine</h1>
         <p class="page-subtitle">Configure automated validation rules and risk alerts.</p>
       </div>
-      <el-button type="primary" icon="Plus" @click="addRule">Add New Rule</el-button>
+      <div class="header-actions">
+        <el-button v-if="selectedRules.length > 0" type="success" icon="Edit" @click="openBatchEdit">
+          Batch Edit ({{ selectedRules.length }})
+        </el-button>
+        <el-button type="primary" icon="Plus" @click="addRule">Add New Rule</el-button>
+      </div>
+    </div>
+
+    <div class="selection-bar" v-if="selectedRules.length > 0">
+      <el-alert type="info" :closable="false" show-icon>
+        <template #title>
+          <span>{{ selectedRules.length }} rules selected</span>
+          <el-button link type="primary" @click="clearSelection" style="margin-left: 12px">Clear Selection</el-button>
+        </template>
+      </el-alert>
     </div>
 
     <div class="rules-grid">
-      <el-card v-for="rule in rules" :key="rule.id" class="rule-card" shadow="hover">
+      <el-card 
+        v-for="rule in rules" 
+        :key="rule.id" 
+        class="rule-card" 
+        :class="{ 'is-selected': isSelected(rule) }"
+        shadow="hover"
+        @click.ctrl="toggleSelection(rule)"
+        @click.meta="toggleSelection(rule)"
+      >
+        <div class="selection-checkbox">
+          <el-checkbox :model-value="isSelected(rule)" @change="toggleSelection(rule)" />
+        </div>
         <div class="rule-header">
           <div class="rule-title-group">
              <div class="rule-icon" :class="getIconClass(rule.level)">
@@ -43,6 +68,49 @@
       </el-card>
     </div>
 
+    <!-- Batch Edit Dialog -->
+    <el-dialog
+      v-model="batchDialogVisible"
+      title="Batch Edit Rules"
+      width="500px"
+    >
+      <el-form :model="batchForm" label-position="top">
+        <el-alert 
+          title="Only selected fields will be updated for all checked rules." 
+          type="warning" 
+          :closable="false" 
+          style="margin-bottom: 20px" 
+        />
+        
+        <el-form-item label="Update Status">
+          <el-checkbox v-model="batchUpdates.enabled">Update Enabled State</el-checkbox>
+          <el-switch v-model="batchForm.enabled" :disabled="!batchUpdates.enabled" style="margin-left: 12px"/>
+        </el-form-item>
+
+        <el-form-item label="Update Risk Level">
+          <el-checkbox v-model="batchUpdates.level">Update Risk Level</el-checkbox>
+          <el-select v-model="batchForm.level" :disabled="!batchUpdates.level" style="width: 100%; margin-top: 8px">
+             <el-option label="Info" value="INFO" />
+             <el-option label="Warning" value="WARNING" />
+             <el-option label="Severe" value="SEVERE" />
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="Update Trigger">
+          <el-checkbox v-model="batchUpdates.trigger">Update Trigger Event</el-checkbox>
+          <el-select v-model="batchForm.trigger" :disabled="!batchUpdates.trigger" style="width: 100%; margin-top: 8px">
+             <el-option label="On Save" value="ON_SAVE" />
+             <el-option label="On Status Change" value="ON_STATUS_CHANGE" />
+             <el-option label="Daily Schedule" value="DAILY" />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="batchDialogVisible = false">Cancel</el-button>
+        <el-button type="primary" @click="saveBatchUpdate">Update {{ selectedRules.length }} Rules</el-button>
+      </template>
+    </el-dialog>
+
     <!-- Rule Editor Dialog -->
     <el-dialog
       v-model="dialogVisible"
@@ -57,8 +125,8 @@
 
         <el-form-item label="Rule Type">
           <el-radio-group v-model="editingRule.ruleType" size="small">
-            <el-radio-button label="LOGIC">Logic (SpEL)</el-radio-button>
-            <el-radio-button label="AI_PROMPT">AI Prompt</el-radio-button>
+            <el-radio-button value="LOGIC">Logic (SpEL)</el-radio-button>
+            <el-radio-button value="AI_PROMPT">AI Prompt</el-radio-button>
           </el-radio-group>
         </el-form-item>
         
@@ -108,13 +176,14 @@
                 <el-icon><Plus /></el-icon> Add Condition
               </el-button>
               
-              <div class="logic-toggle" v-if="editingRule.conditions.length > 1">
-                 <span>Logic:</span>
-                 <el-radio-group v-model="editingRule.logic" size="small">
-                   <el-radio-button label="AND" />
-                   <el-radio-button label="OR" />
-                 </el-radio-group>
-              </div>
+               <div class="logic-toggle" v-if="editingRule.conditions.length > 1">
+                  <span>Logic:</span>
+                  <el-radio-group v-model="editingRule.logic" size="small">
+                    <el-radio-button value="AND">AND</el-radio-button>
+                    <el-radio-button value="OR">OR</el-radio-button>
+                  </el-radio-group>
+               </div>
+
            </div>
         </el-form-item>
 
@@ -143,8 +212,9 @@
 
 <script setup>
 import { ref } from 'vue'
-import { Plus, Delete, Warning, InfoFilled, Bell } from '@element-plus/icons-vue'
+import { Plus, Delete, Warning, InfoFilled, Bell, Edit } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+import evaluationApi from '../../services/evaluationApi'
 
 const rules = ref([
   {
@@ -178,6 +248,61 @@ const rules = ref([
 
 const dialogVisible = ref(false)
 const editingRule = ref({})
+
+// Batch Selection Logic
+const selectedRules = ref([])
+const isSelected = (rule) => selectedRules.value.some(r => r.id === rule.id)
+
+const toggleSelection = (rule) => {
+  const idx = selectedRules.value.findIndex(r => r.id === rule.id)
+  if (idx > -1) {
+    selectedRules.value.splice(idx, 1)
+  } else {
+    selectedRules.value.push(rule)
+  }
+}
+
+const clearSelection = () => {
+  selectedRules.value = []
+}
+
+// Batch Edit Logic
+const batchDialogVisible = ref(false)
+const batchForm = ref({ enabled: false, level: 'INFO', trigger: 'ON_SAVE' })
+const batchUpdates = ref({ enabled: false, level: false, trigger: false })
+
+const openBatchEdit = () => {
+  batchUpdates.value = { enabled: false, level: false, trigger: false }
+  batchDialogVisible.value = true
+}
+
+const saveBatchUpdate = async () => {
+  const updates = selectedRules.value.map(rule => {
+    const updatedRule = { ...rule }
+    if (batchUpdates.value.enabled) updatedRule.enabled = batchForm.value.enabled
+    if (batchUpdates.value.level) updatedRule.level = batchForm.value.level
+    if (batchUpdates.value.trigger) updatedRule.trigger = batchForm.value.trigger
+    return updatedRule
+  })
+
+  try {
+    // Send to backend
+    await evaluationApi.batchUpdateRules(updates)
+    
+    // Update local state
+    updates.forEach(updated => {
+      const idx = rules.value.findIndex(r => r.id === updated.id)
+      if (idx > -1) rules.value[idx] = updated
+    })
+    
+    ElMessage.success(`Successfully updated ${updates.length} rules`)
+    batchDialogVisible.value = false
+    clearSelection()
+  } catch (error) {
+    ElMessage.error('Failed to update rules')
+    console.error(error)
+  }
+}
 
 const addRule = () => {
   editingRule.value = {
@@ -244,6 +369,15 @@ const getIconClass = (level) => {
   align-items: flex-end;
 }
 
+.header-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.selection-bar {
+  margin-bottom: 16px;
+}
+
 .page-title {
   font-size: 24px;
   font-weight: 700;
@@ -266,6 +400,19 @@ const getIconClass = (level) => {
   border-radius: 12px;
   border: 1px solid var(--border-color);
   transition: all 0.2s;
+  position: relative;
+}
+
+.rule-card.is-selected {
+  border-color: #3B82F6;
+  background-color: #EFF6FF;
+}
+
+.selection-checkbox {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 10;
 }
 
 .rule-card:hover {

@@ -101,9 +101,12 @@ const fetchMetadata = async () => {
     if (response.ok) {
       const result = await response.json()
       contractFields.value = result.data
+    } else {
+      ElMessage.error('Failed to load fields for masking')
     }
   } catch (error) {
     console.error('Failed to fetch metadata', error)
+    ElMessage.error('Network error loading fields')
   }
 }
 

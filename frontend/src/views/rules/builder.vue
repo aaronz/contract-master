@@ -47,10 +47,10 @@
           <h3 class="panel-title">Actions</h3>
           <el-form-item label="Notify Channels">
             <el-checkbox-group v-model="ruleConfig.channels">
-              <el-checkbox label="email">Email</el-checkbox>
-              <el-checkbox label="sms">SMS</el-checkbox>
-              <el-checkbox label="system">System</el-checkbox>
-              <el-checkbox label="webhook">Webhook</el-checkbox>
+              <el-checkbox value="email">Email</el-checkbox>
+              <el-checkbox value="sms">SMS</el-checkbox>
+              <el-checkbox value="system">System</el-checkbox>
+              <el-checkbox value="webhook">Webhook</el-checkbox>
             </el-checkbox-group>
           </el-form-item>
         </el-form>
@@ -80,36 +80,54 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import ConditionGroup from '@/components/rules/ConditionGroup.vue'
-import { Close, Check } from '@element-plus/icons-vue'
+import evaluationApi from '@/services/evaluationApi'
 
+const route = useRoute()
+const router = useRouter()
 const saving = ref(false)
+const isEditMode = ref(false)
 
 const ruleConfig = reactive({
-  name: 'High Value Contract Risk Check',
-  level: 'warning',
-  trigger: 'pre_approval',
-  channels: ['system', 'email'],
+  ruleId: null,
+  name: 'New Rule',
+  level: 'info',
+  trigger: 'create',
+  ruleType: 'LOGIC',
+  channels: ['system'],
   conditions: {
     type: 'group',
     operator: 'AND',
-    children: [
-      { type: 'rule', field: 'amount', operator: 'gt', value: '1000000' },
-      { 
-        type: 'group', 
-        operator: 'OR', 
-        children: [
-          { type: 'rule', field: 'payment_terms', operator: 'contains', value: 'Prepayment' },
-          { type: 'rule', field: 'risk_score', operator: 'gt', value: '80' }
-        ] 
+    children: []
+  }
+})
+
+onMounted(async () => {
+  if (route.query.id) {
+    isEditMode.value = true
+    try {
+      const response = await evaluationApi.getRule(route.query.id)
+      const data = response.data
+      if (data) {
+        ruleConfig.ruleId = data.ruleId
+        ruleConfig.name = data.ruleName
+        ruleConfig.level = data.ruleLevel
+        ruleConfig.trigger = data.triggerTime
+        ruleConfig.ruleType = data.ruleType
+        ruleConfig.conditions = data.ruleCondition ? JSON.parse(data.ruleCondition) : { type: 'group', operator: 'AND', children: [] }
+        // Map other fields if needed
       }
-    ]
+    } catch (error) {
+      ElMessage.error('Failed to load rule')
+    }
   }
 })
 
 const generateSpEL = (node) => {
+  if (!node) return ''
   if (node.type === 'rule') {
     const opMap = {
       'eq': '==',
@@ -130,20 +148,39 @@ const generateSpEL = (node) => {
     return `#${node.field || '?'} ${opMap[node.operator] || '=='} '${node.value}'`
   }
   
-  if (node.type === 'group') {
+  if (node.type === 'group' && node.children) {
     const childrenExpr = node.children.map(generateSpEL).join(` ${node.operator} `)
     return `(${childrenExpr})`
   }
   return ''
 }
 
-const saveRule = () => {
+const saveRule = async () => {
   saving.value = true
-  // Mock API call
-  setTimeout(() => {
+  const payload = {
+    ruleName: ruleConfig.name,
+    ruleLevel: ruleConfig.level,
+    triggerTime: ruleConfig.trigger,
+    ruleType: ruleConfig.ruleType,
+    isEnabled: true,
+    ruleCondition: JSON.stringify(ruleConfig.conditions),
+    // Additional fields mapping
+  }
+
+  try {
+    if (isEditMode.value) {
+      await evaluationApi.updateRule(ruleConfig.ruleId, payload)
+    } else {
+      await evaluationApi.createRule(payload)
+    }
+    ElMessage.success('Rule saved successfully')
+    router.push('/rules/list')
+  } catch (error) {
+    ElMessage.error('Failed to save rule')
+    console.error(error)
+  } finally {
     saving.value = false
-    ElMessage.success('Rule logic saved successfully')
-  }, 1000)
+  }
 }
 </script>
 

@@ -1,4 +1,4 @@
-package com.contractmaster.evaluation.model;
+package com.contract.master.evaluation.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
@@ -31,6 +31,12 @@ public class EvaluationJob {
     @Column(name = "triggered_by")
     private String triggeredBy;
 
+    @Column(name = "target_rules", length = 4096)
+    private String targetRules;
+
+    @Column(name = "target_contracts", length = 4096)
+    private String targetContracts;
+
     // Constructors
     public EvaluationJob() {
     }
@@ -44,6 +50,22 @@ public class EvaluationJob {
     }
 
     // Getters and Setters
+    public String getTargetRules() {
+        return targetRules;
+    }
+
+    public void setTargetRules(String targetRules) {
+        this.targetRules = targetRules;
+    }
+
+    public String getTargetContracts() {
+        return targetContracts;
+    }
+
+    public void setTargetContracts(String targetContracts) {
+        this.targetContracts = targetContracts;
+    }
+
     public String getId() {
         return id;
     }

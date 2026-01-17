@@ -263,9 +263,12 @@ const handleSaveConnector = async () => {
       ElMessage.success(isEdit.value ? 'Connector updated' : 'Connector created')
       showConnectorDialog.value = false
       // fetchConnectors() // Would implement this to refresh list
+    } else {
+      ElMessage.error('Failed to save connector')
     }
   } catch (error) {
     console.error('Failed to save connector', error)
+    ElMessage.error('Network error saving connector')
   } finally {
     saving.value = false
   }

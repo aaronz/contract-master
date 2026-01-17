@@ -1,4 +1,4 @@
-package com.contractmaster.evaluation.service;
+package com.contract.master.evaluation.service;
 
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;

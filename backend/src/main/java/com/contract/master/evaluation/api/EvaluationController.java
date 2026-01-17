@@ -1,7 +1,7 @@
-package com.contractmaster.evaluation.api;
+package com.contract.master.evaluation.api;
 
-import com.contractmaster.evaluation.model.EvaluationJob;
-import com.contractmaster.evaluation.service.EvaluationService;
+import com.contract.master.evaluation.model.EvaluationJob;
+import com.contract.master.evaluation.service.EvaluationService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,6 +1,6 @@
-package com.contractmaster.evaluation.repository;
+package com.contract.master.evaluation.repository;
 
-import com.contractmaster.evaluation.model.EvaluationJob;
+import com.contract.master.evaluation.model.EvaluationJob;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,5 +11,5 @@ import java.util.List;
 @Repository
 public interface EvaluationJobRepository extends JpaRepository<EvaluationJob, String> {
     List<EvaluationJob> findAllByTenantIdOrderByCreatedAtDesc(String tenantId);
-    Page<EvaluationJob> findByTenantIdOrderByCreatedAtDesc(String tenantId, Pageable pageable);
+    Page<EvaluationJob> findByTenantId(String tenantId, Pageable pageable);
 }

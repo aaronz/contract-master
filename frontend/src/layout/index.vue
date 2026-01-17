@@ -60,10 +60,13 @@
 
           <!-- Configuration -->
           <div class="menu-group-title">Configuration</div>
-          <el-menu-item index="/rules/builder">
-            <el-icon><Operation /></el-icon>
-            <span>Rule Engine</span>
-          </el-menu-item>
+          <el-sub-menu index="rules">
+            <template #title>
+              <el-icon><Operation /></el-icon>
+              <span>Rule Engine</span>
+            </template>
+            <el-menu-item index="/rules/list">Evaluation Rules</el-menu-item>
+          </el-sub-menu>
           <el-sub-menu index="settings">
             <template #title>
               <el-icon><Setting /></el-icon>
@@ -154,6 +157,8 @@ import {
   Warning, Connection, Hide, DocumentChecked, Operation, Tools 
 } from '@element-plus/icons-vue'
 import { ref } from 'vue'
+
+const tenantId = ref('default-tenant')
 </script>
 
 <style scoped>

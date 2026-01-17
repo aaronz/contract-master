@@ -2,7 +2,7 @@
   <div class="dynamic-fields">
     <div v-for="field in fields" :key="field.id" class="field-item">
       <div class="field-header">
-        <label>{{ field.fieldAlias || field.fieldCode }}</label>
+        <label :style="getFieldStyle(field.fieldCode)">{{ field.fieldName }}</label>
         <el-tag 
           v-if="data[field.fieldCode + '_source']" 
           :type="data[field.fieldCode + '_source'] === 'AI' ? 'warning' : 'info'"
@@ -18,18 +18,29 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
+import { useFieldStore } from '@/stores/fieldStore'
 
+const fieldStore = useFieldStore()
 const props = defineProps(['contractData'])
-const fields = ref([])
 const data = ref(props.contractData || {})
 
+const fields = computed(() => fieldStore.fields.filter(f => f.isVisible !== false))
+
+const getFieldStyle = (fieldCode) => {
+  const field = fieldStore.fields.find(f => f.fieldCode === fieldCode)
+  if (!field) return {}
+  return {
+    color: field.fieldColor,
+    fontWeight: field.fieldStyles?.includes('bold') ? 'bold' : 'normal',
+    fontStyle: field.fieldStyles?.includes('italic') ? 'italic' : 'normal',
+  }
+}
+
 onMounted(async () => {
-  // Mock API call to get field configs
-  fields.value = [
-    { id: 1, fieldCode: 'custom_field_1', fieldAlias: 'Project Code', isVisible: true },
-    { id: 2, fieldCode: 'custom_field_2', fieldAlias: 'Internal Priority', isVisible: true }
-  ]
+  if (fieldStore.fields.length === 0) {
+    await fieldStore.fetchFieldConfigs()
+  }
 })
 </script>
 

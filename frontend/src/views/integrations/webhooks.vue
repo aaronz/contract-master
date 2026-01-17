@@ -42,16 +42,16 @@
         </el-form-item>
         <el-form-item label="Trigger Events">
           <el-checkbox-group v-model="form.events">
-            <el-checkbox label="CONTRACT_VERIFIED">Verification Completed</el-checkbox>
-            <el-checkbox label="CONTRACT_PUBLISHED">Contract Published</el-checkbox>
-            <el-checkbox label="AI_EXTRACTION_FAILED">Extraction Failure</el-checkbox>
+            <el-checkbox value="CONTRACT_VERIFIED">Verification Completed</el-checkbox>
+            <el-checkbox value="CONTRACT_PUBLISHED">Contract Published</el-checkbox>
+            <el-checkbox value="AI_EXTRACTION_FAILED">Extraction Failure</el-checkbox>
           </el-checkbox-group>
         </el-form-item>
         <el-form-item label="Authentication Type">
           <el-radio-group v-model="form.authType">
-            <el-radio label="HMAC">HMAC Signature</el-radio>
-            <el-radio label="BEARER">Bearer Token</el-radio>
-            <el-radio label="NONE">None</el-radio>
+            <el-radio value="HMAC">HMAC Signature</el-radio>
+            <el-radio value="BEARER">Bearer Token</el-radio>
+            <el-radio value="NONE">None</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="Enabled">

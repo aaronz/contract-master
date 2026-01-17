@@ -1,0 +1,42 @@
+package com.contract.master.api;
+
+import com.contract.master.domain.RuleConfig;
+import com.contract.master.domain.RuleConfigRepository;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MockMvc;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@SpringBootTest
+@AutoConfigureMockMvc
+public class RuleEngineControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private RuleConfigRepository ruleRepository;
+
+    @Test
+    @WithMockUser
+    public void testListRules() throws Exception {
+        RuleConfig rule = new RuleConfig();
+        rule.setRuleId("test-rule-1");
+        rule.setRuleName("Test Rule");
+        rule.setTenantId("tenant-1");
+        rule.setIsEnabled(true);
+        ruleRepository.save(rule);
+
+        mockMvc.perform(get("/api/rules")
+                        .header("X-Tenant-ID", "tenant-1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data").isArray())
+                .andExpect(jsonPath("$.data[0].ruleName").value("Test Rule"));
+    }
+}

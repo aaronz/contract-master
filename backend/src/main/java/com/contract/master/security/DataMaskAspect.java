@@ -1,5 +1,6 @@
 package com.contract.master.security;
 
+import com.contract.master.api.GlobalExceptionHandler.ApiResponse;
 import com.contract.master.utils.MaskUtils;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
@@ -23,17 +24,25 @@ public class DataMaskAspect {
                 .anyMatch(a -> a.getAuthority().equals("ADMIN"));
 
         if (isAdmin) return;
+
+        Object data = result;
+        if (result instanceof ApiResponse) {
+            data = ((ApiResponse<?>) result).getData();
+        }
+
+        if (data == null) return;
         
-        if (result instanceof Collection<?>) {
-            for (Object obj : (Collection<?>) result) {
+        if (data instanceof Collection<?>) {
+            for (Object obj : (Collection<?>) data) {
                 applyMask(obj);
             }
         } else {
-            applyMask(result);
+            applyMask(data);
         }
     }
 
     private void applyMask(Object obj) {
+        if (obj == null) return;
         Field[] fields = obj.getClass().getDeclaredFields();
         for (Field field : fields) {
             if (field.isAnnotationPresent(DataMask.class)) {

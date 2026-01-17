@@ -66,91 +66,91 @@
               <div class="form-section">
                 <h3 class="section-header">Core Details</h3>
                 <div class="form-grid">
-                  <div class="field-group">
-                    <label>Contract Number</label>
+                  <div class="field-group" v-if="isFieldVisible('contract_no')">
+                    <label>{{ getFieldName('contract_no') }}</label>
                     <el-input v-if="isEditMode" v-model="form.contractNo" />
-                    <div v-else class="display-val font-mono">{{ form.contractNo }}</div>
+                    <div v-else class="display-val font-mono" :style="getFieldStyle('contract_no')">{{ form.contractNo }}</div>
                   </div>
-                  <div class="field-group">
-                    <label>Contract Name</label>
+                  <div class="field-group" v-if="isFieldVisible('contract_name')">
+                    <label>{{ getFieldName('contract_name') }}</label>
                     <el-input v-if="isEditMode" v-model="form.contractName" />
-                    <div v-else class="display-val">{{ form.contractName }}</div>
+                    <div v-else class="display-val" :style="getFieldStyle('contract_name')">{{ form.contractName }}</div>
                   </div>
-                  <div class="field-group">
-                    <label>Contract Type</label>
+                  <div class="field-group" v-if="isFieldVisible('contract_type')">
+                    <label>{{ getFieldName('contract_type') }}</label>
                     <el-input v-if="isEditMode" v-model="form.contractType" />
-                    <div v-else class="display-val">{{ form.contractType }}</div>
+                    <div v-else class="display-val" :style="getFieldStyle('contract_type')">{{ form.contractType }}</div>
                   </div>
-                  <div class="field-group">
-                    <label>Status</label>
+                  <div class="field-group" v-if="isFieldVisible('contract_status')">
+                    <label>{{ getFieldName('contract_status') }}</label>
                     <el-select v-if="isEditMode" v-model="form.contractStatus" style="width: 100%">
                       <el-option label="Active" value="Active" />
                       <el-option label="Draft" value="Draft" />
                       <el-option label="Pending" value="Pending" />
                       <el-option label="Expired" value="Expired" />
                     </el-select>
-                    <el-tag v-else :type="getStatusType(form.contractStatus)" round>{{ form.contractStatus }}</el-tag>
+                    <el-tag v-else :type="getStatusType(form.contractStatus)" round :style="getFieldStyle('contract_status')">{{ form.contractStatus }}</el-tag>
                   </div>
                 </div>
               </div>
 
               <!-- Parties -->
               <div class="parties-wrapper">
-                <div class="form-section party-card">
-                  <h3 class="section-header text-blue">Party A (Us)</h3>
-                  <div class="form-stack">
-                    <div class="field-group">
-                      <label>Entity Name</label>
-                      <el-input v-if="isEditMode" v-model="form.partyAName" />
-                      <div v-else class="display-val strong">{{ form.partyAName }}</div>
-                    </div>
-                    <div class="grid-2">
-                      <div class="field-group">
-                        <label>Contact</label>
-                        <el-input v-if="isEditMode" v-model="form.partyAContact" />
-                        <div v-else class="display-val">{{ form.partyAContact }}</div>
-                      </div>
-                      <div class="field-group">
-                        <label>Phone</label>
-                        <el-input v-if="isEditMode" v-model="form.partyAPhone" />
-                        <div v-else class="display-val">{{ form.partyAPhone }}</div>
-                      </div>
-                    </div>
-                    <div class="field-group">
-                      <label>Address</label>
-                      <el-input v-if="isEditMode" v-model="form.partyAAddress" type="textarea" :rows="2" />
-                      <div v-else class="display-val">{{ form.partyAAddress }}</div>
-                    </div>
-                  </div>
-                </div>
+                <div class="form-section party-card" v-if="isFieldVisible('party_a_name') || isFieldVisible('party_a_contact') || isFieldVisible('party_a_phone')">
+                   <h3 class="section-header text-blue">Party A (Us)</h3>
+                   <div class="form-stack">
+                     <div class="field-group" v-if="isFieldVisible('party_a_name')">
+                       <label>{{ getFieldName('party_a_name') }}</label>
+                       <el-input v-if="isEditMode" v-model="form.partyAName" />
+                       <div v-else class="display-val strong" :style="getFieldStyle('party_a_name')">{{ form.partyAName }}</div>
+                     </div>
+                     <div class="grid-2">
+                       <div class="field-group" v-if="isFieldVisible('party_a_contact')">
+                         <label>{{ getFieldName('party_a_contact') }}</label>
+                         <el-input v-if="isEditMode" v-model="form.partyAContact" />
+                         <div v-else class="display-val" :style="getFieldStyle('party_a_contact')">{{ form.partyAContact }}</div>
+                       </div>
+                       <div class="field-group" v-if="isFieldVisible('party_a_phone')">
+                         <label>{{ getFieldName('party_a_phone') }}</label>
+                         <el-input v-if="isEditMode" v-model="form.partyAPhone" />
+                         <div v-else class="display-val" :style="getFieldStyle('party_a_phone')">{{ form.partyAPhone }}</div>
+                       </div>
+                     </div>
+                     <div class="field-group" v-if="isFieldVisible('party_a_address')">
+                       <label>{{ getFieldName('party_a_address') }}</label>
+                       <el-input v-if="isEditMode" v-model="form.partyAAddress" type="textarea" :rows="2" />
+                       <div v-else class="display-val" :style="getFieldStyle('party_a_address')">{{ form.partyAAddress }}</div>
+                     </div>
+                   </div>
+                 </div>
 
-                <div class="form-section party-card">
-                  <h3 class="section-header text-purple">Party B (Counterparty)</h3>
-                  <div class="form-stack">
-                    <div class="field-group">
-                      <label>Entity Name</label>
-                      <el-input v-if="isEditMode" v-model="form.partyBName" />
-                      <div v-else class="display-val strong">{{ form.partyBName }}</div>
-                    </div>
-                    <div class="grid-2">
-                      <div class="field-group">
-                        <label>Contact</label>
-                        <el-input v-if="isEditMode" v-model="form.partyBContact" />
-                        <div v-else class="display-val">{{ form.partyBContact }}</div>
-                      </div>
-                      <div class="field-group">
-                        <label>Phone</label>
-                        <el-input v-if="isEditMode" v-model="form.partyBPhone" />
-                        <div v-else class="display-val">{{ form.partyBPhone }}</div>
-                      </div>
-                    </div>
-                    <div class="field-group">
-                      <label>Address</label>
-                      <el-input v-if="isEditMode" v-model="form.partyBAddress" type="textarea" :rows="2" />
-                      <div v-else class="display-val">{{ form.partyBAddress }}</div>
-                    </div>
-                  </div>
-                </div>
+                 <div class="form-section party-card" v-if="isFieldVisible('party_b_name') || isFieldVisible('party_b_contact') || isFieldVisible('party_b_phone')">
+                   <h3 class="section-header text-purple">Party B (Counterparty)</h3>
+                   <div class="form-stack">
+                     <div class="field-group" v-if="isFieldVisible('party_b_name')">
+                       <label>{{ getFieldName('party_b_name') }}</label>
+                       <el-input v-if="isEditMode" v-model="form.partyBName" />
+                       <div v-else class="display-val strong" :style="getFieldStyle('party_b_name')">{{ form.partyBName }}</div>
+                     </div>
+                     <div class="grid-2">
+                       <div class="field-group" v-if="isFieldVisible('party_b_contact')">
+                         <label>{{ getFieldName('party_b_contact') }}</label>
+                         <el-input v-if="isEditMode" v-model="form.partyBContact" />
+                         <div v-else class="display-val" :style="getFieldStyle('party_b_contact')">{{ form.partyBContact }}</div>
+                       </div>
+                       <div class="field-group" v-if="isFieldVisible('party_b_phone')">
+                         <label>{{ getFieldName('party_b_phone') }}</label>
+                         <el-input v-if="isEditMode" v-model="form.partyBPhone" />
+                         <div v-else class="display-val" :style="getFieldStyle('party_b_phone')">{{ form.partyBPhone }}</div>
+                       </div>
+                     </div>
+                     <div class="field-group" v-if="isFieldVisible('party_b_address')">
+                       <label>{{ getFieldName('party_b_address') }}</label>
+                       <el-input v-if="isEditMode" v-model="form.partyBAddress" type="textarea" :rows="2" />
+                       <div v-else class="display-val" :style="getFieldStyle('party_b_address')">{{ form.partyBAddress }}</div>
+                     </div>
+                   </div>
+                 </div>
               </div>
 
               <!-- Third Party -->
@@ -168,17 +168,20 @@
               </div>
 
               <!-- Custom Fields -->
-              <div class="form-section" v-if="contractFields && contractFields.length > 0">
+              <div class="form-section" v-if="fieldStore.fields.some(f => f.source === 'EXTEND')">
                 <h3 class="section-header">Additional Information</h3>
                 <div class="form-grid">
-                  <div class="field-group" v-for="field in contractFields || []" :key="field.id">
+                  <div 
+                    class="field-group" 
+                    v-for="field in fieldStore.fields.filter(f => f.source === 'EXTEND' && isFieldVisible(f.fieldCode))" 
+                    :key="field.fieldCode"
+                  >
                     <label>{{ field.fieldName }}</label>
                     <el-input 
                       v-if="isEditMode" 
-                      v-model="form.customData[field.fieldCode]" 
-                      :name="'custom_field_' + field.fieldCode"
+                      v-model="form.extendedFields[field.fieldCode]" 
                     />
-                    <div v-else class="display-val">{{ form.customData[field.fieldCode] }}</div>
+                    <div v-else class="display-val" :style="getFieldStyle(field.fieldCode)">{{ form.extendedFields[field.fieldCode] || 'N/A' }}</div>
                   </div>
                 </div>
               </div>
@@ -189,48 +192,48 @@
             <div class="form-section">
               <h3 class="section-header">Financial Details</h3>
               <div class="form-grid-3">
-                <div class="field-group">
-                  <label>Currency</label>
+                <div class="field-group" v-if="isFieldVisible('currency_type')">
+                  <label>{{ getFieldName('currency_type') }}</label>
                   <el-select v-if="isEditMode" v-model="form.currencyType" style="width: 100%">
                     <el-option label="CNY" value="CNY" />
                     <el-option label="USD" value="USD" />
                     <el-option label="EUR" value="EUR" />
                   </el-select>
-                  <div v-else class="display-val">{{ form.currencyType }}</div>
+                  <div v-else class="display-val" :style="getFieldStyle('currency_type')">{{ form.currencyType }}</div>
                 </div>
-                <div class="field-group">
-                  <label>Contract Amount</label>
+                <div class="field-group" v-if="isFieldVisible('contract_amount')">
+                  <label>{{ getFieldName('contract_amount') }}</label>
                   <el-input-number v-if="isEditMode" v-model="form.contractAmount" :precision="2" style="width: 100%" />
-                  <div v-else class="display-val highlight">{{ formatCurrency(form.contractAmount, form.currencyType) }}</div>
+                  <div v-else class="display-val highlight" :style="getFieldStyle('contract_amount')">{{ formatCurrency(form.contractAmount, form.currencyType) }}</div>
                 </div>
-                <div class="field-group">
-                  <label>Tax Rate (%)</label>
+                <div class="field-group" v-if="isFieldVisible('tax_rate')">
+                  <label>{{ getFieldName('tax_rate') }}</label>
                   <el-input-number v-if="isEditMode" v-model="form.taxRate" :precision="2" style="width: 100%" />
-                  <div v-else class="display-val">{{ form.taxRate }}%</div>
+                  <div v-else class="display-val" :style="getFieldStyle('tax_rate')">{{ form.taxRate }}%</div>
                 </div>
-                <div class="field-group">
-                  <label>Tax Amount</label>
+                <div class="field-group" v-if="isFieldVisible('tax_amount')">
+                  <label>{{ getFieldName('tax_amount') }}</label>
                   <el-input-number v-if="isEditMode" v-model="form.taxAmount" :precision="2" style="width: 100%" />
-                  <div v-else class="display-val">{{ formatCurrency(form.taxAmount, form.currencyType) }}</div>
+                  <div v-else class="display-val" :style="getFieldStyle('tax_amount')">{{ formatCurrency(form.taxAmount, form.currencyType) }}</div>
                 </div>
-                <div class="field-group">
-                  <label>Total Amount (Inc. Tax)</label>
+                <div class="field-group" v-if="isFieldVisible('total_amount_with_tax')">
+                  <label>{{ getFieldName('total_amount_with_tax') }}</label>
                   <el-input-number v-if="isEditMode" v-model="form.totalAmountWithTax" :precision="2" style="width: 100%" />
-                  <div v-else class="display-val highlight">{{ formatCurrency(form.totalAmountWithTax, form.currencyType) }}</div>
+                  <div v-else class="display-val highlight" :style="getFieldStyle('total_amount_with_tax')">{{ formatCurrency(form.totalAmountWithTax, form.currencyType) }}</div>
                 </div>
-                <div class="field-group">
-                  <label>Payment Method</label>
+                <div class="field-group" v-if="isFieldVisible('payment_method')">
+                  <label>{{ getFieldName('payment_method') }}</label>
                   <el-select v-if="isEditMode" v-model="form.paymentMethod" style="width: 100%">
                     <el-option label="Bank Transfer" value="Bank Transfer" />
                     <el-option label="Check" value="Check" />
                     <el-option label="Cash" value="Cash" />
                   </el-select>
-                  <div v-else class="display-val">{{ form.paymentMethod }}</div>
+                  <div v-else class="display-val" :style="getFieldStyle('payment_method')">{{ form.paymentMethod }}</div>
                 </div>
-                <div class="field-group full-width">
-                  <label>Payment Terms</label>
+                <div class="field-group full-width" v-if="isFieldVisible('payment_term')">
+                  <label>{{ getFieldName('payment_term') }}</label>
                   <el-input v-if="isEditMode" v-model="form.paymentTerm" type="textarea" :rows="3" />
-                  <div v-else class="display-val text-block">{{ form.paymentTerm }}</div>
+                  <div v-else class="display-val text-block" :style="getFieldStyle('payment_term')">{{ form.paymentTerm }}</div>
                 </div>
               </div>
             </div>
@@ -240,28 +243,28 @@
             <div class="form-section">
               <h3 class="section-header">Subject Matter</h3>
               <div class="form-grid-3">
-                 <div class="field-group">
-                   <label>Subject Type</label>
+                 <div class="field-group" v-if="isFieldVisible('subject_type')">
+                   <label>{{ getFieldName('subject_type') }}</label>
                    <el-select v-if="isEditMode" v-model="form.subjectType" style="width: 100%">
                      <el-option label="Goods" value="Goods" />
                      <el-option label="Services" value="Services" />
                    </el-select>
-                   <div v-else class="display-val">{{ form.subjectType }}</div>
+                   <div v-else class="display-val" :style="getFieldStyle('subject_type')">{{ form.subjectType }}</div>
                  </div>
-                 <div class="field-group">
-                   <label>Quantity</label>
+                 <div class="field-group" v-if="isFieldVisible('subject_quantity')">
+                   <label>{{ getFieldName('subject_quantity') }}</label>
                    <el-input-number v-if="isEditMode" v-model="form.subjectQuantity" style="width: 100%" />
-                   <div v-else class="display-val">{{ form.subjectQuantity }}</div>
+                   <div v-else class="display-val" :style="getFieldStyle('subject_quantity')">{{ form.subjectQuantity }}</div>
                  </div>
-                 <div class="field-group">
-                   <label>Unit Price</label>
+                 <div class="field-group" v-if="isFieldVisible('unit_price')">
+                   <label>{{ getFieldName('unit_price') }}</label>
                    <el-input-number v-if="isEditMode" v-model="form.unitPrice" style="width: 100%" />
-                   <div v-else class="display-val">{{ formatCurrency(form.unitPrice, form.currencyType) }}</div>
+                   <div v-else class="display-val" :style="getFieldStyle('unit_price')">{{ formatCurrency(form.unitPrice, form.currencyType) }}</div>
                  </div>
-                 <div class="field-group full-width">
-                   <label>Subject Description</label>
+                 <div class="field-group full-width" v-if="isFieldVisible('subject_desc')">
+                   <label>{{ getFieldName('subject_desc') }}</label>
                    <el-input v-if="isEditMode" v-model="form.subjectDesc" type="textarea" :rows="3" />
-                   <div v-else class="display-val text-block">{{ form.subjectDesc }}</div>
+                   <div v-else class="display-val text-block" :style="getFieldStyle('subject_desc')">{{ form.subjectDesc }}</div>
                  </div>
               </div>
             </div>
@@ -269,30 +272,30 @@
             <div class="form-section mt-6">
               <h3 class="section-header">Performance Terms</h3>
               <div class="form-grid-2">
-                <div class="field-group">
-                  <label>Performance Method</label>
+                <div class="field-group" v-if="isFieldVisible('performance_method')">
+                  <label>{{ getFieldName('performance_method') }}</label>
                   <el-input v-if="isEditMode" v-model="form.performanceMethod" />
-                  <div v-else class="display-val">{{ form.performanceMethod }}</div>
+                  <div v-else class="display-val" :style="getFieldStyle('performance_method')">{{ form.performanceMethod }}</div>
                 </div>
-                <div class="field-group">
-                  <label>Location</label>
+                <div class="field-group" v-if="isFieldVisible('performance_location')">
+                  <label>{{ getFieldName('performance_location') }}</label>
                   <el-input v-if="isEditMode" v-model="form.performanceLocation" />
-                  <div v-else class="display-val">{{ form.performanceLocation }}</div>
+                  <div v-else class="display-val" :style="getFieldStyle('performance_location')">{{ form.performanceLocation }}</div>
                 </div>
-                <div class="field-group">
-                  <label>Start Date</label>
+                <div class="field-group" v-if="isFieldVisible('performance_start_date')">
+                  <label>{{ getFieldName('performance_start_date') }}</label>
                   <el-date-picker v-if="isEditMode" v-model="form.performanceStartDate" type="date" style="width: 100%" />
-                  <div v-else class="display-val">{{ form.performanceStartDate }}</div>
+                  <div v-else class="display-val" :style="getFieldStyle('performance_start_date')">{{ form.performanceStartDate }}</div>
                 </div>
-                <div class="field-group">
-                  <label>End Date</label>
+                <div class="field-group" v-if="isFieldVisible('performance_end_date')">
+                  <label>{{ getFieldName('performance_end_date') }}</label>
                   <el-date-picker v-if="isEditMode" v-model="form.performanceEndDate" type="date" style="width: 100%" />
-                  <div v-else class="display-val">{{ form.performanceEndDate }}</div>
+                  <div v-else class="display-val" :style="getFieldStyle('performance_end_date')">{{ form.performanceEndDate }}</div>
                 </div>
-                <div class="field-group full-width">
-                  <label>Quality Standard</label>
+                <div class="field-group full-width" v-if="isFieldVisible('quality_standard')">
+                  <label>{{ getFieldName('quality_standard') }}</label>
                   <el-input v-if="isEditMode" v-model="form.qualityStandard" type="textarea" :rows="2" />
-                  <div v-else class="display-val text-block">{{ form.qualityStandard }}</div>
+                  <div v-else class="display-val text-block" :style="getFieldStyle('quality_standard')">{{ form.qualityStandard }}</div>
                 </div>
               </div>
             </div>
@@ -302,20 +305,20 @@
             <div class="form-section">
               <h3 class="section-header">Important Dates</h3>
               <div class="form-grid-3">
-                <div class="field-group">
-                  <label>Sign Date</label>
+                <div class="field-group" v-if="isFieldVisible('sign_date')">
+                  <label>{{ getFieldName('sign_date') }}</label>
                   <el-date-picker v-if="isEditMode" v-model="form.signDate" type="date" style="width: 100%" />
-                  <div v-else class="display-val">{{ form.signDate }}</div>
+                  <div v-else class="display-val" :style="getFieldStyle('sign_date')">{{ form.signDate }}</div>
                 </div>
-                <div class="field-group">
-                  <label>Effective Date</label>
+                <div class="field-group" v-if="isFieldVisible('effective_date')">
+                  <label>{{ getFieldName('effective_date') }}</label>
                   <el-date-picker v-if="isEditMode" v-model="form.effectiveDate" type="date" style="width: 100%" />
-                  <div v-else class="display-val">{{ form.effectiveDate }}</div>
+                  <div v-else class="display-val" :style="getFieldStyle('effective_date')">{{ form.effectiveDate }}</div>
                 </div>
-                <div class="field-group">
-                  <label>Expire Date</label>
+                <div class="field-group" v-if="isFieldVisible('expire_date')">
+                  <label>{{ getFieldName('expire_date') }}</label>
                   <el-date-picker v-if="isEditMode" v-model="form.expireDate" type="date" style="width: 100%" />
-                  <div v-else class="display-val">{{ form.expireDate }}</div>
+                  <div v-else class="display-val" :style="getFieldStyle('expire_date')">{{ form.expireDate }}</div>
                 </div>
               </div>
             </div>
@@ -323,30 +326,30 @@
             <div class="form-section mt-6">
               <h3 class="section-header">Legal Provisions</h3>
               <div class="form-grid-2">
-                <div class="field-group">
-                  <label>Dispute Resolution</label>
+                <div class="field-group" v-if="isFieldVisible('dispute_resolution')">
+                  <label>{{ getFieldName('dispute_resolution') }}</label>
                   <el-select v-if="isEditMode" v-model="form.disputeResolution" style="width: 100%">
                     <el-option label="Negotiation" value="Negotiation" />
                     <el-option label="Arbitration" value="Arbitration" />
                     <el-option label="Litigation" value="Litigation" />
                   </el-select>
-                  <div v-else class="display-val">{{ form.disputeResolution }}</div>
+                  <div v-else class="display-val" :style="getFieldStyle('dispute_resolution')">{{ form.disputeResolution }}</div>
                 </div>
-                <div class="field-group">
-                  <label>Governing Law</label>
+                <div class="field-group" v-if="isFieldVisible('governing_law')">
+                  <label>{{ getFieldName('governing_law') }}</label>
                   <el-input v-if="isEditMode" v-model="form.governingLaw" />
-                  <div v-else class="display-val">{{ form.governingLaw }}</div>
+                  <div v-else class="display-val" :style="getFieldStyle('governing_law')">{{ form.governingLaw }}</div>
                 </div>
                 
-                <div class="field-group full-width">
-                  <label>Legal Review</label>
+                <div class="field-group full-width" v-if="isFieldVisible('legal_review_flag')">
+                  <label>{{ getFieldName('legal_review_flag') }}</label>
                   <div v-if="isEditMode" class="review-box">
                     <el-checkbox v-model="form.legalReviewFlag" label="Reviewed by Legal" border />
                     <el-input v-if="form.legalReviewFlag" v-model="form.legalReviewOpinion" placeholder="Legal Opinion..." />
                   </div>
                   <div v-else class="display-val">
-                    <el-tag :type="form.legalReviewFlag ? 'success' : 'info'">{{ form.legalReviewFlag ? 'Reviewed' : 'Pending' }}</el-tag>
-                    <p v-if="form.legalReviewFlag" class="mt-2">{{ form.legalReviewOpinion }}</p>
+                    <el-tag :type="form.legalReviewFlag ? 'success' : 'info'" :style="getFieldStyle('legal_review_flag')">{{ form.legalReviewFlag ? 'Reviewed' : 'Pending' }}</el-tag>
+                    <p v-if="form.legalReviewFlag && isFieldVisible('legal_review_opinion')" class="mt-2" :style="getFieldStyle('legal_review_opinion')">{{ form.legalReviewOpinion }}</p>
                   </div>
                 </div>
               </div>
@@ -527,6 +530,9 @@ import { useRouter } from 'vue-router'
 import { ArrowLeft, Cpu, Check, ChatDotRound, UploadFilled, Document, Close, Postcard } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 
+import { useFieldStore } from '@/stores/fieldStore'
+
+const fieldStore = useFieldStore()
 const router = useRouter()
 const activeTab = ref('general')
 const showSidePanel = ref(true)
@@ -536,11 +542,28 @@ const isEditMode = ref(false)
 const analyzing = ref(false)
 const progress = ref(0)
 const showCardGenerator = ref(false)
-const contractFields = ref([])
+
 const cardConfig = ref({
-  selectedFields: ['contractNo', 'partyAName', 'partyBName', 'amount'],
+  selectedFields: ['contractNo', 'partyAName', 'partyBName', 'contractAmount'],
   customLabels: {}
 })
+
+const getFieldStyle = (fieldCode) => {
+  const field = fieldStore.fields.find(f => f.fieldCode === fieldCode)
+  if (!field) return {}
+  return {
+    color: field.fieldColor,
+    fontWeight: field.fieldStyles?.includes('bold') ? 'bold' : 'normal',
+    fontStyle: field.fieldStyles?.includes('italic') ? 'italic' : 'normal',
+  }
+}
+
+const isFieldVisible = (fieldCode) => fieldStore.isFieldVisible(fieldCode)
+
+const getFieldName = (code) => {
+  const f = fieldStore.fields.find(field => field.fieldCode === code)
+  return f ? f.fieldName : code
+}
 
 // Unified visual styles to match detail page
 const cardStyles = {
@@ -611,57 +634,23 @@ const cardStyles = {
 
 // Field Groups for Card Layout
 const fieldGroups = {
-  general: ['contractNo', 'contractName', 'contractType', 'contractStatus', 'crmContractId', 'partyAName', 'partyAContact', 'partyAPhone', 'partyAAddress', 'partyBName', 'partyBContact', 'partyBPhone', 'partyBAddress'],
-  financials: ['contractAmount', 'taxRate', 'taxAmount', 'totalAmountWithTax', 'currencyType', 'paymentMethod', 'paymentTerm', 'invoiceTitle', 'invoiceType', 'taxpayerId'],
-  performance: ['subjectType', 'subjectDesc', 'subjectQuantity', 'unitPrice', 'performanceMethod', 'performanceLocation', 'performanceStartDate', 'performanceEndDate', 'qualityStandard'],
-  legal: ['signDate', 'effectiveDate', 'expireDate', 'disputeResolution', 'governingLaw', 'legalReviewFlag', 'legalReviewOpinion', 'remark', 'createUser', 'createTime']
+  general: ['contract_no', 'contract_name', 'contract_type', 'contract_status', 'crm_contract_id', 'party_a_name', 'party_a_contact', 'party_a_phone', 'party_a_address', 'party_b_name', 'party_b_contact', 'party_b_phone', 'party_b_address'],
+  financials: ['contract_amount', 'tax_rate', 'tax_amount', 'total_amount_with_tax', 'currency_type', 'payment_method', 'payment_term', 'invoice_title', 'invoice_type', 'taxpayer_id'],
+  performance: ['subject_type', 'subject_desc', 'subject_quantity', 'unit_price', 'performance_method', 'performance_location', 'performance_start_date', 'performance_end_date', 'quality_standard'],
+  legal: ['sign_date', 'effective_date', 'expire_date', 'dispute_resolution', 'governing_law', 'legal_review_flag', 'legal_review_opinion', 'remark', 'create_user', 'create_time']
 }
 
 const getFieldsInGroup = (group) => {
   const selected = cardConfig.value.selectedFields
   if (group === 'extended') {
-    return contractFields.value.filter(f => f.source === 'EXTEND' && selected.includes(f.fieldCode))
+    return fieldStore.fields.filter(f => f.source === 'EXTEND' && selected.includes(f.fieldCode))
   }
   const groupFields = fieldGroups[group] || []
-  return contractFields.value.filter(f => groupFields.includes(f.fieldCode) && selected.includes(f.fieldCode))
+  return fieldStore.fields.filter(f => groupFields.includes(f.fieldCode) && selected.includes(f.fieldCode))
 }
 
 const hasFieldsInGroup = (group) => {
   return getFieldsInGroup(group).length > 0
-}
-
-const fetchMetadata = async () => {
-  try {
-    const response = await fetch('/api/metadata/contract-fields', {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        'X-Tenant-ID': localStorage.getItem('tenantId')
-      }
-    })
-    if (response.ok) {
-      const result = await response.json()
-      contractFields.value = result.data
-    }
-  } catch (error) {
-    console.error('Failed to fetch metadata', error)
-  }
-}
-
-const getFieldName = (code) => {
-  const f = contractFields.value.find(field => field.fieldCode === code)
-  return f ? f.fieldName : code
-}
-
-const getFieldValue = (code) => {
-  if (form.hasOwnProperty(code)) return form[code]
-  if (form.customData && form.customData.hasOwnProperty(code)) return form.customData[code]
-  if (form.extendedFields && form.extendedFields.hasOwnProperty(code)) return form.extendedFields[code]
-  return 'N/A'
-}
-
-const downloadCard = () => {
-  ElMessage.success('Card generation started...')
-  showCardGenerator.value = false
 }
 
 const fetchContractDetail = async () => {
@@ -676,14 +665,17 @@ const fetchContractDetail = async () => {
     if (response.ok) {
       const result = await response.json()
       Object.assign(form, result.data)
+    } else {
+      ElMessage.error('Failed to fetch contract details')
     }
   } catch (error) {
     console.error('Failed to fetch contract detail', error)
+    ElMessage.error('Network error loading contract')
   }
 }
 
 onMounted(() => {
-  fetchMetadata()
+  fieldStore.fetchFieldConfigs()
   fetchContractDetail()
 })
 
@@ -781,9 +773,12 @@ const saveContract = async () => {
       isEditMode.value = false
       ElMessage.success('Contract updated successfully')
       fetchContractDetail()
+    } else {
+      ElMessage.error('Failed to save changes')
     }
   } catch (error) {
     console.error('Update failed', error)
+    ElMessage.error('Network error saving changes')
   }
 }
 

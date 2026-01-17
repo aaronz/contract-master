@@ -26,6 +26,8 @@ fi
 
 log_info "Starting Contract Master Development Environment..."
 
+log_info "Resetting Docker environment..."
+docker-compose down -v --remove-orphans
 docker-compose up -d
 
 cleanup() {

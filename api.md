@@ -4,6 +4,13 @@
 |----------|--------|-------------|---------|
 | `/api/auth/login` | POST | User login | 1.0.0 |
 | `/api/contracts` | GET | List contracts (paginated, also used for evaluation selection) | 1.1.0 |
+| `/api/contracts` | POST | Create a new contract | 1.0.0 |
+| `/api/contracts/{id}` | GET | Get contract details | 1.0.0 |
+| `/api/contracts/{id}` | PUT | Update contract details | 1.0.0 |
+| `/api/contracts/{id}/audit` | GET | Retrieve contract audit logs | 1.0.0 |
+| `/api/contracts/{id}/extensions` | POST | Update contract extension data | 1.0.0 |
+| `/api/contracts/{id}/verify` | POST | Verify contract data validity | 1.0.0 |
+| `/api/contracts/batch-archive` | POST | Archive multiple contracts | 1.0.0 |
 | `/api/evaluations` | POST | Trigger a manual rule evaluation | 1.0.0 |
 | `/api/metadata/contract-fields` | GET | Unified field metadata | 1.1.0 |
 | `/api/problem-center/evaluation-jobs` | GET | Retrieve a paginated list of evaluation jobs | 1.0.0 |

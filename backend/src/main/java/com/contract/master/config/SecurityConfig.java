@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -13,6 +14,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Autowired
@@ -29,9 +31,12 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/publish/**").permitAll()
                 .requestMatchers("/api/contracts").permitAll() // Temporarily permit all for GET /api/contracts to unblock frontend
-                .requestMatchers("/api/evaluations/**").permitAll() // Permit all for new evaluation endpoints
+                .requestMatchers("/api/evaluations/**").permitAll()
+                .requestMatchers("/api/evaluations").permitAll() // Permit all for new evaluation endpoints
                 .requestMatchers("/api/problem-center/**").permitAll() // Permit all for new problem center endpoints
-                .requestMatchers("/api/rules/trigger-scenarios").permitAll() // Permit all for new rules trigger scenarios endpoint
+                .requestMatchers("/api/rules/**").permitAll()
+                .requestMatchers("/api/rules").permitAll() // Permit all for rules endpoints
+                .requestMatchers("/api/settings/fields").permitAll() // Permit all for field config
                 .requestMatchers("/api/contracts/*/audit").authenticated()
                 .requestMatchers("/h2-console/**").permitAll()
                 .anyRequest().authenticated()

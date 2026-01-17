@@ -32,6 +32,11 @@ public class RuleEngineController {
         return GlobalExceptionHandler.ApiResponse.success(ruleConfigRepository.findByTenantId(TenantContext.getCurrentTenant()));
     }
 
+    @GetMapping("/{id}")
+    public GlobalExceptionHandler.ApiResponse<RuleConfig> get(@PathVariable String id) {
+        return GlobalExceptionHandler.ApiResponse.success(ruleConfigRepository.findById(id).orElse(null));
+    }
+
     @PostMapping
     public GlobalExceptionHandler.ApiResponse<RuleConfig> create(@RequestBody RuleConfig rule) {
         if (rule.getRuleId() == null) {
@@ -49,6 +54,13 @@ public class RuleEngineController {
         rule.setRuleId(id);
         rule.setTenantId(TenantContext.getCurrentTenant());
         return GlobalExceptionHandler.ApiResponse.success(ruleConfigRepository.save(rule));
+    }
+
+    @PutMapping("/batch")
+    public GlobalExceptionHandler.ApiResponse<List<RuleConfig>> batchUpdate(@RequestBody List<RuleConfig> rules) {
+        String tenantId = TenantContext.getCurrentTenant();
+        rules.forEach(rule -> rule.setTenantId(tenantId));
+        return GlobalExceptionHandler.ApiResponse.success(ruleEngineService.batchUpdate(rules));
     }
 
     @PostMapping("/validate/{contractId}")
@@ -72,5 +84,15 @@ public class RuleEngineController {
         Map<String, Object> responseData = new HashMap<>();
         responseData.put("analysis", ruleEngineService.analyzeWithAI(contractId));
         return GlobalExceptionHandler.ApiResponse.success(responseData);
+    }
+
+    @GetMapping("/trigger-scenarios")
+    public GlobalExceptionHandler.ApiResponse<Map<String, List<Map<String, String>>>> getTriggerScenarios() {
+        List<Map<String, String>> scenarios = java.util.Arrays.asList(
+            java.util.Map.of("name", "Contract Creation", "description", "Rules are evaluated automatically when a new contract is created."),
+            java.util.Map.of("name", "Contract Update", "description", "Rules are evaluated automatically when an existing contract is updated."),
+            java.util.Map.of("name", "Scheduled Review", "description", "Rules can be scheduled to run periodically against active contracts.")
+        );
+        return GlobalExceptionHandler.ApiResponse.success(java.util.Map.of("scenarios", scenarios));
     }
 }

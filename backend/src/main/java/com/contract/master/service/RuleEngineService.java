@@ -30,6 +30,11 @@ public class RuleEngineService {
     @Autowired
     private ContractService contractService;
 
+    @org.springframework.transaction.annotation.Transactional
+    public List<RuleConfig> batchUpdate(List<RuleConfig> rules) {
+        return ruleConfigRepository.saveAll(rules);
+    }
+
     public List<String> validate(ContractDTO contract) {
         String tenantId = TenantContext.getCurrentTenant();
         List<RuleConfig> rules = ruleConfigRepository.findByTenantIdAndIsEnabled(tenantId, true);

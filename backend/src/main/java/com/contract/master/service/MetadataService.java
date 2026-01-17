@@ -2,11 +2,14 @@ package com.contract.master.service;
 
 import com.contract.master.domain.ContractExtendField;
 import com.contract.master.domain.ContractExtendFieldRepository;
+import com.contract.master.domain.FieldConfig;
+import com.contract.master.domain.FieldConfigRepository;
 import com.contract.master.dto.FieldMetadataDTO;
 import com.contract.master.security.TenantContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,67 +20,91 @@ public class MetadataService {
     @Autowired
     private ContractExtendFieldRepository extendFieldRepository;
 
+    @Autowired
+    private FieldConfigRepository fieldConfigRepository;
+
     public List<FieldMetadataDTO> getContractFields() {
         String tenantId = TenantContext.getCurrentTenant();
         List<FieldMetadataDTO> fields = new ArrayList<>();
         
-        fields.add(new FieldMetadataDTO("contractNo", "Contract Number", "TEXT", "STANDARD"));
-        fields.add(new FieldMetadataDTO("contractName", "Contract Name", "TEXT", "STANDARD"));
-        fields.add(new FieldMetadataDTO("contractType", "Contract Type", "TEXT", "STANDARD"));
-        fields.add(new FieldMetadataDTO("contractStatus", "Status", "TEXT", "STANDARD"));
-        fields.add(new FieldMetadataDTO("crmContractId", "CRM ID", "TEXT", "STANDARD"));
+        List<FieldConfig> configs = fieldConfigRepository.findByTenantId(tenantId);
 
-        fields.add(new FieldMetadataDTO("partyAName", "Party A Name", "TEXT", "STANDARD"));
-        fields.add(new FieldMetadataDTO("partyAContact", "Party A Contact", "TEXT", "STANDARD"));
-        fields.add(new FieldMetadataDTO("partyAPhone", "Party A Phone", "TEXT", "STANDARD"));
-        fields.add(new FieldMetadataDTO("partyAAddress", "Party A Address", "TEXT", "STANDARD"));
-
-        fields.add(new FieldMetadataDTO("partyBName", "Party B Name", "TEXT", "STANDARD"));
-        fields.add(new FieldMetadataDTO("partyBContact", "Party B Contact", "TEXT", "STANDARD"));
-        fields.add(new FieldMetadataDTO("partyBPhone", "Party B Phone", "TEXT", "STANDARD"));
-        fields.add(new FieldMetadataDTO("partyBAddress", "Party B Address", "TEXT", "STANDARD"));
-
-        fields.add(new FieldMetadataDTO("contractAmount", "Amount", "NUMBER", "STANDARD"));
-        fields.add(new FieldMetadataDTO("taxRate", "Tax Rate", "NUMBER", "STANDARD"));
-        fields.add(new FieldMetadataDTO("taxAmount", "Tax Amount", "NUMBER", "STANDARD"));
-        fields.add(new FieldMetadataDTO("totalAmountWithTax", "Total Amount", "NUMBER", "STANDARD"));
-        fields.add(new FieldMetadataDTO("currencyType", "Currency", "TEXT", "STANDARD"));
-        fields.add(new FieldMetadataDTO("paymentMethod", "Payment Method", "TEXT", "STANDARD"));
-        fields.add(new FieldMetadataDTO("paymentTerm", "Payment Term", "TEXT", "STANDARD"));
-
-        fields.add(new FieldMetadataDTO("invoiceTitle", "Invoice Title", "TEXT", "STANDARD"));
-        fields.add(new FieldMetadataDTO("taxpayerId", "Taxpayer ID", "TEXT", "STANDARD"));
-        fields.add(new FieldMetadataDTO("invoiceType", "Invoice Type", "TEXT", "STANDARD"));
-
-        fields.add(new FieldMetadataDTO("signDate", "Sign Date", "DATE", "STANDARD"));
-        fields.add(new FieldMetadataDTO("effectiveDate", "Effective Date", "DATE", "STANDARD"));
-        fields.add(new FieldMetadataDTO("expireDate", "Expire Date", "DATE", "STANDARD"));
-
-        fields.add(new FieldMetadataDTO("performanceLocation", "Performance Location", "TEXT", "STANDARD"));
-        fields.add(new FieldMetadataDTO("performanceMethod", "Performance Method", "TEXT", "STANDARD"));
-        fields.add(new FieldMetadataDTO("performanceStartDate", "Performance Start", "DATE", "STANDARD"));
-        fields.add(new FieldMetadataDTO("performanceEndDate", "Performance End", "DATE", "STANDARD"));
-        fields.add(new FieldMetadataDTO("qualityStandard", "Quality Standard", "TEXT", "STANDARD"));
-
-        fields.add(new FieldMetadataDTO("legalReviewFlag", "Legal Review", "BOOLEAN", "STANDARD"));
-        fields.add(new FieldMetadataDTO("legalReviewOpinion", "Legal Opinion", "TEXT", "STANDARD"));
-        fields.add(new FieldMetadataDTO("disputeResolution", "Dispute Resolution", "TEXT", "STANDARD"));
-        fields.add(new FieldMetadataDTO("governingLaw", "Governing Law", "TEXT", "STANDARD"));
-
-        fields.add(new FieldMetadataDTO("subjectType", "Subject Type", "TEXT", "STANDARD"));
-        fields.add(new FieldMetadataDTO("subjectDesc", "Subject Description", "TEXT", "STANDARD"));
-        fields.add(new FieldMetadataDTO("subjectQuantity", "Quantity", "NUMBER", "STANDARD"));
-        fields.add(new FieldMetadataDTO("unitPrice", "Unit Price", "NUMBER", "STANDARD"));
-
-        fields.add(new FieldMetadataDTO("remark", "Remark", "TEXT", "STANDARD"));
-        fields.add(new FieldMetadataDTO("createUser", "Creator", "TEXT", "STANDARD"));
-        fields.add(new FieldMetadataDTO("createTime", "Create Time", "DATE", "STANDARD"));
+        for (Field field : com.contract.master.dto.ContractDTO.class.getDeclaredFields()) {
+            String name = field.getName();
+            if (name.equals("extendedFields") || name.equals("attachments") || name.equals("tenantId") || name.equals("contractId")) {
+                continue;
+            }
+            
+            String fieldCode = camelToSnakeCase(name);
+            FieldConfig config = configs.stream().filter(c -> c.getFieldCode().equals(fieldCode)).findFirst().orElse(null);
+            
+            String type = getMetadataType(field.getType());
+            String label = config != null && config.getFieldAlias() != null ? config.getFieldAlias() : camelToWords(name);
+            FieldMetadataDTO dto = new FieldMetadataDTO(fieldCode, label, type, "STANDARD");
+            applyConfigToDTO(dto, config);
+            fields.add(dto);
+        }
 
         List<ContractExtendField> extendFields = extendFieldRepository.findByTenantId(tenantId);
-        fields.addAll(extendFields.stream()
-                .map(f -> new FieldMetadataDTO(f.getFieldCode(), f.getFieldName(), f.getFieldType(), "EXTEND"))
-                .collect(Collectors.toList()));
+        for (ContractExtendField ef : extendFields) {
+            FieldConfig config = configs.stream().filter(c -> c.getFieldCode().equals(ef.getFieldCode())).findFirst().orElse(null);
+            String label = config != null && config.getFieldAlias() != null ? config.getFieldAlias() : ef.getFieldName();
+            FieldMetadataDTO dto = new FieldMetadataDTO(ef.getFieldCode(), label, ef.getFieldType(), "EXTEND");
+            applyConfigToDTO(dto, config);
+            fields.add(dto);
+        }
 
         return fields;
+    }
+
+    private String camelToSnakeCase(String camel) {
+        if (camel == null) return null;
+        StringBuilder result = new StringBuilder();
+        for (char c : camel.toCharArray()) {
+            if (Character.isUpperCase(c)) {
+                result.append("_");
+                result.append(Character.toLowerCase(c));
+            } else {
+                result.append(c);
+            }
+        }
+        return result.toString();
+    }
+
+    private void applyConfigToDTO(FieldMetadataDTO dto, FieldConfig config) {
+        if (config != null) {
+            dto.setId(config.getId());
+            dto.setIsVisible(config.getIsVisible() != null ? config.getIsVisible() : true);
+            dto.setApiReturn(config.getApiReturn() != null ? config.getApiReturn() : true);
+            dto.setDisplayOrder(config.getDisplayOrder() != null ? config.getDisplayOrder() : 999);
+            dto.setFieldColor(config.getFieldColor());
+            dto.setFieldStyles(config.getFieldStyles());
+        } else {
+            dto.setIsVisible(true);
+            dto.setApiReturn(true);
+            dto.setDisplayOrder(999);
+        }
+    }
+
+    private String getMetadataType(Class<?> type) {
+        if (type == java.math.BigDecimal.class || type == Integer.class || type == Long.class) return "NUMBER";
+        if (type == java.time.LocalDate.class || type == java.time.LocalDateTime.class) return "DATE";
+        if (type == Boolean.class) return "BOOLEAN";
+        return "TEXT";
+    }
+
+    private String camelToWords(String camel) {
+        StringBuilder result = new StringBuilder();
+        for (char c : camel.toCharArray()) {
+            if (Character.isUpperCase(c)) {
+                result.append(" ");
+                result.append(c);
+            } else if (result.length() == 0) {
+                result.append(Character.toUpperCase(c));
+            } else {
+                result.append(c);
+            }
+        }
+        return result.toString();
     }
 }

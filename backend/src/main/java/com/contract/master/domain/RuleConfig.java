@@ -72,4 +72,6 @@ public class RuleConfig extends BaseTenantEntity {
     public void setAiPromptTemplate(String aiPromptTemplate) { this.aiPromptTemplate = aiPromptTemplate; }
     public String getRuleId() { return ruleId; }
     public void setRuleId(String ruleId) { this.ruleId = ruleId; }
+    public String getTriggerTime() { return triggerTime; }
+    public void setTriggerTime(String triggerTime) { this.triggerTime = triggerTime; }
 }
