@@ -1,66 +1,38 @@
 package com.contract.master.evaluation.api;
 
-import com.contract.master.evaluation.model.EvaluationJob;
 import com.contract.master.evaluation.service.EvaluationService;
-
+import com.contract.master.dto.EvaluationTriggerRequest;
+import com.contract.master.api.GlobalExceptionHandler; // Assuming GlobalExceptionHandler is in api package
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication; // Assuming Spring Security for user details
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import com.contract.master.security.TenantContext;
-import org.springframework.security.core.context.SecurityContextHolder;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/evaluations")
 public class EvaluationController {
 
-    private final EvaluationService evaluationService;
-
-    public EvaluationController(EvaluationService evaluationService) {
-        this.evaluationService = evaluationService;
-    }
-
-    // Request DTO for triggering evaluation
-    public static class TriggerEvaluationRequest {
-        private List<String> ruleIds;
-        private List<String> contractIds;
-
-        public List<String> getRuleIds() {
-            return ruleIds;
-        }
-
-        public void setRuleIds(List<String> ruleIds) {
-            this.ruleIds = ruleIds;
-        }
-
-        public List<String> getContractIds() {
-            return contractIds;
-        }
-
-        public void setContractIds(List<String> contractIds) {
-            this.contractIds = contractIds;
-        }
-    }
+    @Autowired
+    private EvaluationService evaluationService;
 
     @PostMapping
-    public ResponseEntity<EvaluationJob> triggerEvaluation(@RequestBody TriggerEvaluationRequest request) {
-        String tenantId = TenantContext.getCurrentTenant();
-        String triggeredBy = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        if (request.getContractIds() == null || request.getContractIds().isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    public ResponseEntity<GlobalExceptionHandler.ApiResponse<Map<String, String>>> triggerEvaluation(
+            @RequestBody EvaluationTriggerRequest request,
+            Authentication authentication) { // Inject Authentication to get current user
+        try {
+            String triggeredBy = "anonymous"; // Default if authentication is not available
+            if (authentication != null && authentication.isAuthenticated()) {
+                triggeredBy = authentication.getName(); // Get username or user ID
+            }
+            String jobId = evaluationService.triggerEvaluation(request.getContractId(), request.getRuleIds(), triggeredBy);
+            return new ResponseEntity<>(GlobalExceptionHandler.ApiResponse.success(Map.of("jobId", jobId)), HttpStatus.ACCEPTED);
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return new ResponseEntity<>(GlobalExceptionHandler.ApiResponse.error(e.getMessage()), HttpStatus.CONFLICT);
+        } catch (Exception e) {
+            return new ResponseEntity<>(GlobalExceptionHandler.ApiResponse.error("Internal server error: " + e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        
-        EvaluationJob job = evaluationService.createAndPublishEvaluationJob(
-            request.getRuleIds() != null ? request.getRuleIds() : Collections.emptyList(),
-            request.getContractIds(),
-            tenantId,
-            triggeredBy
-        );
-
-        return new ResponseEntity<>(job, HttpStatus.ACCEPTED);
     }
 }
