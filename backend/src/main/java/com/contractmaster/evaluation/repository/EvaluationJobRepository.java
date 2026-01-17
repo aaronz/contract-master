@@ -10,6 +10,6 @@ import java.util.List;
 
 @Repository
 public interface EvaluationJobRepository extends JpaRepository<EvaluationJob, String> {
-    List<EvaluationJob> findByTenantIdOrderByCreatedAtDesc(String tenantId);
+    List<EvaluationJob> findAllByTenantIdOrderByCreatedAtDesc(String tenantId);
     Page<EvaluationJob> findByTenantIdOrderByCreatedAtDesc(String tenantId, Pageable pageable);
 }
