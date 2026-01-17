@@ -10,7 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID; // Assuming we generate a UUID for the job for now.
+import com.contract.master.security.TenantContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @RestController
 @RequestMapping("/api/evaluations")
@@ -18,7 +19,7 @@ public class EvaluationController {
 
     private final EvaluationService evaluationService;
 
-    public EvaluationController(EvaluationService evaluationService) { // Constructor updated
+    public EvaluationController(EvaluationService evaluationService) {
         this.evaluationService = evaluationService;
     }
 
@@ -46,19 +47,15 @@ public class EvaluationController {
 
     @PostMapping
     public ResponseEntity<EvaluationJob> triggerEvaluation(@RequestBody TriggerEvaluationRequest request) {
-        // Placeholder for tenantId and triggeredBy, to be fetched from security context
-        String tenantId = "default-tenant"; // Replace with actual tenant ID from security context
-        String triggeredBy = "user-test"; // Replace with actual user ID from security context
+        String tenantId = TenantContext.getCurrentTenant();
+        String triggeredBy = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        // For now, let's assume we're processing a single rule, as per T012 goal.
-        // Batch processing will be handled in T022
-        if (request.getRuleIds() == null || request.getRuleIds().isEmpty() || request.getContractIds() == null || request.getContractIds().isEmpty()) {
+        if (request.getContractIds() == null || request.getContractIds().isEmpty()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-
-        // Use the EvaluationService to create and publish the job
+        
         EvaluationJob job = evaluationService.createAndPublishEvaluationJob(
-            request.getRuleIds(),
+            request.getRuleIds() != null ? request.getRuleIds() : Collections.emptyList(),
             request.getContractIds(),
             tenantId,
             triggeredBy

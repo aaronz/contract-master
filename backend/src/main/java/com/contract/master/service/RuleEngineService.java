@@ -36,8 +36,19 @@ public class RuleEngineService {
     }
 
     public List<String> validate(ContractDTO contract) {
+        return validate(contract, null);
+    }
+
+    public List<String> validate(ContractDTO contract, List<String> specificRuleIds) {
         String tenantId = TenantContext.getCurrentTenant();
         List<RuleConfig> rules = ruleConfigRepository.findByTenantIdAndIsEnabled(tenantId, true);
+        
+        if (specificRuleIds != null && !specificRuleIds.isEmpty()) {
+            rules = rules.stream()
+                    .filter(r -> specificRuleIds.contains(r.getRuleId()))
+                    .collect(Collectors.toList());
+        }
+
         List<String> violations = new ArrayList<>();
 
         for (RuleConfig rule : rules) {

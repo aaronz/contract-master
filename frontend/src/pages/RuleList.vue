@@ -6,8 +6,11 @@
         <p class="page-subtitle">Configure automated validation rules and risk alerts.</p>
       </div>
       <div class="header-actions">
-        <el-button v-if="selectedRules.length > 0" type="success" icon="Edit" @click="openBatchEdit">
-          Batch Edit ({{ selectedRules.length }})
+        <el-button v-if="selectedRules.length > 0" type="success" icon="VideoPlay" @click="handleTriggerEvaluation">
+          Run Evaluation ({{ selectedRules.length }})
+        </el-button>
+        <el-button v-if="selectedRules.length > 0" type="warning" icon="Edit" @click="openBatchEdit">
+          Batch Edit
         </el-button>
         <el-button type="primary" icon="Plus" @click="addRule">Add New Rule</el-button>
       </div>
@@ -126,24 +129,68 @@
         @cancel="editorVisible = false"
       />
     </el-drawer>
+
+    <!-- Contract Selector Modal -->
+    <ContractSelectorModal
+      v-if="showContractSelector"
+      v-model="showContractSelector"
+      @confirm="onContractsSelected"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { Plus, Delete, Warning, InfoFilled, Bell, Edit } from '@element-plus/icons-vue'
+import { Plus, Delete, Warning, InfoFilled, Bell, Edit, VideoPlay } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import evaluationApi from '../services/evaluationApi'
 import RuleEditorForm from '@/components/rules/RuleEditorForm.vue'
+import ContractSelectorModal from '@/components/ContractSelectorModal.vue'
 
 const rules = ref([])
 const editorVisible = ref(false)
 const saving = ref(false)
 const editingRule = ref({})
+const showContractSelector = ref(false)
 
 onMounted(async () => {
   await fetchRules()
 })
+
+const handleTriggerEvaluation = () => {
+  showContractSelector.value = true
+}
+
+const onContractsSelected = async (contractIds) => {
+  showContractSelector.value = false
+  const ruleIds = selectedRules.value.map(r => r.id)
+  
+  try {
+    // If no rules selected, ruleIds will be empty (backend interprets as "all enabled rules")
+    // But frontend UX implies we trigger for "Selected Rules" if selection exists.
+    // If selection bar is visible, we trigger for selected rules.
+    // If we add a global "Run All" button later, we'd pass empty ruleIds.
+    
+    // For now, let's assume this trigger is only available when rules are selected
+    // OR we can make it available globally.
+    // Based on the UI, let's add the button to the header actions as "Run Evaluation"
+    // which runs for selected rules (if any) or ALL rules (if none selected, maybe prompt?)
+    
+    // Better UX: 
+    // 1. If rules selected -> "Evaluate Selected Rules"
+    // 2. If no rules selected -> "Evaluate All Rules"
+    
+    const response = await evaluationApi.triggerEvaluation(ruleIds, contractIds)
+    if (response.status === 202) {
+       ElMessage.success('Evaluation job started')
+       // Optionally redirect to problem center or show a toast with link
+    }
+  } catch (error) {
+    ElMessage.error('Failed to trigger evaluation')
+    console.error(error)
+  }
+}
+
 
 const fetchRules = async () => {
   try {
@@ -159,7 +206,7 @@ const fetchRules = async () => {
         level: r.ruleLevel,
         trigger: r.triggerTime,
         enabled: r.isEnabled,
-        conditions: parseCondition(r.ruleCondition),
+        conditions: parseConditionForList(r.ruleCondition),
         logic: 'AND'
       }))
     } else {
@@ -172,15 +219,14 @@ const fetchRules = async () => {
   }
 }
 
-const parseCondition = (conditionStr) => {
+const parseConditionForList = (conditionStr) => {
   if (!conditionStr) return []
   try {
-    return JSON.parse(conditionStr)
+    const parsed = JSON.parse(conditionStr)
+    if (parsed.children) return parsed.children.filter(c => c.type === 'rule')
+    return Array.isArray(parsed) ? parsed : []
   } catch (e) {
-    // If not JSON, it might be a simple string condition like "amount > 1000"
-    // We can try to parse simple expressions or just return it as a raw display
     if (typeof conditionStr === 'string' && !conditionStr.startsWith('{') && !conditionStr.startsWith('[')) {
-        // Very basic parsing for display: "amount > 1000" -> { field: 'amount', operator: '>', value: '1000' }
         const parts = conditionStr.split(' ')
         if (parts.length >= 3) {
             return [{
@@ -191,9 +237,41 @@ const parseCondition = (conditionStr) => {
         }
         return [{ field: 'Raw', operator: ':', value: conditionStr }]
     }
-    console.warn('Failed to parse rule condition:', conditionStr)
     return []
   }
+}
+
+const parseCondition = (conditionStr) => {
+  if (!conditionStr) return { type: 'group', operator: 'AND', children: [] }
+  try {
+    return JSON.parse(conditionStr)
+  } catch (e) {
+    // If not JSON, it might be a simple string condition like "amount > 1000"
+    // We can try to parse simple expressions or just return it as a raw display
+    if (typeof conditionStr === 'string' && !conditionStr.startsWith('{') && !conditionStr.startsWith('[')) {
+        // Very basic parsing for display: "amount > 1000" -> { field: 'amount', operator: '>', value: '1000' }
+        const parts = conditionStr.split(' ')
+        if (parts.length >= 3) {
+            return {
+                type: 'group',
+                operator: 'AND',
+                children: [{
+                    type: 'rule',
+                    field: parts[0],
+                    operator: convertOperator(parts[1]),
+                    value: parts.slice(2).join(' ')
+                }]
+            }
+        }
+    }
+    console.warn('Failed to parse rule condition:', conditionStr)
+    return { type: 'group', operator: 'AND', children: [] }
+  }
+}
+
+const convertOperator = (op) => {
+    const map = { '>': 'gt', '<': 'lt', '==': 'eq', '!=': 'neq', '>=': 'gte', '<=': 'lte' }
+    return map[op] || 'eq'
 }
 
 // Batch Selection Logic
@@ -264,7 +342,7 @@ const editRule = async (rule) => {
   // Fetch fresh data to ensure we have the latest conditions
   try {
     const response = await evaluationApi.getRule(rule.id)
-    const data = response.data
+    const data = response.data.data // Wrapper handling
     editingRule.value = {
       ruleId: data.ruleId,
       id: data.ruleId,

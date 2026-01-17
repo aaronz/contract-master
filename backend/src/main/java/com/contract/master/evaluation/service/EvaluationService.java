@@ -66,7 +66,7 @@ public class EvaluationService {
                         try {
                             ContractDTO contract = contractService.getContractById(contractId);
                             if (contract != null) {
-                                List<String> violations = ruleEngineService.validate(contract);
+                                List<String> violations = ruleEngineService.validate(contract, ruleIds);
                                 EvaluationResult.ResultStatus status = violations.isEmpty() ? EvaluationResult.ResultStatus.PASS : EvaluationResult.ResultStatus.FAIL;
                                 String resultDetail = violations.isEmpty() ? "Passed all rules" : String.join("; ", violations);
 
