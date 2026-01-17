@@ -17,7 +17,6 @@ import java.util.UUID; // Assuming we generate a UUID for the job for now.
 public class EvaluationController {
 
     private final EvaluationService evaluationService;
-    private final KafkaProducerService kafkaProducerService;
 
     public EvaluationController(EvaluationService evaluationService) { // Constructor updated
         this.evaluationService = evaluationService;

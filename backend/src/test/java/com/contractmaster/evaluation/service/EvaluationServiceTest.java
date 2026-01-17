@@ -48,32 +48,42 @@ class EvaluationServiceTest {
         contractIds = Arrays.asList("contract1", "contract2");
 
         testJob = new EvaluationJob(tenantId, EvaluationJob.JobStatus.PENDING, EvaluationJob.TriggerType.MANUAL, LocalDateTime.now(), triggeredBy);
-        testJob.setId("job-123");
+
     }
 
     @Test
     void testCreateAndPublishEvaluationJob() {
-        when(jobRepository.save(any(EvaluationJob.class))).thenReturn(testJob);
+        when(jobRepository.save(any(EvaluationJob.class))).thenAnswer(invocation -> {
+            EvaluationJob jobArgument = invocation.getArgument(0); // Get the job instance passed to save
+            jobArgument.setId("job-123-generated"); // Simulate the repository setting the ID
+            return jobArgument; // Return the SAME instance, now with an ID
+        });
 
         EvaluationJob createdJob = evaluationService.createAndPublishEvaluationJob(ruleIds, contractIds, tenantId, triggeredBy);
 
         assertNotNull(createdJob);
-        assertEquals(testJob.getId(), createdJob.getId());
+        assertNotNull(createdJob.getId());
+        assertEquals("job-123-generated", createdJob.getId());
         assertEquals(EvaluationJob.JobStatus.PENDING, createdJob.getStatus());
+
         verify(jobRepository, times(1)).save(any(EvaluationJob.class));
-        verify(kafkaProducerService, times(1)).sendMessage(testJob.getId()); // Verify Kafka message is sent
+        verify(kafkaProducerService, times(1)).sendMessage("job-123-generated");
     }
 
     @Test
     void testListen_jobCompletion() {
-        when(jobRepository.findById(testJob.getId())).thenReturn(Optional.of(testJob));
-        when(jobRepository.save(any(EvaluationJob.class))).thenReturn(testJob);
+        // For testListen, the mock should return a job that already has an ID
+        EvaluationJob existingJob = new EvaluationJob(tenantId, EvaluationJob.JobStatus.PENDING, EvaluationJob.TriggerType.MANUAL, LocalDateTime.now(), triggeredBy);
+        existingJob.setId("job-123"); // Set a specific ID for this test case
+
+        when(jobRepository.findById(existingJob.getId())).thenReturn(Optional.of(existingJob));
+        when(jobRepository.save(any(EvaluationJob.class))).thenReturn(existingJob); // Return the same instance for updates
         when(resultRepository.save(any(EvaluationResult.class))).thenReturn(new EvaluationResult());
 
-        evaluationService.listen(testJob.getId());
+        evaluationService.listen(existingJob.getId());
 
-        assertEquals(EvaluationJob.JobStatus.COMPLETED, testJob.getStatus());
-        assertNotNull(testJob.getCompletedAt());
+        assertEquals(EvaluationJob.JobStatus.COMPLETED, existingJob.getStatus());
+        assertNotNull(existingJob.getCompletedAt());
         verify(jobRepository, times(2)).save(any(EvaluationJob.class)); // Once for IN_PROGRESS, once for COMPLETED
         verify(resultRepository, times(1)).save(any(EvaluationResult.class));
     }

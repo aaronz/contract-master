@@ -8,12 +8,14 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List; // Added import for List
 
 @Service
 public class EvaluationService {
 
     private final EvaluationJobRepository jobRepository;
     private final EvaluationResultRepository resultRepository;
+    private final KafkaProducerService kafkaProducerService; // Added KafkaProducerService field
 
     public EvaluationService(EvaluationJobRepository jobRepository, EvaluationResultRepository resultRepository, KafkaProducerService kafkaProducerService) {
         this.jobRepository = jobRepository;
