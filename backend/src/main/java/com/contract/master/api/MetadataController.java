@@ -1,7 +1,7 @@
 package com.contract.master.api;
 
 import com.contract.master.dto.FieldMetadataDTO;
-import com.contract.master.service.MetadataService;
+import com.contract.master.contract.metadata.application.MetadataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -1,8 +1,8 @@
 package com.contract.master.api;
 
-import com.contract.master.domain.AuditLog;
+import com.contract.master.audit.domain.model.AuditLog;
 import com.contract.master.dto.ContractDTO;
-import com.contract.master.service.ContractService;
+import com.contract.master.contract.application.ContractService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*; // Import all annotations from
 
 import java.util.List;
 import java.util.Map;
+import com.contract.master.audit.application.AuditService;
 
 @RestController
 @RequestMapping("/api/contracts")
@@ -20,7 +21,7 @@ public class ContractController {
     private ContractService contractService;
 
     @Autowired
-    private com.contract.master.service.AuditService auditService;
+    private com.contract.master.audit.application.AuditService auditService;
 
     @GetMapping
     public GlobalExceptionHandler.ApiResponse<Page<ContractDTO>> list(Pageable pageable) {
@@ -44,7 +45,7 @@ public class ContractController {
     }
 
     @GetMapping("/{id}/audit")
-    public GlobalExceptionHandler.ApiResponse<List<com.contract.master.domain.AuditLog>> audit(@PathVariable String id) {
+    public GlobalExceptionHandler.ApiResponse<List<com.contract.master.audit.domain.model.AuditLog>> audit(@PathVariable String id) {
         return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, auditService.getAuditLogsByContract(id));
     }
 

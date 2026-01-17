@@ -1,7 +1,7 @@
 package com.contract.master.api;
 
-import com.contract.master.domain.Notification;
-import com.contract.master.service.NotificationService;
+import com.contract.master.notification.domain.model.Notification;
+import com.contract.master.notification.application.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

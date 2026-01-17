@@ -1,7 +1,7 @@
 package com.contract.master;
 
-import com.contract.master.domain.ContractBase;
-import com.contract.master.domain.ContractBaseRepository;
+import com.contract.master.contract.domain.model.ContractBase;
+import com.contract.master.contract.domain.repository.ContractBaseRepository;
 import com.contract.master.security.TenantContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

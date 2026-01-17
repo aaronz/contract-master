@@ -2,7 +2,7 @@ package com.contract.master.integration.application;
 
 import com.contract.master.contract.domain.model.Contract;
 import com.contract.master.contract.domain.repository.ContractRepository;
-import com.contract.master.service.RuleEngineService;
+import com.contract.master.evaluation.application.RuleEngineService;
 import com.contract.master.security.TenantContext;
 import com.contract.master.dto.ContractDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,18 +30,18 @@ public class CrmIntegrationApplicationService {
         if (crmId == null) return;
 
         Contract contract = contractRepository.findById(crmId)
-                .orElse(new Contract());
+                .orElseGet(() -> {
+                    Contract newContract = new Contract();
+                    newContract.setContractId(UUID.randomUUID().toString());
+                    return newContract;
+                });
 
-        contract.setCrmId(crmId);
-        contract.setCrmSource(source);
-        contract.setContractName((String) payload.getOrDefault("name", "CRM Sync " + LocalDateTime.now()));
-        contract.setContractNo((String) payload.getOrDefault("number", "SN-" + System.currentTimeMillis()));
-        
-        contract.setSyncTime(LocalDateTime.now());
-
-        if (contract.getContractId() == null) {
-            contract.setContractId(UUID.randomUUID().toString());
-        }
+        contract.syncFromCrm(
+                crmId,
+                source,
+                (String) payload.getOrDefault("name", "CRM Sync " + LocalDateTime.now()),
+                (String) payload.getOrDefault("number", "SN-" + System.currentTimeMillis())
+        );
 
         contractRepository.save(contract);
     }

@@ -1,12 +1,12 @@
 package com.contract.master.evaluation.service;
 
-import com.contract.master.evaluation.model.EvaluationJob;
-import com.contract.master.evaluation.model.EvaluationResult;
-import com.contract.master.evaluation.repository.EvaluationJobRepository;
-import com.contract.master.evaluation.repository.EvaluationResultRepository;
-import com.contract.master.service.AuditService;
-import com.contract.master.service.ContractService;
-import com.contract.master.service.RuleEngineService;
+import com.contract.master.evaluation.domain.model.EvaluationJob;
+import com.contract.master.evaluation.domain.model.EvaluationResult;
+import com.contract.master.evaluation.domain.repository.EvaluationJobRepository;
+import com.contract.master.evaluation.domain.repository.EvaluationResultRepository;
+import com.contract.master.audit.application.AuditService;
+import com.contract.master.contract.application.ContractService;
+import com.contract.master.evaluation.application.RuleEngineService;
 import com.contract.master.dto.ContractDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,6 +31,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.*;
+import com.contract.master.evaluation.application.EvaluationApplicationService;
+import com.contract.master.evaluation.infrastructure.messaging.KafkaProducerService;
 
 @ExtendWith(MockitoExtension.class)
 class EvaluationServiceTest {
@@ -51,7 +53,7 @@ class EvaluationServiceTest {
     private ObjectMapper objectMapper = new ObjectMapper();
 
     @InjectMocks
-    private EvaluationService evaluationService;
+    private EvaluationApplicationService evaluationService;
 
     private EvaluationJob testJob;
     private List<String> ruleIds;

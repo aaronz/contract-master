@@ -1,6 +1,6 @@
 package com.contract.master.rule;
 
-import com.contract.master.domain.ContractBase;
+import com.contract.master.contract.domain.model.ContractBase;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

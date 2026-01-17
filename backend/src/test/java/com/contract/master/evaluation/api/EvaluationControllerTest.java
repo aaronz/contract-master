@@ -2,7 +2,7 @@ package com.contract.master.evaluation.api;
 
 import com.contract.master.api.GlobalExceptionHandler;
 import com.contract.master.dto.EvaluationTriggerRequest;
-import com.contract.master.evaluation.service.EvaluationService;
+import com.contract.master.evaluation.application.EvaluationApplicationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,7 +37,7 @@ class EvaluationControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private EvaluationService evaluationService;
+    private EvaluationApplicationService evaluationService;
 
     @Autowired
     private ObjectMapper objectMapper;

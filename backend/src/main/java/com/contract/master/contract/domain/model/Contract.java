@@ -1,7 +1,7 @@
 package com.contract.master.contract.domain.model;
 
-import com.contract.master.domain.BaseTenantEntity;
-import com.contract.master.domain.TenantEntityListener;
+import com.contract.master.shared.domain.model.BaseTenantEntity;
+import com.contract.master.shared.infrastructure.persistence.TenantEntityListener;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -73,6 +73,17 @@ public class Contract extends BaseTenantEntity {
 
     @Column(name = "archive_time")
     private LocalDateTime archiveTime;
+
+    public void syncFromCrm(String crmId, String crmSource, String contractName, String contractNo) {
+        this.crmId = crmId;
+        this.crmSource = crmSource;
+        this.contractName = contractName;
+        this.contractNo = contractNo;
+        this.syncTime = LocalDateTime.now();
+        if (this.status == null) {
+            this.status = "DRAFT";
+        }
+    }
 
     public String getContractId() { return contractId; }
     public void setContractId(String contractId) { this.contractId = contractId; }

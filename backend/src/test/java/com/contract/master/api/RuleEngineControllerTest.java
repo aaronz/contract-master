@@ -1,7 +1,7 @@
 package com.contract.master.api;
 
-import com.contract.master.domain.RuleConfig;
-import com.contract.master.domain.RuleConfigRepository;
+import com.contract.master.evaluation.domain.model.RuleConfig;
+import com.contract.master.evaluation.domain.repository.RuleConfigRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;

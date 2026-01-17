@@ -1,7 +1,7 @@
 package com.contract.master.security;
 
-import com.contract.master.domain.AuditLog;
-import com.contract.master.domain.AuditLogRepository;
+import com.contract.master.audit.domain.model.AuditLog;
+import com.contract.master.audit.domain.repository.AuditLogRepository;
 import org.hibernate.event.service.spi.EventListenerRegistry;
 import org.hibernate.event.spi.*;
 import org.hibernate.persister.entity.EntityPersister;

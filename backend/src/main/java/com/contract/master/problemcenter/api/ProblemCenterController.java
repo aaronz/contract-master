@@ -1,9 +1,9 @@
 package com.contract.master.problemcenter.api;
 
-import com.contract.master.evaluation.model.EvaluationJob;
-import com.contract.master.evaluation.model.EvaluationResult; // Import EvaluationResult
-import com.contract.master.evaluation.repository.EvaluationJobRepository;
-import com.contract.master.evaluation.repository.EvaluationResultRepository; // Import EvaluationResultRepository
+import com.contract.master.evaluation.domain.model.EvaluationJob;
+import com.contract.master.evaluation.domain.model.EvaluationResult; // Import EvaluationResult
+import com.contract.master.evaluation.domain.repository.EvaluationJobRepository;
+import com.contract.master.evaluation.domain.repository.EvaluationResultRepository; // Import EvaluationResultRepository
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

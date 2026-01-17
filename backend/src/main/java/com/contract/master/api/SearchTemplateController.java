@@ -1,7 +1,7 @@
 package com.contract.master.api;
 
-import com.contract.master.domain.SearchTemplate;
-import com.contract.master.domain.SearchTemplateRepository;
+import com.contract.master.contract.domain.model.SearchTemplate;
+import com.contract.master.contract.domain.repository.SearchTemplateRepository;
 import com.contract.master.security.TenantContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

@@ -1,0 +1,27 @@
+package com.contract.master.contract.domain.model;
+
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import com.contract.master.shared.domain.model.BaseTenantEntity;
+
+@Entity
+@Table(name = "search_template")
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class SearchTemplate extends BaseTenantEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "template_name", length = 128)
+    private String templateName;
+
+    @Column(name = "user_id", length = 64)
+    private String userId;
+
+    @Column(name = "filter_json", columnDefinition = "TEXT")
+    private String filterJson;
+
+    public void setUserId(String userId) { this.userId = userId; }
+}

@@ -1,7 +1,7 @@
 package com.contract.master.api;
 
-import com.contract.master.domain.ContractExtendField;
-import com.contract.master.domain.ContractExtendFieldRepository;
+import com.contract.master.contract.domain.model.ContractExtendField;
+import com.contract.master.contract.domain.repository.ContractExtendFieldRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;

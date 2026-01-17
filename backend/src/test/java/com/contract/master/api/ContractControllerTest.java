@@ -1,10 +1,10 @@
 package com.contract.master.api;
 
-import com.contract.master.domain.ContractBase;
-import com.contract.master.domain.ContractBaseRepository;
-import com.contract.master.domain.FieldConfig;
-import com.contract.master.domain.FieldConfigRepository;
-import com.contract.master.service.ContractService;
+import com.contract.master.contract.domain.model.ContractBase;
+import com.contract.master.contract.domain.repository.ContractBaseRepository;
+import com.contract.master.contract.metadata.domain.model.FieldConfig;
+import com.contract.master.contract.metadata.domain.repository.FieldConfigRepository;
+import com.contract.master.contract.application.ContractService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,7 +37,7 @@ public class ContractControllerTest {
     private FieldConfigRepository fieldConfigRepository;
 
     @Autowired
-    private com.contract.master.service.ContractService contractService; // Inject ContractService to clear cache
+    private com.contract.master.contract.application.ContractService contractService; // Inject ContractService to clear cache
 
     @BeforeEach // Add BeforeEach
     void setup() {

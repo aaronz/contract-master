@@ -1,7 +1,7 @@
 package com.contract.master.api;
 
-import com.contract.master.domain.DownstreamSystem;
-import com.contract.master.domain.DownstreamSystemRepository;
+import com.contract.master.integration.domain.model.DownstreamSystem;
+import com.contract.master.integration.domain.repository.DownstreamSystemRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;

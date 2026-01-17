@@ -1,7 +1,7 @@
 package com.contract.master.api;
 
 import com.contract.master.dto.DashboardStatsDTO;
-import com.contract.master.service.DashboardService;
+import com.contract.master.dashboard.application.DashboardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*; // Import all annotations from rest

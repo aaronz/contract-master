@@ -1,4 +1,4 @@
-package com.contract.master.evaluation.api;
+package com.contract.master.evaluation.interfaces.rest;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import com.contract.master.contract.application.ContractService;
+import com.contract.master.dto.ContractDTO;
 
 @RestController("evaluationContractController")
 @RequestMapping("/api/evaluation/contracts")

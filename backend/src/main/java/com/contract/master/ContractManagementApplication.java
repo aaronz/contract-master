@@ -1,17 +1,17 @@
 package com.contract.master;
 
-import com.contract.master.domain.ContractBase;
-import com.contract.master.domain.ContractBaseRepository;
-import com.contract.master.domain.RuleConfig;
-import com.contract.master.domain.RuleConfigRepository;
-import com.contract.master.domain.User;
-import com.contract.master.domain.UserRepository;
+import com.contract.master.contract.domain.model.ContractBase;
+import com.contract.master.contract.domain.repository.ContractBaseRepository;
+import com.contract.master.evaluation.domain.model.RuleConfig;
+import com.contract.master.evaluation.domain.repository.RuleConfigRepository;
+import com.contract.master.identity.domain.model.User;
+import com.contract.master.identity.domain.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import com.contract.master.service.AuditService; // Import AuditService
-import com.contract.master.domain.AuditLogRepository; // Import AuditLogRepository
+import com.contract.master.audit.application.AuditService; // Import AuditService
+import com.contract.master.audit.domain.repository.AuditLogRepository; // Import AuditLogRepository
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.security.crypto.password.PasswordEncoder;
 

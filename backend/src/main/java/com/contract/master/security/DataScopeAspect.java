@@ -1,7 +1,7 @@
 package com.contract.master.security;
 
-import com.contract.master.domain.DataPermissionRule;
-import com.contract.master.domain.DataPermissionRuleRepository;
+import com.contract.master.shared.domain.model.DataPermissionRule;
+import com.contract.master.shared.domain.repository.DataPermissionRuleRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.contract.master.contract.domain.repository.ContractBaseRepository;
 
 @Aspect
 @Component
@@ -28,7 +29,7 @@ public class DataScopeAspect {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Pointcut("execution(* com.contract.master.domain.ContractBaseRepository..*(..))")
+    @Pointcut("execution(* com.contract.master.contract.domain.model.ContractBaseRepository..*(..))")
     public void contractRepositoryMethods() {}
 
     @Before("contractRepositoryMethods()")

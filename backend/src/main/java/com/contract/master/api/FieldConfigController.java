@@ -1,7 +1,7 @@
 package com.contract.master.api;
 
-import com.contract.master.domain.FieldConfig;
-import com.contract.master.service.FieldConfigService;
+import com.contract.master.contract.metadata.domain.model.FieldConfig;
+import com.contract.master.contract.metadata.application.FieldConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*; // Import all annotations from rest

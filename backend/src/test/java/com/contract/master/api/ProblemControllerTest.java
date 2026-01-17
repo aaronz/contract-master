@@ -1,6 +1,6 @@
 package com.contract.master.api;
 
-import com.contract.master.service.NotificationService;
+import com.contract.master.notification.application.NotificationService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;

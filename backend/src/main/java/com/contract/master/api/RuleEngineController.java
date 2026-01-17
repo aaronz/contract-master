@@ -1,11 +1,11 @@
 package com.contract.master.api;
 
-import com.contract.master.domain.RuleConfig;
-import com.contract.master.domain.RuleConfigRepository;
+import com.contract.master.evaluation.domain.model.RuleConfig;
+import com.contract.master.evaluation.domain.repository.RuleConfigRepository;
+import com.contract.master.evaluation.application.RuleEngineService;
 import com.contract.master.dto.ContractDTO;
 import com.contract.master.security.TenantContext;
-import com.contract.master.service.ContractService;
-import com.contract.master.service.RuleEngineService;
+import com.contract.master.contract.application.ContractService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*; // Import all annotations from rest

@@ -1,7 +1,7 @@
 package com.contract.master.integration.domain.model;
 
-import com.contract.master.domain.BaseTenantEntity;
-import com.contract.master.domain.TenantEntityListener;
+import com.contract.master.shared.domain.model.BaseTenantEntity;
+import com.contract.master.shared.infrastructure.persistence.TenantEntityListener;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
