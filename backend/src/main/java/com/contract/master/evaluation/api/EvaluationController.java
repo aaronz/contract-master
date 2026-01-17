@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication; // Assuming Spring Secu
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.List; // Import List
 
 @RestController
 @RequestMapping("/api/evaluations")
@@ -27,7 +28,14 @@ public class EvaluationController {
             if (authentication != null && authentication.isAuthenticated()) {
                 triggeredBy = authentication.getName(); // Get username or user ID
             }
-            String jobId = evaluationService.triggerEvaluation(request.getContractId(), request.getRuleIds(), triggeredBy);
+            
+            // Assuming the frontend will send only one contractId for re-evaluation
+            if (request.getContractIds() == null || request.getContractIds().size() != 1) {
+                return new ResponseEntity<>(GlobalExceptionHandler.ApiResponse.error("Exactly one contract ID is required for re-evaluation."), HttpStatus.BAD_REQUEST);
+            }
+            String contractId = request.getContractIds().get(0);
+
+            String jobId = evaluationService.triggerReEvaluationForSingleContract(contractId, request.getRuleIds(), triggeredBy);
             return new ResponseEntity<>(GlobalExceptionHandler.ApiResponse.success(Map.of("jobId", jobId)), HttpStatus.ACCEPTED);
         } catch (IllegalArgumentException | IllegalStateException e) {
             return new ResponseEntity<>(GlobalExceptionHandler.ApiResponse.error(e.getMessage()), HttpStatus.CONFLICT);

@@ -12,6 +12,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EvaluationTriggerRequest {
-    private String contractId;
+    private List<String> contractIds; // Changed from single contractId
     private List<String> ruleIds;
 }

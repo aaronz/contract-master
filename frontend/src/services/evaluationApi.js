@@ -5,10 +5,10 @@ import request from '@/utils/request';
 const API_BASE_URL = '';
 
 export default {
-  triggerEvaluation(ruleIds, contractIds) {
+  triggerEvaluation(contractId, ruleIds) { // Changed parameter order and single contractId
     return request.post(`/evaluations`, {
+      contractIds: [contractId], // Wrap single contractId in a list
       ruleIds: ruleIds,
-      contractIds: contractIds,
     });
   },
 

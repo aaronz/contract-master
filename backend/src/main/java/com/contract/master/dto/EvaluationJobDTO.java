@@ -15,12 +15,13 @@ import java.util.Map;
 @AllArgsConstructor
 public class EvaluationJobDTO {
     private String jobId;
-    private String contractId;
-    private List<String> ruleIds;
+    private String tenantId;
     private String status;
-    private String triggeredBy;
+    private String triggerType; // Corresponds to EvaluationJob.TriggerType
     private LocalDateTime createdAt;
     private LocalDateTime completedAt;
-    private Map<String, Object> results;
-    private String tenantId;
+    private String triggeredBy;
+    private List<String> targetRules; // Deserialized from target_rules JSON string
+    private List<String> targetContracts; // Deserialized from target_contracts JSON string
+    private Map<String, Object> results; // Not directly from model, but useful for UI
 }
