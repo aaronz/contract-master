@@ -20,7 +20,7 @@ public class EvaluationController {
     private EvaluationService evaluationService;
 
     @PostMapping
-    public ResponseEntity<GlobalExceptionHandler.ApiResponse<Map<String, String>>> triggerEvaluation(
+    public ResponseEntity<GlobalExceptionHandler.ApiResponse<?>> triggerEvaluation(
             @RequestBody EvaluationTriggerRequest request,
             Authentication authentication) { // Inject Authentication to get current user
         try {
@@ -31,16 +31,16 @@ public class EvaluationController {
             
             // Assuming the frontend will send only one contractId for re-evaluation
             if (request.getContractIds() == null || request.getContractIds().size() != 1) {
-                return new ResponseEntity<>(GlobalExceptionHandler.ApiResponse.error("Exactly one contract ID is required for re-evaluation."), HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(GlobalExceptionHandler.ApiResponse.error(HttpStatus.BAD_REQUEST.value(), "Exactly one contract ID is required for re-evaluation."), HttpStatus.BAD_REQUEST);
             }
             String contractId = request.getContractIds().get(0);
 
             String jobId = evaluationService.triggerReEvaluationForSingleContract(contractId, request.getRuleIds(), triggeredBy);
-            return new ResponseEntity<>(GlobalExceptionHandler.ApiResponse.success(Map.of("jobId", jobId)), HttpStatus.ACCEPTED);
+            return new ResponseEntity<>(GlobalExceptionHandler.ApiResponse.success(HttpStatus.ACCEPTED, Map.of("jobId", jobId)), HttpStatus.ACCEPTED);
         } catch (IllegalArgumentException | IllegalStateException e) {
-            return new ResponseEntity<>(GlobalExceptionHandler.ApiResponse.error(e.getMessage()), HttpStatus.CONFLICT);
+            return new ResponseEntity<>(GlobalExceptionHandler.ApiResponse.error(HttpStatus.CONFLICT.value(), e.getMessage()), HttpStatus.CONFLICT);
         } catch (Exception e) {
-            return new ResponseEntity<>(GlobalExceptionHandler.ApiResponse.error("Internal server error: " + e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(GlobalExceptionHandler.ApiResponse.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Internal server error: " + e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

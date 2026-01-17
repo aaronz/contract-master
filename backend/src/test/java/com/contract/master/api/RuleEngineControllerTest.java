@@ -9,9 +9,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get; // Add this import
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.hamcrest.Matchers.hasItem; // Import hasItem
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -37,6 +38,6 @@ public class RuleEngineControllerTest {
                         .header("X-Tenant-ID", "tenant-1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").isArray())
-                .andExpect(jsonPath("$.data[0].ruleName").value("Test Rule"));
+                .andExpect(jsonPath("$.data[*].ruleName", hasItem("Test Rule"))); // Assert presence instead of order
     }
 }

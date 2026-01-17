@@ -7,7 +7,8 @@ import com.contract.master.security.TenantContext;
 import com.contract.master.service.ContractService;
 import com.contract.master.service.RuleEngineService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*; // Import all annotations from rest
 
 import java.util.HashMap;
 import java.util.List;
@@ -29,12 +30,12 @@ public class RuleEngineController {
 
     @GetMapping
     public GlobalExceptionHandler.ApiResponse<List<RuleConfig>> list() {
-        return GlobalExceptionHandler.ApiResponse.success(ruleConfigRepository.findByTenantId(TenantContext.getCurrentTenant()));
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, ruleConfigRepository.findByTenantId(TenantContext.getCurrentTenant()));
     }
 
     @GetMapping("/{id}")
     public GlobalExceptionHandler.ApiResponse<RuleConfig> get(@PathVariable String id) {
-        return GlobalExceptionHandler.ApiResponse.success(ruleConfigRepository.findById(id).orElse(null));
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, ruleConfigRepository.findById(id).orElse(null));
     }
 
     @PostMapping
@@ -46,21 +47,21 @@ public class RuleEngineController {
             rule.setRuleType("LOGIC");
         }
         rule.setTenantId(TenantContext.getCurrentTenant());
-        return GlobalExceptionHandler.ApiResponse.success(ruleConfigRepository.save(rule));
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, ruleConfigRepository.save(rule));
     }
 
     @PutMapping("/{id}")
     public GlobalExceptionHandler.ApiResponse<RuleConfig> update(@PathVariable String id, @RequestBody RuleConfig rule) {
         rule.setRuleId(id);
         rule.setTenantId(TenantContext.getCurrentTenant());
-        return GlobalExceptionHandler.ApiResponse.success(ruleConfigRepository.save(rule));
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, ruleConfigRepository.save(rule));
     }
 
     @PutMapping("/batch")
     public GlobalExceptionHandler.ApiResponse<List<RuleConfig>> batchUpdate(@RequestBody List<RuleConfig> rules) {
         String tenantId = TenantContext.getCurrentTenant();
         rules.forEach(rule -> rule.setTenantId(tenantId));
-        return GlobalExceptionHandler.ApiResponse.success(ruleEngineService.batchUpdate(rules));
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, ruleEngineService.batchUpdate(rules));
     }
 
     @PostMapping("/validate/{contractId}")
@@ -76,14 +77,14 @@ public class RuleEngineController {
             responseData.put("status", "NOT_FOUND");
         }
         
-        return GlobalExceptionHandler.ApiResponse.success(responseData);
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, responseData);
     }
 
     @PostMapping("/ai-analyze/{contractId}")
     public GlobalExceptionHandler.ApiResponse<Map<String, Object>> aiAnalyze(@PathVariable String contractId) {
         Map<String, Object> responseData = new HashMap<>();
         responseData.put("analysis", ruleEngineService.analyzeWithAI(contractId));
-        return GlobalExceptionHandler.ApiResponse.success(responseData);
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, responseData);
     }
 
     @GetMapping("/trigger-scenarios")
@@ -93,6 +94,6 @@ public class RuleEngineController {
             java.util.Map.of("name", "Contract Update", "description", "Rules are evaluated automatically when an existing contract is updated."),
             java.util.Map.of("name", "Scheduled Review", "description", "Rules can be scheduled to run periodically against active contracts.")
         );
-        return GlobalExceptionHandler.ApiResponse.success(java.util.Map.of("scenarios", scenarios));
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, java.util.Map.of("scenarios", scenarios));
     }
 }

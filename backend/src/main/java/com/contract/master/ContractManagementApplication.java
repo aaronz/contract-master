@@ -10,6 +10,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import com.contract.master.service.AuditService; // Import AuditService
+import com.contract.master.domain.AuditLogRepository; // Import AuditLogRepository
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -23,6 +25,13 @@ public class ContractManagementApplication {
     public static void main(String[] args) {
         SpringApplication.run(ContractManagementApplication.class, args);
     }
+
+    // Explicitly define AuditService as a bean for diagnostic purposes
+    @Bean
+    public AuditService auditService(AuditLogRepository auditLogRepository) {
+        return new AuditService(auditLogRepository);
+    }
+    
 
     @Bean
     public CommandLineRunner initData(UserRepository userRepository, ContractBaseRepository contractRepository, RuleConfigRepository ruleRepository, PasswordEncoder passwordEncoder) {

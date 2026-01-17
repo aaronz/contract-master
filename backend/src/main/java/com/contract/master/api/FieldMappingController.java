@@ -4,7 +4,8 @@ import com.contract.master.domain.FieldMapping;
 import com.contract.master.domain.FieldMappingRepository;
 import com.contract.master.security.TenantContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*; // Import all annotations from rest
 
 import java.util.List;
 
@@ -17,18 +18,18 @@ public class FieldMappingController {
 
     @GetMapping
     public GlobalExceptionHandler.ApiResponse<List<FieldMapping>> list() {
-        return GlobalExceptionHandler.ApiResponse.success(repository.findByTenantId(TenantContext.getCurrentTenant()));
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, repository.findByTenantId(TenantContext.getCurrentTenant()));
     }
 
     @PostMapping
     public GlobalExceptionHandler.ApiResponse<FieldMapping> save(@RequestBody FieldMapping mapping) {
         mapping.setTenantId(TenantContext.getCurrentTenant());
-        return GlobalExceptionHandler.ApiResponse.success(repository.save(mapping));
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, repository.save(mapping));
     }
 
     @DeleteMapping("/{id}")
     public GlobalExceptionHandler.ApiResponse<Void> delete(@PathVariable Long id) {
         repository.deleteById(id);
-        return GlobalExceptionHandler.ApiResponse.success(null);
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, null);
     }
 }

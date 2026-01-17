@@ -23,6 +23,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Collections;
+import com.contract.master.security.TenantContext; // Added import for TenantContext
+import org.mockito.MockedStatic;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -86,7 +88,7 @@ class EvaluationServiceTest {
         verify(kafkaProducerService, times(1)).sendMessage("job-123-generated");
         
         verify(auditService, times(1)).logChange(
-            eq("JOB-job-123-generated"), 
+            eq("JOB-" + createdJob.getId()), 
             eq("EvaluationJob"), 
             isNull(), 
             eq("Created"), 
@@ -107,7 +109,7 @@ class EvaluationServiceTest {
         when(jobRepository.save(any(EvaluationJob.class))).thenReturn(existingJob);
         when(resultRepository.save(any(EvaluationResult.class))).thenReturn(new EvaluationResult());
         when(contractService.getContractById(anyString())).thenReturn(new ContractDTO()); // Return a dummy contract
-        when(ruleEngineService.validate(any(ContractDTO.class))).thenReturn(Collections.emptyList()); // Simulate validation passing
+        when(ruleEngineService.validate(any(ContractDTO.class), eq(ruleIds))).thenReturn(Collections.emptyList()); // Simulate validation passing
 
         evaluationService.listen(existingJob.getId());
 
@@ -126,5 +128,93 @@ class EvaluationServiceTest {
 
         verify(jobRepository, never()).save(any(EvaluationJob.class));
         verify(resultRepository, never()).save(any(EvaluationResult.class));
+    }
+
+    @Test
+    void testTriggerReEvaluationForSingleContract_Success() throws Exception {
+        String singleContractId = "singleContract1";
+        List<String> rulesForReEval = Arrays.asList("ruleA", "ruleB");
+        String reEvalTriggeredBy = "re-eval-user";
+        
+        ContractDTO mockContract = new ContractDTO();
+        mockContract.setContractId(singleContractId);
+        when(contractService.getContractById(singleContractId)).thenReturn(mockContract);
+
+        when(jobRepository.findByTenantIdAndTargetContractsContainingAndStatus(
+                eq(tenantId), anyString(), eq(EvaluationJob.JobStatus.IN_PROGRESS)))
+                .thenReturn(Collections.emptyList());
+
+        when(jobRepository.save(any(EvaluationJob.class))).thenAnswer(invocation -> {
+            EvaluationJob jobArgument = invocation.getArgument(0);
+            jobArgument.setId("job-re-eval-123");
+            return jobArgument;
+        });
+
+        // Mock TenantContext
+        try (MockedStatic<TenantContext> mocked = mockStatic(TenantContext.class)) {
+            mocked.when(TenantContext::getCurrentTenant).thenReturn(tenantId);
+
+            String jobId = evaluationService.triggerReEvaluationForSingleContract(singleContractId, rulesForReEval, reEvalTriggeredBy);
+
+            assertNotNull(jobId);
+            assertEquals("job-re-eval-123", jobId);
+            verify(contractService, times(1)).getContractById(singleContractId);
+            verify(jobRepository, times(1)).findByTenantIdAndTargetContractsContainingAndStatus(
+                    eq(tenantId), anyString(), eq(EvaluationJob.JobStatus.IN_PROGRESS));
+            verify(jobRepository, times(1)).save(any(EvaluationJob.class));
+            verify(auditService, times(1)).logReEvaluationTriggered(singleContractId, String.join(",", rulesForReEval), reEvalTriggeredBy);
+            verify(kafkaProducerService, times(1)).sendMessage("job-re-eval-123");
+        }
+    }
+
+    @Test
+    void testTriggerReEvaluationForSingleContract_ContractNotFound() {
+        String singleContractId = "nonExistentContract";
+        List<String> rulesForReEval = Arrays.asList("ruleA");
+        String reEvalTriggeredBy = "re-eval-user";
+
+        when(contractService.getContractById(singleContractId)).thenThrow(new IllegalArgumentException("Contract not found"));
+
+        try (MockedStatic<TenantContext> mocked = mockStatic(TenantContext.class)) {
+            mocked.when(TenantContext::getCurrentTenant).thenReturn(tenantId);
+            
+            assertThrows(IllegalArgumentException.class, () ->
+                    evaluationService.triggerReEvaluationForSingleContract(singleContractId, rulesForReEval, reEvalTriggeredBy));
+
+            verify(contractService, times(1)).getContractById(singleContractId);
+            verify(jobRepository, never()).findByTenantIdAndTargetContractsContainingAndStatus(anyString(), anyString(), any());
+            verify(jobRepository, never()).save(any(EvaluationJob.class));
+            verify(auditService, never()).logReEvaluationTriggered(anyString(), anyString(), anyString());
+            verify(kafkaProducerService, never()).sendMessage(anyString());
+        }
+    }
+
+    @Test
+    void testTriggerReEvaluationForSingleContract_AlreadyInProgress() throws Exception {
+        String singleContractId = "contractInProg";
+        List<String> rulesForReEval = Arrays.asList("ruleA");
+        String reEvalTriggeredBy = "re-eval-user";
+        
+        ContractDTO mockContract = new ContractDTO();
+        mockContract.setContractId(singleContractId);
+        when(contractService.getContractById(singleContractId)).thenReturn(mockContract);
+
+        when(jobRepository.findByTenantIdAndTargetContractsContainingAndStatus(
+                eq(tenantId), anyString(), eq(EvaluationJob.JobStatus.IN_PROGRESS)))
+                .thenReturn(Arrays.asList(new EvaluationJob())); // Simulate job in progress
+
+        try (MockedStatic<TenantContext> mocked = mockStatic(TenantContext.class)) {
+            mocked.when(TenantContext::getCurrentTenant).thenReturn(tenantId);
+            
+            assertThrows(IllegalStateException.class, () ->
+                    evaluationService.triggerReEvaluationForSingleContract(singleContractId, rulesForReEval, reEvalTriggeredBy));
+
+            verify(contractService, times(1)).getContractById(singleContractId);
+            verify(jobRepository, times(1)).findByTenantIdAndTargetContractsContainingAndStatus(
+                    eq(tenantId), anyString(), eq(EvaluationJob.JobStatus.IN_PROGRESS));
+            verify(jobRepository, never()).save(any(EvaluationJob.class));
+            verify(auditService, never()).logReEvaluationTriggered(anyString(), anyString(), anyString());
+            verify(kafkaProducerService, never()).sendMessage(anyString());
+        }
     }
 }

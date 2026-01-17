@@ -8,7 +8,7 @@ import com.contract.master.service.RateLimiterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.*; // Import all annotations from rest
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -38,26 +38,26 @@ public class WebHookController {
         }
 
         crmIntegrationService.syncContract(payload, source.toUpperCase());
-        return GlobalExceptionHandler.ApiResponse.success(null);
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, null);
     }
 
     @GetMapping("/configs")
     @PreAuthorize("hasRole('ADMIN')")
     public GlobalExceptionHandler.ApiResponse<List<WebHookConfig>> listConfigs() {
-        return GlobalExceptionHandler.ApiResponse.success(configRepository.findByTenantId(TenantContext.getCurrentTenant()));
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, configRepository.findByTenantId(TenantContext.getCurrentTenant()));
     }
 
     @PostMapping("/configs")
     @PreAuthorize("hasRole('ADMIN')")
     public GlobalExceptionHandler.ApiResponse<WebHookConfig> saveConfig(@RequestBody WebHookConfig config) {
         config.setTenantId(TenantContext.getCurrentTenant());
-        return GlobalExceptionHandler.ApiResponse.success(configRepository.save(config));
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, configRepository.save(config));
     }
 
     @DeleteMapping("/configs/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public GlobalExceptionHandler.ApiResponse<Void> deleteConfig(@PathVariable Long id) {
         configRepository.deleteById(id);
-        return GlobalExceptionHandler.ApiResponse.success(null);
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, null);
     }
 }

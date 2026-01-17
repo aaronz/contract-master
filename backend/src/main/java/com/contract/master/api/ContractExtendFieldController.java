@@ -4,7 +4,14 @@ import com.contract.master.domain.ContractExtendField;
 import com.contract.master.domain.ContractExtendFieldRepository;
 import com.contract.master.security.TenantContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,7 +27,7 @@ public class ContractExtendFieldController {
 
     @GetMapping
     public GlobalExceptionHandler.ApiResponse<List<ContractExtendField>> list() {
-        return GlobalExceptionHandler.ApiResponse.success(repository.findByTenantId(TenantContext.getCurrentTenant()));
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, repository.findByTenantId(TenantContext.getCurrentTenant()));
     }
 
     @PostMapping
@@ -34,7 +41,7 @@ public class ContractExtendFieldController {
             field.setFieldId(UUID.randomUUID().toString());
         }
         field.setTenantId(tenantId);
-        return GlobalExceptionHandler.ApiResponse.success(repository.save(field));
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, repository.save(field));
     }
 
     @DeleteMapping("/{id}")
@@ -46,6 +53,6 @@ public class ContractExtendFieldController {
             }
             repository.deleteById(id);
         }
-        return GlobalExceptionHandler.ApiResponse.success(null);
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, null);
     }
 }

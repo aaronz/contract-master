@@ -2,11 +2,9 @@ package com.contract.master.api;
 
 import com.contract.master.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*; // Import all annotations from rest
 
 @RestController
 @RequestMapping("/api/problems")
@@ -22,6 +20,6 @@ public class ProblemController {
             throw new IllegalArgumentException("Invalid problem ID");
         }
         notificationService.resolveIssue(id);
-        return GlobalExceptionHandler.ApiResponse.success(null);
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, null);
     }
 }

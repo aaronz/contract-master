@@ -32,11 +32,11 @@ public class GlobalExceptionHandler {
         public T getData() { return data; }
         public void setData(T data) { this.data = data; }
 
-        public static <T> ApiResponse<T> success(T data) {
-            return new ApiResponse<>(200, "Success", data);
+        public static <T> ApiResponse<T> success(HttpStatus httpStatus, T data) {
+            return new ApiResponse<>(httpStatus.value(), "Success", data);
         }
 
-        public static ApiResponse<Object> error(int status, String message) {
+        public static <T> ApiResponse<T> error(int status, String message) {
             return new ApiResponse<>(status, message, null);
         }
     }

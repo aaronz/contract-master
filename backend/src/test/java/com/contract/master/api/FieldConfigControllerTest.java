@@ -31,6 +31,7 @@ public class FieldConfigControllerTest {
         FieldConfig config = new FieldConfig();
         config.setFieldCode("test_field");
         config.setTenantId("tenant_a");
+        config.setConfigType("DEFAULT"); // Add configType
         fieldConfigRepository.save(config);
 
         mockMvc.perform(get("/api/settings/fields")
@@ -45,6 +46,7 @@ public class FieldConfigControllerTest {
         FieldConfig config = new FieldConfig();
         config.setFieldCode("global_field");
         config.setTenantId("tenant_b");
+        config.setConfigType("DEFAULT"); // Add configType
         fieldConfigRepository.save(config);
 
         mockMvc.perform(get("/api/settings/fields"))
@@ -56,8 +58,8 @@ public class FieldConfigControllerTest {
     @WithMockUser
     public void testBatchSaveConfigs() throws Exception {
         String payload = "[" +
-                "{\"fieldCode\":\"field1\",\"fieldAlias\":\"Alias1\",\"isVisible\":true,\"displayOrder\":1}," +
-                "{\"fieldCode\":\"field2\",\"fieldAlias\":\"Alias2\",\"isVisible\":false,\"displayOrder\":2}" +
+                "{\"fieldCode\":\"field1\",\"fieldAlias\":\"Alias1\",\"isVisible\":true,\"displayOrder\":1, \"configType\":\"CONTRACT\"}," +
+                "{\"fieldCode\":\"field2\",\"fieldAlias\":\"Alias2\",\"isVisible\":false,\"displayOrder\":2, \"configType\":\"CONTRACT\"}" +
                 "]";
 
         mockMvc.perform(post("/api/settings/fields/batch")
@@ -79,6 +81,7 @@ public class FieldConfigControllerTest {
         FieldConfig config = new FieldConfig();
         config.setFieldCode("private_field");
         config.setTenantId("tenant_x");
+        config.setConfigType("DEFAULT"); // Add configType
         FieldConfig saved = fieldConfigRepository.save(config);
 
         String payload = "[{\"id\":" + saved.getId() + ",\"fieldCode\":\"hacked\",\"fieldAlias\":\"Hacked\"}]";
