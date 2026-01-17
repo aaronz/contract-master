@@ -47,10 +47,6 @@
           :show-text="false" 
           class="ai-progress"
         />
-        <el-button type="primary" @click="openRuleSelector" class="glass-btn">
-          <el-icon><Refresh /></el-icon> Re-evaluate
-        </el-button>
-        
         <el-button type="primary" @click="saveContract" v-if="isEditMode" class="save-btn">
           <el-icon><Check /></el-icon> Save Changes
         </el-button>
@@ -59,8 +55,6 @@
         </el-button>
       </div>
     </div>
-
-    <RuleSelectorModal v-model="showRuleSelectorModal" @confirm="handleReEvaluation" />
 
     <div class="detail-container">
       <!-- Main Content (Left) -->
@@ -533,12 +527,10 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { ArrowLeft, Cpu, Check, ChatDotRound, UploadFilled, Document, Close, Postcard, Refresh } from '@element-plus/icons-vue'
+import { ArrowLeft, Cpu, Check, ChatDotRound, UploadFilled, Document, Close, Postcard } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 
 import { useFieldStore } from '@/stores/fieldStore'
-import evaluationApi from '@/services/evaluationApi' // Import evaluationApi
-import RuleSelectorModal from '@/components/RuleSelectorModal.vue' // Import RuleSelectorModal
 
 const fieldStore = useFieldStore()
 const router = useRouter()
@@ -550,7 +542,6 @@ const isEditMode = ref(false)
 const analyzing = ref(false)
 const progress = ref(0)
 const showCardGenerator = ref(false)
-const showRuleSelectorModal = ref(false)
 
 const cardConfig = ref({
   selectedFields: ['contractNo', 'partyAName', 'partyBName', 'contractAmount'],
@@ -830,40 +821,6 @@ const confirmAiSuggestions = () => {
 const publishContract = () => {
   form.contractStatus = 'PUBLISHED'
   ElMessage.success('Publication initiated')
-}
-
-const openRuleSelector = () => {
-  showRuleSelectorModal.value = true
-}
-
-const handleReEvaluation = async (ruleIds) => {
-  if (!form.contractId) {
-    ElMessage.error('Contract ID is missing for re-evaluation.');
-    return;
-  }
-  if (!ruleIds || ruleIds.length === 0) {
-    ElMessage.warning('No rules selected for re-evaluation.');
-    return;
-  }
-
-  try {
-    // Assuming evaluationApi.triggerEvaluation expects contractId first, then ruleIds
-    const response = await evaluationApi.triggerEvaluation(form.contractId, ruleIds);
-    if (response.data && response.data.jobId) {
-      ElMessage.success(`Re-evaluation started successfully! Job ID: ${response.data.jobId}`);
-      // Optionally, refresh contract details or update a status
-    } else {
-      ElMessage.error('Failed to start re-evaluation. No job ID returned.');
-    }
-  } catch (error) {
-    console.error('Re-evaluation failed:', error);
-    // Handle specific error codes from backend (e.g., 409 Conflict for in-progress evaluation)
-    if (error.response && error.response.status === 409) {
-      ElMessage.warning('An evaluation is already in progress for this contract.');
-    } else {
-      ElMessage.error('Failed to start re-evaluation: ' + (error.response?.data?.message || error.message));
-    }
-  }
 }
 </script>
 
