@@ -28,6 +28,10 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/publish/**").permitAll()
+                .requestMatchers("/api/contracts").permitAll() // Temporarily permit all for GET /api/contracts to unblock frontend
+                .requestMatchers("/api/evaluations/**").permitAll() // Permit all for new evaluation endpoints
+                .requestMatchers("/api/problem-center/**").permitAll() // Permit all for new problem center endpoints
+                .requestMatchers("/api/rules/trigger-scenarios").permitAll() // Permit all for new rules trigger scenarios endpoint
                 .requestMatchers("/api/contracts/*/audit").authenticated()
                 .requestMatchers("/h2-console/**").permitAll()
                 .anyRequest().authenticated()
