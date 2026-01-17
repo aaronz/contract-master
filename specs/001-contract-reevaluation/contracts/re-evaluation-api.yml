@@ -1,0 +1,46 @@
+openapi: 3.0.0
+info:
+  title: Contract Re-evaluation API
+  version: 1.0.0
+paths:
+  /api/evaluations:
+    post:
+      summary: Trigger a new contract re-evaluation
+      description: Initiates a new evaluation job for a specific contract with a given set of rules.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                contractId:
+                  type: string
+                  description: The ID of the contract to be re-evaluated.
+                ruleIds:
+                  type: array
+                  items:
+                    type: string
+                  description: The list of rule IDs to be used in the evaluation.
+              required:
+                - contractId
+                - ruleIds
+      responses:
+        '202':
+          description: Accepted. The evaluation job has been successfully created and queued.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jobId:
+                    type: string
+                    description: The ID of the created evaluation job.
+        '400':
+          description: Bad Request. The request is malformed (e.g., missing parameters).
+        '404':
+          description: Not Found. The specified contract or one of the rules does not exist.
+        '409':
+          description: Conflict. An evaluation for this contract is already in progress.
+components:
+  schemas: {}
