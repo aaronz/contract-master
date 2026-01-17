@@ -1,21 +1,45 @@
 # Global Database Schema Manifest
 
-| Table Name | Description | Key Changes |
-|------------|-------------|-------------|
-| `user_info` | System users | Added initialization |
-| `contract_base` | Core contract data | Added standard fields |
-| `rule_config` | Rule & AI config | Added `rule_type`, `ai_prompt_template` |
-| `downstream_system` | External connectors | Added access key generation |
-| `notification` | System alerts/issues | Added resolution logic |
-| `contract_extend_field` | Custom field definitions | Added tenant-scoped extensions |
-| `evaluation_jobs` | Stores details of rule evaluation jobs |
-    - `job_id` (PK, UUID): Unique identifier for the job.
-    - `contract_id` (FK to `contract_base`): The contract being evaluated.
-    - `rule_ids` (TEXT Array): The list of rules used for this evaluation.
-    - `status` (VARCHAR): The current status of the job (`PENDING`, `IN_PROGRESS`, `COMPLETED`, `FAILED`).
-    - `triggered_by` (VARCHAR): The ID of the user who initiated the job.
-    - `created_at` (TIMESTAMP): When the job was created.
-    - `completed_at` (TIMESTAMP, nullable): When the job was completed or failed.
-    - `results` (JSONB, nullable): The results of the evaluation.
-    - `tenant_id` (VARCHAR): The tenant identifier. |
-| `evaluation_results` | Stores individual results of rule evaluations | New table for detailed outcomes per rule-contract pair |
+## Core Tables
+
+| Table Name | Description | Key Fields |
+|------------|-------------|------------|
+| `tenant_info` | Organizations using the platform | `tenant_id` (PK), `tenant_name`, `status` |
+| `user_info` | System users with credentials | `user_id` (PK), `user_name`, `password`, `user_type` |
+| `contract_base` | Central contract repository | `contract_id` (PK), `contract_no`, `amount`, `status`, `tenant_id` |
+| `contract_attachment` | File references for contracts | `attachment_id` (PK), `contract_id`, `storage_path`, `is_main` |
+
+## Extension & Metadata
+
+| Table Name | Description | Key Fields |
+|------------|-------------|------------|
+| `contract_extend_field` | Dynamic field definitions | `field_id` (PK), `field_name`, `field_code`, `field_type`, `tenant_id` |
+| `contract_extend_data` | Values for dynamic fields | `id` (PK), `contract_id`, `field_id`, `field_value` |
+| `field_config` | UI visibility & display settings | `id` (PK), `field_code`, `is_visible`, `display_order`, `tenant_id` |
+
+## Rules & Evaluation
+
+| Table Name | Description | Key Fields |
+|------------|-------------|------------|
+| `rule_config` | Validation rule definitions | `rule_id` (PK), `rule_name`, `rule_type`, `rule_condition`, `tenant_id` |
+| `evaluation_jobs` | Rule execution job tracking | `id` (PK), `status`, `triggered_by`, `created_at`, `tenant_id` |
+| `evaluation_results` | Detailed rule validation outcomes | `id` (PK), `job_id`, `contract_id`, `rule_id`, `result_status` |
+
+## Integration & Operations
+
+| Table Name | Description | Key Fields |
+|------------|-------------|------------|
+| `downstream_system` | External ERP/Finance targets | `system_id` (PK), `endpoint_url`, `access_key`, `auth_type` |
+| `field_mapping` | Data translation for external sync | `id` (PK), `internal_field`, `external_field`, `transformation` |
+| `audit_log` | Field-level modification history | `id` (PK), `contract_id`, `field_name`, `old_value`, `new_value` |
+| `notification` | System alerts and task reminders | `id` (PK), `user_id`, `title`, `content`, `is_read` |
+| `webhook_config` | Outbound event subscriptions | `id` (PK), `url`, `events`, `is_enabled` |
+
+## Relationship Tables
+
+| Table Name | Description |
+|------------|-------------|
+| `user_role_rel` | Maps users to one or more roles |
+| `role_permission_rel` | Maps roles to system permissions |
+| `role_info` | Defines system roles (ADMIN, USER, etc.) |
+| `permission_info` | Defines discrete system capabilities |
