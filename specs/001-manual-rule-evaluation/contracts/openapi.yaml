@@ -1,0 +1,180 @@
+openapi: 3.0.3
+info:
+  title: Manual Rule Evaluation API
+  version: 1.0.0
+  description: |-
+    API for manually triggering and viewing rule evaluations.
+
+paths:
+  /api/evaluations:
+    post:
+      summary: Trigger a Manual Rule Evaluation
+      description: |-
+        Triggers a manual evaluation for one or more rules against a list of contracts. 
+        This is an asynchronous operation. The API will return an evaluation job ID, 
+        and the results can be retrieved from the Problem Center.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rule_ids:
+                  type: array
+                  items:
+                    type: string
+                  description: A list of rule IDs to be evaluated.
+                contract_ids:
+                  type: array
+                  items:
+                    type: string
+                  description: A list of contract IDs to evaluate the rules against.
+              required:
+                - rule_ids
+                - contract_ids
+      responses:
+        '202':
+          description: Accepted. The evaluation job has been successfully created.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  job_id:
+                    type: string
+                    description: The unique identifier for the asynchronous evaluation job.
+
+  /api/problem-center/evaluation-jobs:
+    get:
+      summary: Get Evaluation Jobs
+      description: |-
+        Retrieves a paginated list of evaluation jobs for the current tenant, 
+        to be displayed in the Problem Center.
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 0
+          description: The page number to retrieve.
+        - in: query
+          name: size
+          schema:
+            type: integer
+            default: 20
+          description: The number of items per page.
+      responses:
+        '200':
+          description: A list of evaluation jobs.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EvaluationJob'
+
+  /api/problem-center/evaluation-jobs/{jobId}/results:
+    get:
+      summary: Get Evaluation Results for a Job
+      description: |-
+        Retrieves the detailed results for a specific evaluation job.
+      parameters:
+        - in: path
+          name: jobId
+          required: true
+          schema:
+            type: string
+          description: The ID of the evaluation job.
+      responses:
+        '200':
+          description: A list of evaluation results for the specified job.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EvaluationResult'
+
+  /api/contracts:
+    get:
+      summary: Get a List of Contracts
+      description: |-
+        Retrieves a list of contracts available for selection as an evaluation context.
+      responses:
+        '200':
+          description: A list of contracts.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Contract'
+  
+  /api/rules/trigger-scenarios:
+    get:
+      summary: Get Automatic Trigger Scenarios
+      description: |-
+        Retrieves the documentation or explanation of what triggers rules automatically.
+      responses:
+        '200':
+          description: A list of trigger scenarios.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  scenarios:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        description:
+                          type: string
+
+components:
+  schemas:
+    EvaluationJob:
+      type: object
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+          enum: [PENDING, IN_PROGRESS, COMPLETED, FAILED]
+        trigger_type:
+          type: string
+          enum: [MANUAL, AUTOMATIC]
+        created_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+        triggered_by:
+          type: string
+        
+    EvaluationResult:
+      type: object
+      properties:
+        id:
+          type: string
+        rule_id:
+          type: string
+        contract_id:
+          type: string
+        status:
+          type: string
+          enum: [PASS, FAIL, ERROR]
+        details:
+          type: string
+
+    Contract:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
