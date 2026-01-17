@@ -55,7 +55,7 @@ const routes = [
       {
         path: 'compliance/problems',
         name: 'ProblemCenter',
-        component: () => import('@/views/compliance/problems.vue'),
+        component: () => import('@/pages/ProblemCenter.vue'), // Updated to new location
       },
       {
         path: 'compliance/masking',
@@ -73,6 +73,16 @@ const routes = [
         path: 'rules/builder',
         name: 'RuleBuilder',
         component: () => import('@/views/rules/builder.vue'),
+      },
+      {
+        path: 'rules/editor', // New route for RuleEditor
+        name: 'RuleEditor',
+        component: () => import('@/pages/RuleEditor.vue'), // New component
+      },
+      {
+        path: 'rules/list', // New route for RuleList
+        name: 'RuleList',
+        component: () => import('@/pages/RuleList.vue'), // New component
       },
       {
         path: 'settings/permissions',
