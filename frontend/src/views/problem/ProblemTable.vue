@@ -21,7 +21,8 @@
       stripe
       highlight-current-row
       @row-click="handleRowClick"
-      style="width: 100%"
+      style="width: 100%; flex: 1"
+      height="100%"
     >
       <el-table-column prop="severity" label="!" width="50">
         <template #default="{ row }">

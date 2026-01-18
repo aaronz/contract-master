@@ -80,4 +80,16 @@ public class ContractController {
     public GlobalExceptionHandler.ApiResponse<Void> batchArchive(@RequestBody List<String> ids) {
         return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, null);
     }
+
+    @GetMapping("/{id}/pdf")
+    public org.springframework.http.ResponseEntity<byte[]> getPdf(@PathVariable String id) {
+        // Mock PDF generation for demonstration
+        byte[] pdfContent = "Mock PDF Content".getBytes();
+        // In real impl: applicationService.generatePdf(id);
+        
+        return org.springframework.http.ResponseEntity.ok()
+                .header("Content-Type", "application/pdf")
+                .header("Content-Disposition", "inline; filename=\"contract.pdf\"")
+                .body(pdfContent);
+    }
 }

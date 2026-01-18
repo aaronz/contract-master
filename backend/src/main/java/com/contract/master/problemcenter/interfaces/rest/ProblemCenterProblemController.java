@@ -58,6 +58,13 @@ public class ProblemCenterProblemController {
         return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, problemRepository.save(updated));
     }
 
+    @PostMapping("/{id}/resolve")
+    public GlobalExceptionHandler.ApiResponse<Void> resolve(@PathVariable Long id) {
+        // Simple resolve implementation reusing updateStatus logic if possible, or just setting status
+        problemService.updateStatus(id, ProblemStatus.RESOLVED, "Resolved via API");
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, null);
+    }
+
     public static class ProblemUpdateRequest {
         private ProblemStatus status;
         private String assigneeId;

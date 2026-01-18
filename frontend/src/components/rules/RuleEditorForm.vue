@@ -110,10 +110,22 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue', 'save', 'cancel'])
 
-const localConfig = reactive({ ...props.modelValue })
+const localConfig = reactive({
+  ...props.modelValue,
+  conditions: typeof props.modelValue.conditions === 'string' 
+    ? JSON.parse(props.modelValue.conditions || '{"type":"group","operator":"AND","children":[]}')
+    : (props.modelValue.conditions || { type: 'group', operator: 'AND', children: [] })
+})
 
 watch(() => props.modelValue, (newVal) => {
-  Object.assign(localConfig, newVal)
+  const parsedConditions = typeof newVal.conditions === 'string'
+    ? JSON.parse(newVal.conditions || '{"type":"group","operator":"AND","children":[]}')
+    : (newVal.conditions || { type: 'group', operator: 'AND', children: [] })
+    
+  Object.assign(localConfig, {
+    ...newVal,
+    conditions: parsedConditions
+  })
 }, { deep: true })
 
 watch(localConfig, (newVal) => {

@@ -77,8 +77,10 @@ watch(dialogVisible, (newVal) => {
 const fetchRules = async () => {
   loading.value = true;
   try {
-    const response = await evaluationApi.getRules(); // This needs to exist in evaluationApi
-    rules.value = response.data.data; // Adjust based on actual API response structure
+    const response = await evaluationApi.getRules(); 
+    const rawData = response.data;
+    // Robust data extraction: direct array, or nested in .data (ApiResponse) or .content (Page)
+    rules.value = Array.isArray(rawData) ? rawData : (rawData.data || rawData.content || []);
   } catch (error) {
     console.error('Failed to fetch rules', error);
     ElMessage.error('Failed to load rules');
