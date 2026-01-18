@@ -365,9 +365,9 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column v-if="fieldStore.isFieldVisible('amount')" label="Amount" prop="amount" width="150" sortable>
+        <el-table-column v-if="fieldStore.isFieldVisible('amount')" label="Amount" prop="contractAmount" width="150" sortable>
           <template #default="{ row }">
-            <span class="amount-text" :style="getFieldStyle('amount')">{{ formatCurrency(row.amount) }}</span>
+            <span class="amount-text" :style="getFieldStyle('amount')">{{ formatCurrency(row.contractAmount || row.amount) }}</span>
           </template>
         </el-table-column>
         <el-table-column v-if="fieldStore.isFieldVisible('status')" label="Status" prop="status" width="120">
@@ -517,30 +517,6 @@ const newContractForm = ref({
   thirdPartyFlag: false,
   thirdPartyInfo: '',
   currencyType: 'USD',
-  amount: 0, // Maps to contractAmount in backend? DTO has contractAmount. list.vue currently uses amount.
-  // detail.vue uses form.contractAmount.
-  // Backend ContractDTO has 'contractAmount'. list.vue creates payload. 
-  // Let's align with detail.vue names where possible, or map them on submit.
-  // Existing list.vue uses 'amount', 'taxRate'. 
-  // I will check handleCreateContract payload construction.
-  // "body: JSON.stringify({ ...newContractForm.value, status: 'DRAFT' })"
-  // If backend expects contractAmount, list.vue might be sending 'amount'.
-  // Backend ContractDTO has 'contractAmount', but Contract has 'amount'. 
-  // ContractDTO getter: getContractAmount().
-  // Let's use 'contractAmount' to be safe and consistent with detail.vue, 
-  // but I need to check if 'amount' was working before. 
-  // Previous `handleCreateContract` sent `amount`. 
-  // ContractService.java: `base.setAmount(dto.getContractAmount());`
-  // Wait, if frontend sends `amount`, Jackson maps it to `amount` in DTO? 
-  // ContractDTO has `private BigDecimal contractAmount;`. 
-  // It does NOT have `amount`. So `amount` in JSON would be ignored unless there's an alias.
-  // Ah, the previous list.vue form bound to `newContractForm.amount`.
-  // If it worked, maybe DTO has `amount` or I missed something.
-  // Let's check ContractDTO again.
-  // "public BigDecimal getContractAmount() { return contractAmount; }"
-  // "public void setContractAmount(BigDecimal contractAmount) { this.contractAmount = contractAmount; }"
-  // It seems `amount` would fail to map to `contractAmount`.
-  // I should rename `amount` to `contractAmount` in the new form to be correct.
   contractAmount: 0,
   taxRate: 0,
   taxAmount: 0,

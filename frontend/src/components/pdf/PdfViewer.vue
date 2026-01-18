@@ -124,7 +124,14 @@ const loadPdf = async () => {
   canvasRefs.value = {};
   
   try {
-    const loadingTask = pdfjsLib.getDocument(props.url);
+    const loadingTask = pdfjsLib.getDocument({
+      url: props.url,
+      httpHeaders: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'X-Tenant-ID': localStorage.getItem('tenantId')
+      },
+      withCredentials: true
+    });
     const doc = await loadingTask.promise;
     pdfDoc.value = doc;
     numPages.value = doc.numPages;

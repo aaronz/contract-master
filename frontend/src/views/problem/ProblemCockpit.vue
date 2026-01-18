@@ -93,14 +93,36 @@ const triggerEvaluation = async () => {
   evaluating.value = true
   try {
     await problemApi.triggerEvaluation(selectedContractId.value)
-    ElMessage.success('Evaluation started asynchronously')
-    // Poll for results after a short delay
-    setTimeout(() => {
-      if (problemTableRef.value) problemTableRef.value.loadProblems()
-    }, 2000)
+    ElMessage.success('Evaluation started. Polling for results...')
+    
+    // Robust polling: Check 5 times every 2 seconds
+    let attempts = 0
+    const maxAttempts = 5
+    
+    const poll = async () => {
+      if (attempts >= maxAttempts) {
+        evaluating.value = false
+        return
+      }
+      
+      attempts++
+      setTimeout(async () => {
+        if (problemTableRef.value) {
+          await problemTableRef.value.loadProblems()
+        }
+        // Continue polling
+        if (attempts < maxAttempts) {
+           poll()
+        } else {
+           evaluating.value = false
+           ElMessage.info('Evaluation polling completed.')
+        }
+      }, 2000)
+    }
+    
+    poll()
   } catch (error) {
     ElMessage.error('Failed to trigger evaluation')
-  } finally {
     evaluating.value = false
   }
 }

@@ -115,40 +115,17 @@
     <el-dialog
       v-model="dialogVisible"
       :title="editingRule.id ? 'Edit Rule' : 'Create Rule'"
-      width="600px"
+      width="900px"
       destroy-on-close
+      :close-on-click-modal="false"
     >
-      <el-form :model="editingRule" label-position="top">
-        <el-form-item label="Rule Name">
-            <el-input v-model="editingRule.name" placeholder="e.g. High Value Contract Alert" />
-        </el-form-item>
-
-        <el-form-item label="Rule Type">
-          <el-radio-group v-model="editingRule.logicType" size="small">
-            <el-radio-button value="GROOVY">Groovy</el-radio-button>
-            <el-radio-button value="REGEX">Regex</el-radio-button>
-          </el-radio-group>
-        </el-form-item>
-        
-        <el-form-item label="Logic Content">
-          <el-input 
-            v-model="editingRule.logicContent" 
-            type="textarea" 
-            :rows="6" 
-            placeholder="e.g. contract.amount > 1000000 (Groovy) or \d{10} (Regex)" 
-          />
-        </el-form-item>
-        
-        <el-form-item label="Action">
-           <el-checkbox v-model="editingRule.sendEmail">Send Email</el-checkbox>
-           <el-checkbox v-model="editingRule.blockProcess">Block Process</el-checkbox>
-        </el-form-item>
-      </el-form>
-      
-      <template #footer>
-        <el-button @click="dialogVisible = false">Cancel</el-button>
-        <el-button type="primary" @click="saveRule">Save Rule</el-button>
-      </template>
+      <RuleEditorForm 
+        v-if="dialogVisible"
+        v-model="editingRule"
+        :saving="saving"
+        @save="saveRule"
+        @cancel="dialogVisible = false"
+      />
     </el-dialog>
   </div>
 </template>
@@ -158,6 +135,7 @@ import { ref, onMounted } from 'vue'
 import { Plus, Delete, Warning, InfoFilled, Bell, Edit } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import evaluationApi from '../../services/evaluationApi'
+import RuleEditorForm from '@/components/rules/RuleEditorForm.vue'
 
 const getIconClass = (level) => {
   if (level === 'SEVERE') return 'icon-severe';
@@ -206,6 +184,7 @@ const rules = ref([
 
 const dialogVisible = ref(false)
 const editingRule = ref({})
+const saving = ref(false)
 
 // Batch Selection Logic
 const selectedRules = ref([])
@@ -292,6 +271,7 @@ const removeCondition = (idx) => {
 }
 
 const saveRule = async () => {
+  saving.value = true
   try {
     if (editingRule.value.id) {
       await problemApi.updateRule(editingRule.value.id, editingRule.value)
@@ -303,6 +283,8 @@ const saveRule = async () => {
     ElMessage.success('Rule saved successfully')
   } catch (error) {
     ElMessage.error('Failed to save rule')
+  } finally {
+    saving.value = false
   }
 }
 

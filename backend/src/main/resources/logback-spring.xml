@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+
+    <springProfile name="production">
+        <root level="ERROR">
+            <appender-ref ref="CONSOLE" />
+        </root>
+        <logger name="org.hibernate" level="OFF" />
+    </springProfile>
+
+    <springProfile name="development">
+        <root level="INFO">
+            <appender-ref ref="CONSOLE" />
+        </root>
+        <logger name="com.contract.master" level="DEBUG" />
+    </springProfile>
+
+</configuration>

@@ -139,13 +139,21 @@ const loadProblems = async () => {
   loading.value = true
   try {
     const params = {
-      contractId: props.contractId
+      contractId: props.contractId,
+      page: pagination.value.page - 1,
+      size: pagination.value.size
     }
     if (filters.value.status) params.status = filters.value.status
 
     const response = await problemApi.getProblems(params)
-    problems.value = response.data
-    pagination.value.total = response.data?.length || 0
+    // Check if response has content property (Spring Data Page) or is direct array
+    if (response.data && response.data.content) {
+      problems.value = response.data.content
+      pagination.value.total = response.data.totalElements
+    } else {
+      problems.value = response.data
+      pagination.value.total = response.data?.length || 0
+    }
   } catch (error) {
     ElMessage.error('Failed to load problems')
   } finally {
