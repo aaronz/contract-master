@@ -159,6 +159,21 @@ import { Plus, Delete, Warning, InfoFilled, Bell, Edit } from '@element-plus/ico
 import { ElMessage } from 'element-plus'
 import evaluationApi from '../../services/evaluationApi'
 
+const getIconClass = (level) => {
+  if (level === 'SEVERE') return 'icon-severe';
+  if (level === 'WARNING') return 'icon-warning';
+  return 'icon-info';
+};
+
+const formatTrigger = (trigger) => {
+  const map = {
+    ON_SAVE: 'On Save',
+    ON_STATUS_CHANGE: 'On Status Change',
+    DAILY: 'Daily Schedule'
+  };
+  return map[trigger] || trigger;
+};
+
 const rules = ref([
   {
     id: 1,
