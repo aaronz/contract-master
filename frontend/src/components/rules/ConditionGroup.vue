@@ -34,12 +34,13 @@
 
         <!-- Single Rule -->
         <div v-else class="rule-item glass-input">
-          <el-select v-model="child.field" placeholder="Select Field" size="small" style="width: 140px">
-            <el-option label="Contract Amount" value="amount" />
-            <el-option label="Sign Date" value="sign_date" />
-            <el-option label="Customer Region" value="region" />
-            <el-option label="Risk Score" value="risk_score" />
-            <el-option label="Payment Terms" value="payment_terms" />
+          <el-select v-model="child.field" placeholder="Select Field" size="small" style="width: 140px" filterable>
+            <el-option 
+              v-for="opt in fieldOptions" 
+              :key="opt.value" 
+              :label="opt.label" 
+              :value="opt.value" 
+            />
           </el-select>
           
           <el-select v-model="child.operator" placeholder="Op" size="small" style="width: 100px">
@@ -68,8 +69,9 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits } from 'vue'
+import { defineProps, defineEmits, onMounted, computed } from 'vue'
 import { Plus, FolderAdd, Delete, Close } from '@element-plus/icons-vue'
+import { useFieldStore } from '@/stores/fieldStore'
 
 const props = defineProps({
   modelValue: Object,
@@ -77,6 +79,20 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue', 'remove'])
+const fieldStore = useFieldStore()
+
+onMounted(() => {
+  if (fieldStore.fields.length === 0) {
+    fieldStore.fetchFieldConfigs()
+  }
+})
+
+const fieldOptions = computed(() => {
+  return fieldStore.fields.map(f => ({
+    label: f.fieldName,
+    value: f.fieldCode
+  }))
+})
 
 const updateOperator = (op) => {
   const newVal = { ...props.modelValue, operator: op }

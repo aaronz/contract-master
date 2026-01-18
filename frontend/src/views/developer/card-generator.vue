@@ -32,15 +32,15 @@
         <div class="preview-stage glass-card-dark">
           <!-- Mock Card with Tabs (Matching detail.vue logic) -->
           <div class="mock-card" :style="{ borderTop: `6px solid ${config.color}`, width: cardWidth, ...cardStyles.container }">
-            <div class="card-header" :style="cardStyles.header">
-              <div class="card-icon" :style="{ background: config.color, ...cardStyles.icon }">
-                <el-icon><Document /></el-icon>
+              <div class="card-header" :style="cardStyles.header">
+                <div class="card-icon" :style="{ background: config.color, ...cardStyles.icon }">
+                  <el-icon><Document /></el-icon>
+                </div>
+                <div class="card-meta">
+                  <div class="card-title" :style="cardStyles.title">Contract #{{ mockData.contract_no }}</div>
+                  <div class="card-sub" :style="cardStyles.subtitle">{{ mockData.contract_name }}</div>
+                </div>
               </div>
-              <div class="card-meta">
-                <div class="card-title" :style="cardStyles.title">Contract #{{ mockData.contractNo }}</div>
-                <div class="card-sub" :style="cardStyles.subtitle">{{ mockData.contractName }}</div>
-              </div>
-            </div>
             
             <div class="card-body-wrapper">
               <el-tabs v-model="activeTab" class="card-tabs-mini">
@@ -177,7 +177,7 @@ const fieldSearch = ref('')
 const config = reactive({
   target: 'web',
   color: '#3B82F6',
-  selectedFields: ['contractNo', 'contractAmount', 'contractStatus', 'effectiveDate', 'expireDate'],
+  selectedFields: ['contract_no', 'contract_amount', 'contract_status', 'effective_date', 'expire_date'],
   size: 'medium',
   customLabels: {}
 })
@@ -284,10 +284,10 @@ const cardStyles = {
 
 // Field Groups for Layout
 const fieldGroups = {
-  general: ['contractNo', 'contractName', 'contractType', 'contractStatus', 'crmContractId', 'partyAName', 'partyAContact', 'partyAPhone', 'partyAAddress', 'partyBName', 'partyBContact', 'partyBPhone', 'partyBAddress'],
-  financials: ['contractAmount', 'taxRate', 'taxAmount', 'totalAmountWithTax', 'currencyType', 'paymentMethod', 'paymentTerm', 'invoiceTitle', 'invoiceType', 'taxpayerId'],
-  performance: ['subjectType', 'subjectDesc', 'subjectQuantity', 'unitPrice', 'performanceMethod', 'performanceLocation', 'performanceStartDate', 'performanceEndDate', 'qualityStandard'],
-  legal: ['signDate', 'effectiveDate', 'expireDate', 'disputeResolution', 'governingLaw', 'legalReviewFlag', 'legalReviewOpinion', 'remark', 'createUser', 'createTime']
+  general: ['contract_no', 'contract_name', 'contract_type', 'contract_status', 'crm_contract_id', 'party_a_name', 'party_a_contact', 'party_a_phone', 'party_a_address', 'party_b_name', 'party_b_contact', 'party_b_phone', 'party_b_address'],
+  financials: ['contract_amount', 'tax_rate', 'tax_amount', 'total_amount_with_tax', 'currency_type', 'payment_method', 'payment_term', 'invoice_title', 'invoice_type', 'taxpayer_id'],
+  performance: ['subject_type', 'subject_desc', 'subject_quantity', 'unit_price', 'performance_method', 'performance_location', 'performance_start_date', 'performance_end_date', 'quality_standard'],
+  legal: ['sign_date', 'effective_date', 'expire_date', 'dispute_resolution', 'governing_law', 'legal_review_flag', 'legal_review_opinion', 'remark', 'create_user', 'create_time']
 }
 
 const getFieldsInGroup = (group) => {
@@ -305,26 +305,26 @@ const hasFieldsInGroup = (group) => {
 
 // Mock Data for Preview
 const mockData = {
-  contractNo: 'CON-2024-001',
-  contractName: 'Strategic Partnership Agreement',
-  contractType: 'Framework',
-  contractStatus: 'Active',
-  contractAmount: 1250000,
-  taxRate: 10,
-  currencyType: 'USD',
-  effectiveDate: '2024-01-01',
-  expireDate: '2024-12-31',
-  partyAName: 'Acme Corp',
-  partyBName: 'TechSolutions Inc',
-  legalReviewFlag: true,
-  legalReviewOpinion: 'Approved',
-  performanceLocation: 'Headquarters',
-  qualityStandard: 'ISO 9001'
+  contract_no: 'CON-2024-001',
+  contract_name: 'Strategic Partnership Agreement',
+  contract_type: 'Framework',
+  contract_status: 'Active',
+  contract_amount: 1250000,
+  tax_rate: 10,
+  currency_type: 'USD',
+  effective_date: '2024-01-01',
+  expire_date: '2024-12-31',
+  party_a_name: 'Acme Corp',
+  party_b_name: 'TechSolutions Inc',
+  legal_review_flag: true,
+  legal_review_opinion: 'Approved',
+  performance_location: 'Headquarters',
+  quality_standard: 'ISO 9001'
 }
 
 const getMockValue = (code) => {
   if (mockData[code] !== undefined) {
-    if (code === 'contractAmount' || code === 'totalAmountWithTax') {
+    if (code === 'contract_amount' || code === 'total_amount_with_tax') {
       return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(mockData[code])
     }
     if (typeof mockData[code] === 'boolean') return mockData[code] ? 'Yes' : 'No'

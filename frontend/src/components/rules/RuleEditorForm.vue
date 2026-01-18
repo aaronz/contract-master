@@ -8,6 +8,14 @@
           <el-form-item label="Rule Name">
             <el-input v-model="localConfig.name" placeholder="e.g. High Value Contract Check" />
           </el-form-item>
+
+          <el-form-item label="Rule Type">
+            <el-select v-model="localConfig.ruleType" class="w-full">
+              <el-option label="Visual Builder (Logic)" value="LOGIC" />
+              <el-option label="Groovy Script" value="GROOVY" />
+              <el-option label="Regular Expression" value="REGEX" />
+            </el-select>
+          </el-form-item>
           
           <el-form-item label="Severity Level">
             <el-select v-model="localConfig.level" class="w-full">
@@ -49,17 +57,29 @@
       <div class="logic-panel">
         <h3 class="panel-title flex justify-between">
           <span>Logic Editor</span>
-          <el-tag size="small" type="info">SpEL Expression Preview</el-tag>
+          <el-tag size="small" type="info">{{ localConfig.ruleType === 'LOGIC' ? 'SpEL Preview' : 'Script Content' }}</el-tag>
         </h3>
         
-        <div class="canvas-wrapper">
+        <!-- Visual Builder -->
+        <div v-if="localConfig.ruleType === 'LOGIC'" class="canvas-wrapper">
           <condition-group 
             v-model="localConfig.conditions" 
             :is-root="true"
           />
         </div>
 
-        <div class="preview-box">
+        <!-- Script/Regex Editor -->
+        <div v-else class="script-editor-wrapper">
+          <el-input
+            v-model="localConfig.logicContent"
+            type="textarea"
+            :rows="12"
+            placeholder="Enter Groovy script or Regex pattern..."
+            class="font-mono"
+          />
+        </div>
+
+        <div v-if="localConfig.ruleType === 'LOGIC'" class="preview-box">
           <div class="code-label">Expression Preview:</div>
           <div class="code-content">{{ generateSpEL(localConfig.conditions) }}</div>
         </div>
@@ -173,6 +193,14 @@ const generateSpEL = (node) => {
   min-height: 300px;
   background: #F8FAFC;
   border-radius: 8px;
+}
+
+.script-editor-wrapper {
+  min-height: 300px;
+}
+
+.font-mono {
+  font-family: 'Fira Code', 'Roboto Mono', monospace;
 }
 
 .preview-box {
