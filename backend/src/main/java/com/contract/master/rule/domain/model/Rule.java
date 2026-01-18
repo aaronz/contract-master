@@ -1,29 +1,59 @@
 package com.contract.master.rule.domain.model;
 
+import com.contract.master.shared.domain.base.AggregateRoot;
 import com.contract.master.shared.domain.base.BaseDomainEntity;
 import com.contract.master.shared.domain.model.TenantId;
-import java.util.Objects;
+import com.contract.master.shared.domain.model.BaseTenantEntity;
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
-public class Rule extends BaseDomainEntity {
-    private final TenantId tenantId;
-    private String ruleName;
-    private String ruleContent;
-    private RuleSeverity severity;
-    private boolean isEnabled;
+@Entity
+@Table(name = "rules")
+public class Rule extends BaseTenantEntity implements AggregateRoot {
 
-    public Rule(TenantId tenantId, String ruleName) {
-        this.tenantId = Objects.requireNonNull(tenantId);
-        this.ruleName = Objects.requireNonNull(ruleName);
-        this.isEnabled = true;
-    }
+    @Column(name = "name", nullable = false)
+    private String name;
 
-    public TenantId getTenantId() { return tenantId; }
-    public String getRuleName() { return ruleName; }
-    public void setRuleName(String ruleName) { this.ruleName = ruleName; }
-    public String getRuleContent() { return ruleContent; }
-    public void setRuleContent(String ruleContent) { this.ruleContent = ruleContent; }
-    public RuleSeverity getSeverity() { return severity; }
-    public void setSeverity(RuleSeverity severity) { this.severity = severity; }
-    public boolean isEnabled() { return isEnabled; }
-    public void setEnabled(boolean enabled) { isEnabled = enabled; }
+    @Column(name = "description")
+    private String description;
+
+    @Column(name = "logic_content", nullable = false, columnDefinition = "TEXT")
+    private String logicContent;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "logic_type", nullable = false)
+    private RuleLogicType logicType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "severity", nullable = false)
+    private Severity severity;
+
+    @Column(name = "category")
+    private String category;
+
+    @Column(name = "version", nullable = false)
+    private Integer version = 1;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private RuleStatus status = RuleStatus.DRAFT;
+
+    public Rule() {}
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+    public String getLogicContent() { return logicContent; }
+    public void setLogicContent(String logicContent) { this.logicContent = logicContent; }
+    public RuleLogicType getLogicType() { return logicType; }
+    public void setLogicType(RuleLogicType logicType) { this.logicType = logicType; }
+    public Severity getSeverity() { return severity; }
+    public void setSeverity(Severity severity) { this.severity = severity; }
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
+    public Integer getVersion() { return version; }
+    public void setVersion(Integer version) { this.version = version; }
+    public RuleStatus getStatus() { return status; }
+    public void setStatus(RuleStatus status) { this.status = status; }
 }

@@ -140,7 +140,7 @@ public class EvaluationApplicationService {
         }
         
         List<EvaluationJob> inProgressJobs = jobRepository.findByTenantIdAndTargetContractsContainingAndStatus(
-                TenantId.of(tenantId), contractIdJson, EvaluationJob.JobStatus.IN_PROGRESS);
+                tenantId, contractIdJson, EvaluationJob.JobStatus.IN_PROGRESS);
 
         if (!inProgressJobs.isEmpty()) {
             throw new IllegalStateException("An evaluation for this contract is already in progress.");

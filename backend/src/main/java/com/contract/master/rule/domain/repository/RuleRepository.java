@@ -1,13 +1,15 @@
 package com.contract.master.rule.domain.repository;
 
 import com.contract.master.rule.domain.model.Rule;
-import com.contract.master.rule.domain.model.RuleId;
+import com.contract.master.rule.domain.model.RuleStatus;
 import com.contract.master.shared.domain.model.TenantId;
-import java.util.List;
-import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface RuleRepository {
-    Optional<Rule> findById(RuleId id);
-    void save(Rule rule);
+import java.util.List;
+
+@Repository
+public interface RuleRepository extends JpaRepository<Rule, Long> {
     List<Rule> findByTenantId(TenantId tenantId);
+    List<Rule> findByTenantIdAndStatus(TenantId tenantId, RuleStatus status);
 }

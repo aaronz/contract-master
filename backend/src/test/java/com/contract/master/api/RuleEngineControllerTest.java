@@ -11,6 +11,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import org.springframework.kafka.test.context.EmbeddedKafka;
+import org.springframework.test.context.ActiveProfiles;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get; // Add this import
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -18,6 +21,8 @@ import static org.hamcrest.Matchers.hasItem; // Import hasItem
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
+@EmbeddedKafka(partitions = 1, topics = {"contract-evaluation"})
 public class RuleEngineControllerTest {
 
     @Autowired
@@ -28,18 +33,18 @@ public class RuleEngineControllerTest {
 
     @Test
     @WithMockUser
-    public void testListRules() throws Exception {
+    public void testGetRuleDetail() throws Exception {
         RuleConfig rule = new RuleConfig();
-        rule.setRuleId("test-rule-1");
-        rule.setRuleName("Test Rule");
+        String businessId = "rule-" + java.util.UUID.randomUUID();
+        rule.setRuleId(businessId);
+        rule.setRuleName("Detail Rule");
         rule.setTenantId(TenantId.of("tenant-1"));
         rule.setIsEnabled(true);
-        ruleRepository.save(rule);
+        rule = ruleRepository.save(rule);
 
-        mockMvc.perform(get("/api/rules")
+        mockMvc.perform(get("/api/rule-configs/" + businessId)
                         .header("X-Tenant-ID", "tenant-1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data").isArray())
-                .andExpect(jsonPath("$.data[*].ruleName", hasItem("Test Rule"))); // Assert presence instead of order
+                .andExpect(jsonPath("$.data.ruleName").value("Detail Rule"));
     }
 }

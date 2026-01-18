@@ -14,6 +14,8 @@ Auto-generated from all feature plans. Last updated: 2026-01-15
 - PostgreSQL (for `integration_log` table) (005-integration-hub)
 - Java 17 + Spring Boot 3.2.x, Spring Data JPA, MapStruc (012-backend-ddd-refactor)
 - Java 17 + Spring Boot 3.2.1, Spring Data JPA, Kafka (013-ddd-domain-restructure)
+- Java 17 (Backend), JavaScript/Vue 3 (Frontend) + Spring Boot 3.2.x, Spring Data JPA, Kafka, PDF.js, Element Plus (014-problem-rule-engine)
+- PostgreSQL (with JSONB support), Redis, MinIO (014-problem-rule-engine)
 
 - Java 17, Vue 3 + Spring Boot 3.2.x, Spring Data JPA, Spring AI (OpenAI/Azure), Drools 9.x, Kafka, Element Plus (001-contract-master-core)
 
@@ -34,9 +36,9 @@ tests/
 Java 17, Vue 3: Follow standard conventions
 
 ## Recent Changes
+- 014-problem-rule-engine: Added Java 17 (Backend), JavaScript/Vue 3 (Frontend) + Spring Boot 3.2.x, Spring Data JPA, Kafka, PDF.js, Element Plus
 - 013-ddd-domain-restructure: Added Java 17 + Spring Boot 3.2.1, Spring Data JPA, Kafka
 - 012-backend-ddd-refactor: Added Java 17 + Spring Boot 3.2.x, Spring Data JPA, MapStruc
-- 012-backend-ddd-refactor: Added [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
 
 
 <!-- MANUAL ADDITIONS START -->

@@ -15,9 +15,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/rules")
+@RequestMapping("/api/rule-configs")
 public class RuleEngineController {
 
     private final RuleEngineDomainService ruleEngineDomainService;
@@ -34,12 +35,16 @@ public class RuleEngineController {
 
     @GetMapping
     public GlobalExceptionHandler.ApiResponse<List<RuleConfig>> list() {
-        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, ruleConfigRepository.findByTenantId(TenantId.of(TenantContext.getCurrentTenant())));
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, ruleConfigRepository.findByTenantId(TenantContext.getCurrentTenant()));
     }
 
     @GetMapping("/{id}")
-    public GlobalExceptionHandler.ApiResponse<RuleConfig> get(@PathVariable Long id) {
-        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, ruleConfigRepository.findById(id).orElse(null));
+    public GlobalExceptionHandler.ApiResponse<RuleConfig> get(@PathVariable String id) {
+        Optional<RuleConfig> rule = ruleConfigRepository.findByRuleId(id);
+        if (rule.isEmpty() && id.matches("\\d+")) {
+            rule = ruleConfigRepository.findById(Long.parseLong(id));
+        }
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, rule.orElse(null));
     }
 
 

@@ -44,8 +44,10 @@ public interface JpaContractRepository extends JpaRepository<Contract, Long>, Co
     Long countRiskAlertsByTenantId(TenantId tenantId);
 
     @Override
+    @Query("SELECT c FROM Contract c WHERE c.tenantId.id = :#{#tenantId.id}")
     Page<Contract> findByTenantId(TenantId tenantId, Pageable pageable);
 
     @Override
+    @Query("SELECT c FROM Contract c WHERE c.tenantId.id = :#{#tenantId.id}")
     List<Contract> findByTenantId(TenantId tenantId);
 }

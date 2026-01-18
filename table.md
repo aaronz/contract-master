@@ -17,7 +17,15 @@
 | `contract_extend_data` | Values for dynamic fields | `id` (PK), `contract_id`, `field_id`, `field_value` |
 | `field_config` | UI visibility & display settings | `id` (PK), `field_code`, `is_visible`, `display_order`, `tenant_id` |
 
-## Rules & Evaluation
+## Rules & Evaluation (New Domain)
+
+| Table Name | Description | Key Fields |
+|------------|-------------|------------|
+| `rules` | Vertical Slice rule definitions | `db_id` (PK), `name`, `logic_type`, `logic_content`, `severity`, `version`, `status`, `tenant_id` |
+| `problem_evaluation_jobs` | Asynchronous job tracking | `db_id` (PK), `contract_id`, `status`, `triggered_by`, `started_at`, `finished_at`, `tenant_id` |
+| `problems` | Identified risks and violations | `db_id` (PK), `evaluation_job_id`, `rule_id`, `contract_id`, `location_in_contract` (JSONB), `highlighted_text`, `generated_message`, `status`, `assignee_id`, `tenant_id` |
+
+## Rules & Evaluation (Legacy/Stabilization)
 
 | Table Name | Description | Key Fields |
 |------------|-------------|------------|

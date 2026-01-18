@@ -30,7 +30,7 @@ public abstract class BaseTenantEntity extends BaseDomainEntity implements Tenan
     }
     @Embedded
     private TenantId tenantId;
-    // Audit fields
+
     @CreatedDate
     @Column(name = "create_time", updatable = false)
     private LocalDateTime createTime;
@@ -65,7 +65,7 @@ public abstract class BaseTenantEntity extends BaseDomainEntity implements Tenan
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false; // Include superclass in equals
+        if (!super.equals(o)) return false;
         BaseTenantEntity that = (BaseTenantEntity) o;
         return Objects.equals(tenantId, that.tenantId) &&
                Objects.equals(createTime, that.createTime) &&
@@ -76,6 +76,6 @@ public abstract class BaseTenantEntity extends BaseDomainEntity implements Tenan
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), tenantId, createTime, createUser, updateTime, updateUser); // Include superclass in hashCode
+        return Objects.hash(super.hashCode(), tenantId, createTime, createUser, updateTime, updateUser);
     }
 }

@@ -1,0 +1,68 @@
+openapi: 3.0.3
+info:
+  title: Problem Center & Rule Engine API
+  version: 1.0.0
+  description: API for managing business rules, triggering contract evaluations, and tracking compliance problems.
+
+paths:
+  /api/rules:
+    get:
+      summary: List all rules for the current tenant
+      responses:
+        '200':
+          description: OK
+    post:
+      summary: Create a new rule
+      responses:
+        '201':
+          description: Created
+
+  /api/evaluations:
+    post:
+      summary: Trigger a new evaluation job for a contract
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [contractId]
+              properties:
+                contractId: { type: string, format: uuid }
+      responses:
+        '202':
+          description: Accepted (Async job started)
+
+  /api/problems:
+    get:
+      summary: List problems with filtering
+      parameters:
+        - name: contractId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: status
+          in: query
+          schema: { type: string, enum: [NEW, ACKNOWLEDGED, RESOLVED, IGNORED] }
+      responses:
+        '200':
+          description: OK
+
+  /api/problems/{id}:
+    get:
+      summary: Get problem details including localization
+      responses:
+        '200':
+          description: OK
+    put:
+      summary: Update problem status, assignee, or notes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status: { type: string, enum: [NEW, ACKNOWLEDGED, RESOLVED, IGNORED] }
+                assigneeId: { type: string }
+                notes: { type: string }
+      responses:
+        '200':
+          description: Updated

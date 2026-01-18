@@ -37,6 +37,7 @@ import java.util.UUID;
     "com.contract.master.integration.domain.model",
     "com.contract.master.notification.domain.model",
     "com.contract.master.rule.domain.model",
+    "com.contract.master.problemcenter.domain.model",
     "com.contract.master.shared.domain.model"
 })
 public class ContractManagementApplication {

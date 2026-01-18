@@ -9,7 +9,9 @@
 | Integration | `com.contract.master.integration.interfaces.rest` | WebHooks, External Sync, Mappings |
 | Dashboard | `com.contract.master.dashboard.interfaces.rest` | Stats & Analytics |
 | Notification | `com.contract.master.notification.interfaces.rest` | Alerts & Messages |
-| Evaluation | `com.contract.master.evaluation.interfaces.rest` | Rule Engine & Evaluation Jobs |
+| Evaluation | `com.contract.master.evaluation.interfaces.rest` | Legacy Rule Engine & Jobs |
+| Rule | `com.contract.master.rule.interfaces.rest` | New Script-based Rule Engine |
+| Problem Center | `com.contract.master.problemcenter.interfaces.rest` | Compliance Cockpit & Issue Tracking |
 
 ## Endpoints
 
@@ -25,14 +27,15 @@
 | `/api/contracts/{id}/verify` | POST | Trigger manual validation/verification of contract data | 1.0.0 |
 | `/api/contracts/batch-archive` | POST | Archive multiple contracts in a single operation | 1.0.0 |
 | `/api/contracts/ai-upload` | POST | Upload file for AI-based data extraction | 1.0.0 |
-| `/api/evaluations` | POST | Trigger manual re-evaluation for a contract with specific rules | 1.2.0 |
-| `/api/evaluation/contracts` | GET | List contracts available for evaluation context | 1.0.0 |
-| `/api/rules` | GET | List all active rule configurations | 1.1.0 |
-| `/api/rules` | POST | Create new hybrid validation rules | 1.1.0 |
-| `/api/rules/{id}` | PUT | Update an existing rule configuration | 1.1.0 |
-| `/api/rules/validate/{contractId}` | POST | Run rule validation against a specific contract | 1.1.0 |
-| `/api/rules/ai-analyze/{contractId}` | POST | Perform AI-driven deeper analysis of contract logic | 1.1.0 |
-| `/api/rules/trigger-scenarios` | GET | Retrieve supported automatic rule trigger scenarios | 1.1.0 |
+| `/api/problem-center/evaluations` | POST | Trigger new vertical slice evaluation job | 1.3.0 |
+| `/api/problems` | GET | List compliance problems with advanced filtering | 1.3.0 |
+| `/api/problems/{id}` | GET | Get problem details including localization | 1.3.0 |
+| `/api/problems/{id}` | PUT | Update problem status, assignee, or notes | 1.3.0 |
+| `/api/rules` | GET | List all active script-based rule configurations | 1.3.0 |
+| `/api/rules` | POST | Create new Groovy/Regex validation rules | 1.3.0 |
+| `/api/rules/{id}` | PUT | Update an existing rule configuration | 1.3.0 |
+| `/api/rule-configs` | GET | [Legacy] List old rule configurations | 1.1.0 |
+| `/api/rule-configs/validate/{contractId}` | POST | [Legacy] Run rule validation | 1.1.0 |
 | `/api/metadata/contract-fields` | GET | Unified system and extended field metadata | 1.1.0 |
 | `/api/settings/fields` | GET | Get all global and tenant field configurations | 1.1.0 |
 | `/api/settings/extend-fields` | POST | Create new extended field definition | 1.0.0 |

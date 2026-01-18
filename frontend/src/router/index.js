@@ -55,7 +55,7 @@ const routes = [
       {
         path: 'compliance/problems',
         name: 'ProblemCenter',
-        component: () => import('@/pages/ProblemCenter.vue'), // Updated to new location
+        component: () => import('@/views/problem/ProblemCockpit.vue'),
       },
       {
         path: 'compliance/masking',
@@ -72,7 +72,7 @@ const routes = [
       {
         path: 'rules/list',
         name: 'RuleList',
-        component: () => import('@/pages/RuleList.vue'),
+        component: () => import('@/views/rule/RuleList.vue'),
       },
       {
         path: 'settings/permissions',

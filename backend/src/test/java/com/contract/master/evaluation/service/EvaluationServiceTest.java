@@ -128,7 +128,7 @@ class EvaluationServiceTest {
         when(contractService.getContractById(singleContractId)).thenReturn(mockContract);
 
         when(jobRepository.findByTenantIdAndTargetContractsContainingAndStatus(
-                eq(TenantId.of(tenantId)), anyString(), eq(EvaluationJob.JobStatus.IN_PROGRESS)))
+                eq(tenantId), anyString(), eq(EvaluationJob.JobStatus.IN_PROGRESS)))
                 .thenReturn(Collections.emptyList());
 
         when(jobRepository.save(any(EvaluationJob.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -141,7 +141,7 @@ class EvaluationServiceTest {
             assertNotNull(jobId);
             verify(contractService, times(1)).getContractById(singleContractId);
             verify(jobRepository, times(1)).findByTenantIdAndTargetContractsContainingAndStatus(
-                    eq(TenantId.of(tenantId)), anyString(), eq(EvaluationJob.JobStatus.IN_PROGRESS));
+                    eq(tenantId), anyString(), eq(EvaluationJob.JobStatus.IN_PROGRESS));
             verify(jobRepository, times(1)).save(any(EvaluationJob.class));
             verify(auditService, times(1)).logReEvaluationTriggered(singleContractId, String.join(",", rulesForReEval), reEvalTriggeredBy);
             verify(kafkaProducerService, times(1)).sendMessage(anyString());

@@ -3,17 +3,15 @@ package com.contract.master.evaluation.domain.model;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
-import com.contract.master.shared.domain.base.BaseDomainEntity;
+import com.contract.master.shared.domain.model.BaseTenantEntity;
+import com.contract.master.shared.domain.model.TenantId;
 
 @Entity
 @Table(name = "evaluation_jobs")
-public class EvaluationJob extends BaseDomainEntity {
+public class EvaluationJob extends BaseTenantEntity {
 
     @Column(name = "job_id", unique = true)
     private String jobId;
-
-    @Column(name = "tenant_id", nullable = false)
-    private String tenantId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
@@ -41,7 +39,7 @@ public class EvaluationJob extends BaseDomainEntity {
     public EvaluationJob() {}
 
     public EvaluationJob(String tenantId, TriggerType triggerType, String triggeredBy) {
-        this.tenantId = tenantId;
+        setTenantId(TenantId.of(tenantId));
         this.status = JobStatus.PENDING;
         this.triggerType = triggerType;
         this.createdAt = LocalDateTime.now();
@@ -49,7 +47,7 @@ public class EvaluationJob extends BaseDomainEntity {
     }
 
     public EvaluationJob(String tenantId, JobStatus status, TriggerType triggerType, LocalDateTime createdAt, String triggeredBy) {
-        this.tenantId = tenantId;
+        setTenantId(TenantId.of(tenantId));
         this.status = status;
         this.triggerType = triggerType;
         this.createdAt = createdAt;
@@ -75,7 +73,6 @@ public class EvaluationJob extends BaseDomainEntity {
 
     public String getJobId() { return jobId; }
     public void setJobId(String jobId) { this.jobId = jobId; }
-    public String getTenantId() { return tenantId; }
     public JobStatus getStatus() { return status; }
     public void setStatus(JobStatus status) { this.status = status; }
     public TriggerType getTriggerType() { return triggerType; }

@@ -3,17 +3,15 @@ package com.contract.master.evaluation.domain.model;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
-import com.contract.master.shared.domain.base.BaseDomainEntity;
+import com.contract.master.shared.domain.model.BaseTenantEntity;
+import com.contract.master.shared.domain.model.TenantId;
 
 @Entity
 @Table(name = "evaluation_results")
-public class EvaluationResult extends BaseDomainEntity {
+public class EvaluationResult extends BaseTenantEntity {
 
     @Column(name = "result_id", unique = true)
     private String resultId;
-
-    @Column(name = "tenant_id", nullable = false)
-    private String tenantId;
 
     @Column(name = "job_id", nullable = false)
     private String jobId;
@@ -36,8 +34,8 @@ public class EvaluationResult extends BaseDomainEntity {
 
     public EvaluationResult() {}
 
-    public EvaluationResult(String tenantId, String jobId, String ruleId, String contractId, ResultStatus status, String details) {
-        this.tenantId = tenantId;
+    public EvaluationResult(TenantId tenantId, String jobId, String ruleId, String contractId, ResultStatus status, String details) {
+        setTenantId(tenantId);
         this.jobId = jobId;
         this.ruleId = ruleId;
         this.contractId = contractId;
@@ -46,17 +44,16 @@ public class EvaluationResult extends BaseDomainEntity {
         this.timestamp = LocalDateTime.now();
     }
 
-    public static EvaluationResult pass(String tenantId, String jobId, String ruleId, String contractId, String details) {
+    public static EvaluationResult pass(TenantId tenantId, String jobId, String ruleId, String contractId, String details) {
         return new EvaluationResult(tenantId, jobId, ruleId, contractId, ResultStatus.PASS, details);
     }
 
-    public static EvaluationResult fail(String tenantId, String jobId, String ruleId, String contractId, String details) {
+    public static EvaluationResult fail(TenantId tenantId, String jobId, String ruleId, String contractId, String details) {
         return new EvaluationResult(tenantId, jobId, ruleId, contractId, ResultStatus.FAIL, details);
     }
 
     public String getResultId() { return resultId; }
     public void setResultId(String resultId) { this.resultId = resultId; }
-    public String getTenantId() { return tenantId; }
     public String getJobId() { return jobId; }
     public String getRuleId() { return ruleId; }
     public String getContractId() { return contractId; }
