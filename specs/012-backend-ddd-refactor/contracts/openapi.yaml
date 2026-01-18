@@ -1,0 +1,85 @@
+openapi: 3.0.3
+info:
+  title: Contract Management API (DDD Refactored)
+  version: 1.0.0
+  description: API for managing contract lifecycle and elements, refactored using DDD principles.
+
+paths:
+  /api/v1/contracts:
+    post:
+      summary: Create a new contract
+      operationId: createContract
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContractCreateRequest'
+      responses:
+        '201':
+          description: Contract created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContractResponse'
+
+  /api/v1/contracts/{id}:
+    get:
+      summary: Get contract details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContractResponse'
+
+components:
+  schemas:
+    ContractCreateRequest:
+      type: object
+      required:
+        - tenantId
+        - contractNo
+        - amount
+      properties:
+        tenantId:
+          type: string
+          format: uuid
+        contractNo:
+          type: string
+        amount:
+          $ref: '#/components/schemas/Money'
+
+    ContractResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        tenantId:
+          type: string
+          format: uuid
+        contractNo:
+          type: string
+        status:
+          type: string
+          enum: [DRAFT, SIGNED, ACTIVE, TERMINATED]
+        amount:
+          $ref: '#/components/schemas/Money'
+
+    Money:
+      type: object
+      properties:
+        amount:
+          type: number
+        currency:
+          type: string
+          example: CNY

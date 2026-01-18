@@ -2,6 +2,7 @@ package com.contract.master.api;
 
 import com.contract.master.integration.domain.model.FieldMapping;
 import com.contract.master.integration.domain.repository.FieldMappingRepository;
+import com.contract.master.shared.domain.model.TenantId;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -33,7 +34,7 @@ public class FieldMappingControllerTest {
     @Test
     @WithMockUser
     public void testListSuccess() throws Exception {
-        when(repository.findByTenantId(any())).thenReturn(Collections.emptyList());
+        when(repository.findByTenantId(any(TenantId.class))).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/api/v1/settings/mapping"))
                 .andExpect(status().isOk())

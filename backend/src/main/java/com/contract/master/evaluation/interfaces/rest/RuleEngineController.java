@@ -1,0 +1,108 @@
+package com.contract.master.evaluation.interfaces.rest;
+
+import com.contract.master.rule.domain.model.RuleConfig;
+import com.contract.master.evaluation.domain.repository.RuleConfigRepository;
+import com.contract.master.evaluation.domain.service.RuleEngineDomainService;
+import com.contract.master.contract.dto.ContractDTO;
+import com.contract.master.security.TenantContext;
+import com.contract.master.contract.application.ContractService;
+import com.contract.master.api.GlobalExceptionHandler;
+import com.contract.master.shared.domain.model.TenantId;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+@RestController
+@RequestMapping("/api/rules")
+public class RuleEngineController {
+
+    private final RuleEngineDomainService ruleEngineDomainService;
+    private final ContractService contractService;
+    private final RuleConfigRepository ruleConfigRepository;
+
+    public RuleEngineController(RuleEngineDomainService ruleEngineDomainService,
+                               ContractService contractService,
+                               RuleConfigRepository ruleConfigRepository) {
+        this.ruleEngineDomainService = ruleEngineDomainService;
+        this.contractService = contractService;
+        this.ruleConfigRepository = ruleConfigRepository;
+    }
+
+    @GetMapping
+    public GlobalExceptionHandler.ApiResponse<List<RuleConfig>> list() {
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, ruleConfigRepository.findByTenantId(TenantId.of(TenantContext.getCurrentTenant())));
+    }
+
+    @GetMapping("/{id}")
+    public GlobalExceptionHandler.ApiResponse<RuleConfig> get(@PathVariable Long id) {
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, ruleConfigRepository.findById(id).orElse(null));
+    }
+
+
+    @PostMapping
+    public GlobalExceptionHandler.ApiResponse<RuleConfig> create(@RequestBody RuleConfig rule) {
+        if (rule.getRuleId() == null) {
+            rule.setRuleId(UUID.randomUUID().toString());
+        }
+        if (rule.getRuleType() == null) {
+            rule.setRuleType("LOGIC");
+        }
+        rule.setTenantId(TenantId.of(TenantContext.getCurrentTenant()));
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, ruleConfigRepository.save(rule));
+    }
+
+    @PutMapping("/{id}")
+    public GlobalExceptionHandler.ApiResponse<RuleConfig> update(@PathVariable String id, @RequestBody RuleConfig rule) {
+        rule.setRuleId(id);
+        rule.setTenantId(TenantId.of(TenantContext.getCurrentTenant()));
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, ruleConfigRepository.save(rule));
+    }
+
+    @PostMapping("/validate/{contractId}")
+    public GlobalExceptionHandler.ApiResponse<Map<String, Object>> validateContract(@PathVariable String contractId) {
+        ContractDTO contract = contractService.getContractById(contractId);
+        Map<String, Object> responseData = new HashMap<>();
+        
+        if (contract != null) {
+            List<String> violations = ruleEngineDomainService.validate(contract, null);
+            responseData.put("status", violations.isEmpty() ? "SUCCESS" : "VIOLATION");
+            responseData.put("violations", violations);
+        } else {
+            responseData.put("status", "NOT_FOUND");
+        }
+        
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, responseData);
+    }
+
+    @PostMapping("/ai-analyze/{contractId}")
+    public GlobalExceptionHandler.ApiResponse<Map<String, Object>> aiAnalyze(@PathVariable String contractId) {
+        ContractDTO contract = contractService.getContractById(contractId);
+        Map<String, Object> responseData = new HashMap<>();
+        
+        if (contract != null) {
+            List<String> violations = ruleEngineDomainService.validate(contract, null);
+            String analysis = violations.stream()
+                    .filter(v -> v.startsWith("AI Rule"))
+                    .collect(java.util.stream.Collectors.joining("; "));
+            responseData.put("analysis", analysis);
+        } else {
+            responseData.put("analysis", "Contract not found");
+        }
+        
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, responseData);
+    }
+
+    @GetMapping("/trigger-scenarios")
+    public GlobalExceptionHandler.ApiResponse<Map<String, List<Map<String, String>>>> getTriggerScenarios() {
+        List<Map<String, String>> scenarios = java.util.Arrays.asList(
+            java.util.Map.of("name", "Contract Creation", "description", "Rules are evaluated automatically when a new contract is created."),
+            java.util.Map.of("name", "Contract Update", "description", "Rules are evaluated automatically when an existing contract is updated."),
+            java.util.Map.of("name", "Scheduled Review", "description", "Rules can be scheduled to run periodically against active contracts.")
+        );
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, java.util.Map.of("scenarios", scenarios));
+    }
+}

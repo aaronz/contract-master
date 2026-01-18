@@ -3,13 +3,14 @@ package com.contract.master.evaluation.domain.model;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+import com.contract.master.shared.domain.base.BaseDomainEntity;
+
 @Entity
 @Table(name = "evaluation_results")
-public class EvaluationResult {
+public class EvaluationResult extends BaseDomainEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    @Column(name = "result_id", unique = true)
+    private String resultId;
 
     @Column(name = "tenant_id", nullable = false)
     private String tenantId;
@@ -33,87 +34,37 @@ public class EvaluationResult {
     @Column(name = "timestamp", nullable = false)
     private LocalDateTime timestamp;
 
-    // Constructors
-    public EvaluationResult() {
-    }
+    public EvaluationResult() {}
 
-    public EvaluationResult(String tenantId, String jobId, String ruleId, String contractId, ResultStatus status, String details, LocalDateTime timestamp) {
+    public EvaluationResult(String tenantId, String jobId, String ruleId, String contractId, ResultStatus status, String details) {
         this.tenantId = tenantId;
         this.jobId = jobId;
         this.ruleId = ruleId;
         this.contractId = contractId;
         this.status = status;
         this.details = details;
-        this.timestamp = timestamp;
+        this.timestamp = LocalDateTime.now();
     }
 
-    // Getters and Setters
-    public String getId() {
-        return id;
+    public static EvaluationResult pass(String tenantId, String jobId, String ruleId, String contractId, String details) {
+        return new EvaluationResult(tenantId, jobId, ruleId, contractId, ResultStatus.PASS, details);
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public static EvaluationResult fail(String tenantId, String jobId, String ruleId, String contractId, String details) {
+        return new EvaluationResult(tenantId, jobId, ruleId, contractId, ResultStatus.FAIL, details);
     }
 
-    public String getTenantId() {
-        return tenantId;
-    }
+    public String getResultId() { return resultId; }
+    public void setResultId(String resultId) { this.resultId = resultId; }
+    public String getTenantId() { return tenantId; }
+    public String getJobId() { return jobId; }
+    public String getRuleId() { return ruleId; }
+    public String getContractId() { return contractId; }
+    public ResultStatus getStatus() { return status; }
+    public String getDetails() { return details; }
+    public LocalDateTime getTimestamp() { return timestamp; }
 
-    public void setTenantId(String tenantId) {
-        this.tenantId = tenantId;
-    }
-
-    public String getJobId() {
-        return jobId;
-    }
-
-    public void setJobId(String jobId) {
-        this.jobId = jobId;
-    }
-
-    public String getRuleId() {
-        return ruleId;
-    }
-
-    public void setRuleId(String ruleId) {
-        this.ruleId = ruleId;
-    }
-
-    public String getContractId() {
-        return contractId;
-    }
-
-    public void setContractId(String contractId) {
-        this.contractId = contractId;
-    }
-
-    public ResultStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(ResultStatus status) {
-        this.status = status;
-    }
-
-    public String getDetails() {
-        return details;
-    }
-
-    public void setDetails(String details) {
-        this.details = details;
-    }
-
-    public LocalDateTime getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    // Enum
     public enum ResultStatus {
-        PASS, FAIL, ERROR
+        PASS, FAIL
     }
 }

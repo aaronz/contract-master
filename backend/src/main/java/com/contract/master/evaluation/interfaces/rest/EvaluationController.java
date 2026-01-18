@@ -1,7 +1,7 @@
 package com.contract.master.evaluation.interfaces.rest;
 
 import com.contract.master.evaluation.application.EvaluationApplicationService;
-import com.contract.master.dto.EvaluationTriggerRequest;
+import com.contract.master.evaluation.dto.EvaluationTriggerRequest;
 import com.contract.master.api.GlobalExceptionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,7 +10,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/evaluations")

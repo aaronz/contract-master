@@ -1,6 +1,8 @@
 package com.contract.master.rule;
+import com.contract.master.shared.domain.model.TenantId;
 
-import com.contract.master.contract.domain.model.ContractBase;
+import com.contract.master.contract.domain.model.Contract;
+import com.contract.master.contract.domain.model.ContractAmount;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,8 +20,8 @@ public class DroolsRuleEngineTest {
 
     @Test
     void testLargeContractViolation() {
-        ContractBase contract = new ContractBase();
-        contract.setAmount(new BigDecimal("2000000"));
+        Contract contract = new Contract();
+        contract.setAmount(ContractAmount.of(new BigDecimal("2000000"), "USD"));
         
         List<String> violations = droolsRuleEngine.validate(contract, "tenant-1");
         
@@ -29,8 +31,8 @@ public class DroolsRuleEngineTest {
 
     @Test
     void testSmallContractNoViolation() {
-        ContractBase contract = new ContractBase();
-        contract.setAmount(new BigDecimal("500000"));
+        Contract contract = new Contract();
+        contract.setAmount(ContractAmount.of(new BigDecimal("500000"), "USD"));
         
         List<String> violations = droolsRuleEngine.validate(contract, "tenant-1");
         

@@ -1,14 +1,51 @@
 package com.contract.master.contract.infrastructure.persistence;
 
+import com.contract.master.contract.domain.model.ContractId;
+import com.contract.master.contract.domain.model.ContractNo;
+import com.contract.master.shared.domain.model.TenantId;
 import com.contract.master.contract.domain.model.Contract;
 import com.contract.master.contract.domain.repository.ContractRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.Optional;
+import java.util.List;
 
 @Repository
-public interface JpaContractRepository extends ContractRepository, JpaRepository<Contract, String> {
+public interface JpaContractRepository extends JpaRepository<Contract, Long>, ContractRepository {
+    @Override
+    @Query("SELECT c FROM Contract c WHERE c.contractId = :id")
+    Optional<Contract> findById(ContractId id);
+
+    @Override
+    Optional<Contract> findByContractNo(ContractNo contractNo);
+
+    @Override
+    Optional<Contract> findByCrmId(String crmId);
+
+    @Override
+    @Query("SELECT COUNT(c) FROM Contract c WHERE c.tenantId.id = :#{#tenantId.id}")
+    Long countByTenantId(TenantId tenantId);
+
+    @Override
+    @Query("SELECT COUNT(c) FROM Contract c WHERE c.tenantId.id = :#{#tenantId.id} AND c.approvalStatus = 'PENDING'")
+    Long countPendingApprovalsByTenantId(TenantId tenantId);
+
+    @Override
+    @Query("SELECT SUM(c.amount.amount) FROM Contract c WHERE c.tenantId.id = :#{#tenantId.id} AND c.status = 'PUBLISHED'")
+    BigDecimal sumActiveValueByTenantId(TenantId tenantId);
+
+    @Override
+    @Query("SELECT COUNT(c) FROM Contract c WHERE c.tenantId.id = :#{#tenantId.id} AND c.status = 'RISK_FLAGGED'")
+    Long countRiskAlertsByTenantId(TenantId tenantId);
+
+    @Override
+    Page<Contract> findByTenantId(TenantId tenantId, Pageable pageable);
+
+    @Override
+    List<Contract> findByTenantId(TenantId tenantId);
 }

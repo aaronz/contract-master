@@ -24,7 +24,7 @@ public class ApplicationConfig {
     public UserDetailsService userDetailsService() {
         return username -> userRepository.findByUserName(username)
                 .map(user -> org.springframework.security.core.userdetails.User.builder()
-                        .username(user.getUserName())
+                        .username(user.getUsername())
                         .password(user.getPassword())
                         .authorities("USER") // Simple role for now
                         .build())

@@ -1,10 +1,16 @@
 package com.contract.master.api;
+import com.contract.master.shared.domain.model.TenantId;
 
-import com.contract.master.contract.domain.model.ContractBase;
-import com.contract.master.contract.domain.repository.ContractBaseRepository;
+import com.contract.master.contract.domain.model.ContractId;
+import com.contract.master.contract.domain.model.ContractNo;
+import com.contract.master.contract.domain.model.Contract;
+import com.contract.master.contract.domain.model.ContractAmount;
+import com.contract.master.contract.domain.model.ContractParty;
+import com.contract.master.contract.domain.repository.ContractRepository;
 import com.contract.master.contract.metadata.domain.model.FieldConfig;
 import com.contract.master.contract.metadata.domain.repository.FieldConfigRepository;
 import com.contract.master.contract.application.ContractService;
+import com.contract.master.shared.domain.model.TenantId;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,7 +19,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional; // Import Transactional
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -24,90 +30,84 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Transactional // Add Transactional annotation
+@Transactional
 public class ContractControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
-    private ContractBaseRepository contractRepository;
+    private ContractRepository contractRepository;
 
     @Autowired
     private FieldConfigRepository fieldConfigRepository;
 
     @Autowired
-    private com.contract.master.contract.application.ContractService contractService; // Inject ContractService to clear cache
+    private ContractService contractService;
 
-    @BeforeEach // Add BeforeEach
+    @BeforeEach
     void setup() {
-        contractService.clearFieldConfigCache(); // Clear cache before each test
+        contractService.clearFieldConfigCache();
     }
 
     @AfterEach
     void tearDown() {
-        contractService.clearFieldConfigCache(); // Clear cache after each test
+        contractService.clearFieldConfigCache();
     }
 
 
     @Test
     @WithMockUser(username = "user1", authorities = {"USER"})
     public void testDataMasking() throws Exception {
-        String contractId = UUID.randomUUID().toString();
-        ContractBase contract = new ContractBase();
-        contract.setContractId(contractId);
-        contract.setContractNo("C123");
-        contract.setPartyAName("Acme");
-        contract.setPartyAPhone("13812345678");
-        contract.setAmount(new BigDecimal("1000.00")); // This field will not be filtered in this test
-        contract.setTenantId("tenant_1");
+        String contractIdStr = UUID.randomUUID().toString();
+        Contract contract = new Contract();
+        contract.setContractId(ContractId.of(contractIdStr));
+        contract.setContractNo(new ContractNo("C123"));
+        contract.setContractName("Acme Contract");
+        contract.setPartyA(new ContractParty(null, "Acme", null, "13812345678", null));
+        contract.setAmount(ContractAmount.of(new BigDecimal("1000.00"), "USD"));
+        contract.setTenantId(TenantId.of("tenant_1"));
         contractRepository.save(contract);
 
-        // Assert that partyAPhone is masked when no FieldConfig hides it
-        mockMvc.perform(get("/api/contracts/" + contractId)
+        mockMvc.perform(get("/api/contracts/" + contractIdStr)
                         .header("X-Tenant-ID", "tenant_1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.partyAPhone").value("138****5678"))
-                .andExpect(jsonPath("$.data.contractAmount").value(1000.00)); // Should still be present
+                .andExpect(jsonPath("$.data.contractAmount").value(1000.00));
     }
 
     @Test
     @WithMockUser(username = "user1", authorities = {"USER"})
     public void testFieldFiltering() throws Exception {
-        // Clear cache to ensure clean state for field configs
         contractService.clearFieldConfigCache();
 
-        String contractId = UUID.randomUUID().toString();
-        ContractBase contract = new ContractBase();
-        contract.setContractId(contractId);
-        contract.setContractNo("C123");
-        contract.setPartyAName("Acme");
-        contract.setPartyAPhone("13812345678");
-        contract.setAmount(new BigDecimal("1000.00"));
-        contract.setTenantId("tenant_1");
+        String contractIdStr = UUID.randomUUID().toString();
+        Contract contract = new Contract();
+        contract.setContractId(ContractId.of(contractIdStr));
+        contract.setContractNo(new ContractNo("C123"));
+        contract.setContractName("Acme Contract");
+        contract.setPartyA(new ContractParty(null, "Acme", null, "13812345678", null));
+        contract.setAmount(ContractAmount.of(new BigDecimal("1000.00"), "USD"));
+        contract.setTenantId(TenantId.of("tenant_1"));
         contractRepository.save(contract);
 
-        // Setup FieldConfig for contract_amount to be hidden (apiReturn = false)
         FieldConfig contractAmountConfig = new FieldConfig();
-        contractAmountConfig.setFieldCode("contract_amount"); // Use snake_case for FieldCode
+        contractAmountConfig.setFieldCode("contract_amount");
         contractAmountConfig.setApiReturn(false);
-        contractAmountConfig.setTenantId("tenant_1");
+        contractAmountConfig.setTenantId(TenantId.of("tenant_1"));
         contractAmountConfig.setConfigType("CONTRACT");
         fieldConfigRepository.save(contractAmountConfig);
 
-        // Setup FieldConfig for party_a_phone to be hidden (apiReturn = false)
         FieldConfig partyAPhoneConfig = new FieldConfig();
-        partyAPhoneConfig.setFieldCode("party_a_phone"); // Use snake_case for FieldCode
+        partyAPhoneConfig.setFieldCode("party_a_phone");
         partyAPhoneConfig.setApiReturn(false);
-        partyAPhoneConfig.setTenantId("tenant_1");
+        partyAPhoneConfig.setTenantId(TenantId.of("tenant_1"));
         partyAPhoneConfig.setConfigType("CONTRACT");
         fieldConfigRepository.save(partyAPhoneConfig);
         
-        // Clear cache again to ensure new FieldConfigs are loaded by ContractService
         contractService.clearFieldConfigCache();
 
-        // Assert that contractAmount and partyAPhone are hidden
-        mockMvc.perform(get("/api/contracts/" + contractId)
+        mockMvc.perform(get("/api/contracts/" + contractIdStr)
                         .header("X-Tenant-ID", "tenant_1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.contractAmount").isEmpty())

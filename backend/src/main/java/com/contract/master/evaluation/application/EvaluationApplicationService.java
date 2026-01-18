@@ -2,14 +2,16 @@ package com.contract.master.evaluation.application;
 
 import com.contract.master.evaluation.domain.model.EvaluationJob;
 import com.contract.master.evaluation.domain.model.EvaluationResult;
+import com.contract.master.evaluation.domain.model.ResultStatus;
 import com.contract.master.evaluation.domain.repository.EvaluationJobRepository;
 import com.contract.master.evaluation.domain.repository.EvaluationResultRepository;
+import com.contract.master.evaluation.domain.service.RuleEngineDomainService;
 import com.contract.master.evaluation.infrastructure.messaging.KafkaProducerService;
 import com.contract.master.audit.application.AuditService;
-import com.contract.master.dto.ContractDTO;
+import com.contract.master.contract.dto.ContractDTO;
 import com.contract.master.contract.application.ContractService;
-import com.contract.master.evaluation.application.RuleEngineService;
 import com.contract.master.security.TenantContext;
+import com.contract.master.shared.domain.model.TenantId;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -18,10 +20,8 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Arrays;
-import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class EvaluationApplicationService {
@@ -32,7 +32,7 @@ public class EvaluationApplicationService {
     private final EvaluationResultRepository resultRepository;
     private final KafkaProducerService kafkaProducerService;
     private final AuditService auditService;
-    private final RuleEngineService ruleEngineService;
+    private final RuleEngineDomainService ruleEngineDomainService;
     private final ContractService contractService;
     private final ObjectMapper objectMapper;
 
@@ -40,14 +40,14 @@ public class EvaluationApplicationService {
                                      EvaluationResultRepository resultRepository,
                                      KafkaProducerService kafkaProducerService,
                                      AuditService auditService,
-                                     RuleEngineService ruleEngineService,
+                                     RuleEngineDomainService ruleEngineDomainService,
                                      ContractService contractService,
                                      ObjectMapper objectMapper) {
         this.jobRepository = jobRepository;
         this.resultRepository = resultRepository;
         this.kafkaProducerService = kafkaProducerService;
         this.auditService = auditService;
-        this.ruleEngineService = ruleEngineService;
+        this.ruleEngineDomainService = ruleEngineDomainService;
         this.contractService = contractService;
         this.objectMapper = objectMapper;
     }
@@ -58,9 +58,9 @@ public class EvaluationApplicationService {
             logger.info("Received evaluation job message: {}", message);
             String jobId = message;
 
-            jobRepository.findById(jobId).ifPresentOrElse(job -> {
+            jobRepository.findByJobId(jobId).ifPresentOrElse(job -> {
                 try {
-                    job.setStatus(EvaluationJob.JobStatus.IN_PROGRESS);
+                    job.start();
                     jobRepository.save(job);
 
                     List<String> contractIds = objectMapper.readValue(job.getTargetContracts(), new TypeReference<List<String>>(){});
@@ -71,19 +71,15 @@ public class EvaluationApplicationService {
                         try {
                             ContractDTO contract = contractService.getContractById(contractId);
                             if (contract != null) {
-                                List<String> violations = ruleEngineService.validate(contract, ruleIds);
-                                EvaluationResult.ResultStatus status = violations.isEmpty() ? EvaluationResult.ResultStatus.PASS : EvaluationResult.ResultStatus.FAIL;
-                                String resultDetail = violations.isEmpty() ? "Passed all rules" : String.join("; ", violations);
-
-                                EvaluationResult result = new EvaluationResult(
-                                    job.getTenantId(),
-                                    job.getId(),
-                                    "batch-rules",
-                                    contractId,
-                                    status,
-                                    resultDetail,
-                                    LocalDateTime.now()
-                                );
+                                List<String> violations = ruleEngineDomainService.validate(contract, ruleIds);
+                                
+                                EvaluationResult result;
+                                if (violations.isEmpty()) {
+                                    result = EvaluationResult.pass(job.getTenantId(), job.getJobId(), "batch-rules", contractId, "Passed all rules");
+                                } else {
+                                    result = EvaluationResult.fail(job.getTenantId(), job.getJobId(), "batch-rules", contractId, String.join("; ", violations));
+                                }
+                                result.setResultId(UUID.randomUUID().toString());
                                 resultRepository.save(result);
                                 processedCount++;
                             }
@@ -92,14 +88,13 @@ public class EvaluationApplicationService {
                         }
                     }
 
-                    job.setStatus(EvaluationJob.JobStatus.COMPLETED);
-                    job.setCompletedAt(LocalDateTime.now());
+                    job.complete();
                     jobRepository.save(job);
 
                     logger.info("Evaluation job {} completed. Processed {} contracts.", jobId, processedCount);
                 } catch (Exception e) {
                     logger.error("Error processing evaluation job {}", jobId, e);
-                    job.setStatus(EvaluationJob.JobStatus.FAILED);
+                    job.fail();
                     jobRepository.save(job);
                 }
             }, () -> {
@@ -111,7 +106,8 @@ public class EvaluationApplicationService {
     }
 
     public EvaluationJob createAndPublishEvaluationJob(List<String> ruleIds, List<String> contractIds, String tenantId, String triggeredBy) {
-        EvaluationJob job = new EvaluationJob(tenantId, EvaluationJob.JobStatus.PENDING, EvaluationJob.TriggerType.MANUAL, LocalDateTime.now(), triggeredBy);
+        EvaluationJob job = new EvaluationJob(tenantId, EvaluationJob.TriggerType.MANUAL, triggeredBy);
+        job.setJobId(UUID.randomUUID().toString());
         try {
             job.setTargetRules(objectMapper.writeValueAsString(ruleIds));
             job.setTargetContracts(objectMapper.writeValueAsString(contractIds));
@@ -122,11 +118,10 @@ public class EvaluationApplicationService {
         
         jobRepository.save(job);
 
-        String description = "Rules: " + String.join(",", ruleIds) + ", Contracts: " + String.join(",", contractIds);
-        auditService.logChange("JOB-" + job.getId(), "EvaluationJob", null, "Created", "CREATE", triggeredBy);
-        logger.info("Manual Evaluation Job Created - Job ID: {}, Tenant ID: {}", job.getId(), tenantId);
+        auditService.logChange("JOB-" + job.getJobId(), "EvaluationJob", null, "Created", "CREATE", triggeredBy);
+        logger.info("Manual Evaluation Job Created - Job ID: {}, Tenant ID: {}", job.getJobId(), tenantId);
 
-        kafkaProducerService.sendMessage(job.getId());
+        kafkaProducerService.sendMessage(job.getJobId());
         return job;
     }
 
@@ -145,7 +140,7 @@ public class EvaluationApplicationService {
         }
         
         List<EvaluationJob> inProgressJobs = jobRepository.findByTenantIdAndTargetContractsContainingAndStatus(
-                tenantId, contractIdJson, EvaluationJob.JobStatus.IN_PROGRESS);
+                TenantId.of(tenantId), contractIdJson, EvaluationJob.JobStatus.IN_PROGRESS);
 
         if (!inProgressJobs.isEmpty()) {
             throw new IllegalStateException("An evaluation for this contract is already in progress.");
@@ -155,6 +150,6 @@ public class EvaluationApplicationService {
         
         auditService.logReEvaluationTriggered(contractId, String.join(",", ruleIds), triggeredBy);
 
-        return job.getId();
+        return job.getJobId();
     }
 }

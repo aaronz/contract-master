@@ -2,14 +2,11 @@ package com.contract.master.contract.domain.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 @Embeddable
-@Getter
 public class ContractAmount {
     @Column(name = "amount", precision = 18, scale = 2)
     private BigDecimal amount;
@@ -38,5 +35,29 @@ public class ContractAmount {
 
     public static ContractAmount of(BigDecimal amount, String currency) {
         return new ContractAmount(amount, BigDecimal.ZERO, BigDecimal.ZERO, amount, currency);
+    }
+
+    public BigDecimal getAmount() { return amount; }
+    public void setAmount(BigDecimal amount) { this.amount = amount; }
+    public BigDecimal getTaxRate() { return taxRate; }
+    public void setTaxRate(BigDecimal taxRate) { this.taxRate = taxRate; }
+    public BigDecimal getTaxAmount() { return taxAmount; }
+    public void setTaxAmount(BigDecimal taxAmount) { this.taxAmount = taxAmount; }
+    public BigDecimal getTotalAmountWithTax() { return totalAmountWithTax; }
+    public void setTotalAmountWithTax(BigDecimal totalAmountWithTax) { this.totalAmountWithTax = totalAmountWithTax; }
+    public String getCurrencyType() { return currencyType; }
+    public void setCurrencyType(String currencyType) { this.currencyType = currencyType; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ContractAmount that = (ContractAmount) o;
+        return Objects.equals(amount, that.amount) && Objects.equals(taxRate, that.taxRate) && Objects.equals(taxAmount, that.taxAmount) && Objects.equals(totalAmountWithTax, that.totalAmountWithTax) && Objects.equals(currencyType, that.currencyType);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(amount, taxRate, taxAmount, totalAmountWithTax, currencyType);
     }
 }

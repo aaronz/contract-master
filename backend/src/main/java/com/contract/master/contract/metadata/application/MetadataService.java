@@ -4,7 +4,7 @@ import com.contract.master.contract.domain.model.ContractExtendField;
 import com.contract.master.contract.domain.repository.ContractExtendFieldRepository;
 import com.contract.master.contract.metadata.domain.model.FieldConfig;
 import com.contract.master.contract.metadata.domain.repository.FieldConfigRepository;
-import com.contract.master.dto.FieldMetadataDTO;
+import com.contract.master.contract.metadata.dto.FieldMetadataDTO;
 import com.contract.master.security.TenantContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,8 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map; // Add this import
 import java.util.stream.Collectors;
-import com.contract.master.dto.ContractDTO;
+import com.contract.master.contract.dto.ContractDTO;
 
+import com.contract.master.shared.domain.model.TenantId;
 @Service
 public class MetadataService {
 
@@ -31,9 +32,9 @@ public class MetadataService {
         String tenantId = TenantContext.getCurrentTenant();
         List<FieldMetadataDTO> fields = new ArrayList<>();
         
-        List<FieldConfig> configs = fieldConfigRepository.findByTenantId(tenantId);
+        List<FieldConfig> configs = fieldConfigRepository.findByTenantId(TenantId.of(tenantId));
 
-        for (Field field : com.contract.master.dto.ContractDTO.class.getDeclaredFields()) {
+        for (Field field : com.contract.master.contract.dto.ContractDTO.class.getDeclaredFields()) {
             String name = field.getName();
             if (name.equals("extendedFields") || name.equals("attachments") || name.equals("tenantId") || name.equals("contractId")) {
                 continue;
@@ -49,7 +50,7 @@ public class MetadataService {
             fields.add(dto);
         }
 
-        List<ContractExtendField> extendFields = extendFieldRepository.findByTenantId(tenantId);
+        List<ContractExtendField> extendFields = extendFieldRepository.findByTenantId(TenantId.of(tenantId));
         for (ContractExtendField ef : extendFields) {
             FieldConfig config = configs.stream().filter(c -> c.getFieldCode().equals(ef.getFieldCode())).findFirst().orElse(null);
             String label = config != null && config.getFieldAlias() != null ? config.getFieldAlias() : ef.getFieldName();

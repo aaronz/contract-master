@@ -2,7 +2,7 @@
 
 ## Field Metadata Unification Strategy
 
-**Decision**: Implement a unified `ContractMetadataService` that aggregates standard JPA fields (from `ContractBase`) and extended fields (from `ContractExtendField`).
+**Decision**: Implement a unified `ContractMetadataService` that aggregates standard JPA fields (from `Contract`) and extended fields (from `ContractExtendField`).
 
 **Rationale**:
 - Currently, standard fields are hardcoded or managed separately from custom fields.

@@ -73,7 +73,7 @@ As a tenant admin, I want to configure my own downstream WebHook targets and API
 
 - **FR-001**: System MUST implement a global `KafkaHeaderInterceptor` for automatic `tenant_id` propagation.
 - **FR-002**: UI MUST provide "Confirm" and "Edit" actions for every AI-extracted field.
-- **FR-003**: System MUST add `validation_results` (JSONB) to `ContractBase` to store structured Drools outcomes.
+- **FR-003**: System MUST add `validation_results` (JSONB) to `Contract` to store structured Drools outcomes.
 - **FR-004**: Audit logging MUST use a Hibernate `PostUpdateEventListener` to capture field-level diffs in JSON format.
 - **FR-005**: UI MUST implement a `DownstreamSystem` management view in the Settings module.
 - **FR-006**: Backend MUST implement a `VERIFY` endpoint to progress contract states.

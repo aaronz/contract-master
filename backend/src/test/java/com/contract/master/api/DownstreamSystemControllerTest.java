@@ -1,4 +1,5 @@
 package com.contract.master.api;
+import com.contract.master.shared.domain.model.TenantId;
 
 import com.contract.master.integration.domain.model.DownstreamSystem;
 import com.contract.master.integration.domain.repository.DownstreamSystemRepository;

@@ -2,7 +2,7 @@ package com.contract.master.contract.application;
 
 import com.contract.master.contract.domain.model.ContractExtendField;
 import com.contract.master.contract.domain.repository.ContractExtendFieldRepository;
-import com.contract.master.dto.ContractDTO;
+import com.contract.master.contract.dto.ContractDTO;
 import com.contract.master.security.TenantContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.contract.master.shared.domain.model.TenantId;
 @Service
 public class ExportService {
 
@@ -26,7 +27,7 @@ public class ExportService {
                 .filter(c -> tenantId.equals(c.getTenantId()))
                 .collect(Collectors.toList());
 
-        List<ContractExtendField> extendFields = extendFieldRepository.findByTenantId(tenantId);
+        List<ContractExtendField> extendFields = extendFieldRepository.findByTenantId(TenantId.of(tenantId));
 
         writer.print("Contract No,Contract Name,Party A,Party B,Amount,Status");
         for (ContractExtendField f : extendFields) {

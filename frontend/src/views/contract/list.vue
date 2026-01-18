@@ -525,7 +525,7 @@ const newContractForm = ref({
   // I will check handleCreateContract payload construction.
   // "body: JSON.stringify({ ...newContractForm.value, status: 'DRAFT' })"
   // If backend expects contractAmount, list.vue might be sending 'amount'.
-  // Backend ContractDTO has 'contractAmount', but ContractBase has 'amount'. 
+  // Backend ContractDTO has 'contractAmount', but Contract has 'amount'. 
   // ContractDTO getter: getContractAmount().
   // Let's use 'contractAmount' to be safe and consistent with detail.vue, 
   // but I need to check if 'amount' was working before. 

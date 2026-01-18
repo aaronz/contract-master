@@ -1,10 +1,11 @@
 package com.contract.master.contract.application;
+import com.contract.master.shared.domain.model.TenantId;
 
-import com.contract.master.contract.domain.model.ContractBase;
-import com.contract.master.contract.domain.repository.ContractBaseRepository;
+import com.contract.master.contract.domain.model.*;
+import com.contract.master.contract.domain.repository.ContractRepository;
 import com.contract.master.contract.domain.repository.ContractExtendDataRepository;
 import com.contract.master.contract.domain.repository.ContractExtendFieldRepository;
-import com.contract.master.dto.ContractDTO;
+import com.contract.master.contract.dto.ContractDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,7 +25,7 @@ import com.contract.master.audit.application.AuditService;
 public class ContractServiceTest {
 
     @Mock
-    private ContractBaseRepository contractBaseRepository;
+    private ContractRepository contractRepository;
 
     @Mock
     private ContractExtendDataRepository extendDataRepository;
@@ -38,49 +39,50 @@ public class ContractServiceTest {
     @InjectMocks
     private ContractService contractService;
 
-    private ContractBase contract;
+    private Contract contract;
 
     @BeforeEach
     void setUp() {
-        contract = new ContractBase();
-        contract.setContractId("CON-001");
+        contract = new Contract();
+        contract.setContractId(ContractId.of("550e8400-e29b-41d4-a716-446655440000"));
+        contract.setContractNo(new ContractNo("TEST-NO-001"));
         contract.setContractName("Test Contract");
-        contract.setAmount(new BigDecimal("1000.00"));
+        contract.setAmount(ContractAmount.of(new BigDecimal("1000.00"), "USD"));
     }
 
     @Test
     void testGetContractById() {
-        when(contractBaseRepository.findById("CON-001")).thenReturn(Optional.of(contract));
+        when(contractRepository.findById(ContractId.of("550e8400-e29b-41d4-a716-446655440000"))).thenReturn(Optional.of(contract));
         
-        ContractDTO dto = contractService.getContractById("CON-001");
+        ContractDTO dto = contractService.getContractById("550e8400-e29b-41d4-a716-446655440000");
         
         assertNotNull(dto);
-        assertEquals("CON-001", dto.getContractId());
+        assertEquals("550e8400-e29b-41d4-a716-446655440000", dto.getContractId());
         assertEquals("Test Contract", dto.getContractName());
-        verify(contractBaseRepository).findById("CON-001");
+        verify(contractRepository).findById(ContractId.of("550e8400-e29b-41d4-a716-446655440000"));
     }
 
     @Test
     void testUpdateContract() {
-        when(contractBaseRepository.findById("CON-001")).thenReturn(Optional.of(contract));
+        when(contractRepository.findById(ContractId.of("550e8400-e29b-41d4-a716-446655440000"))).thenReturn(Optional.of(contract));
         
-        ContractBase updated = new ContractBase();
+        Contract updated = new Contract();
         updated.setContractName("Updated Name");
-        updated.setAmount(new BigDecimal("2000.00"));
+        updated.setAmount(ContractAmount.of(new BigDecimal("2000.00"), "USD"));
         
-        contractService.updateContract("CON-001", updated);
+        contractService.updateContract("550e8400-e29b-41d4-a716-446655440000", updated);
         
         assertEquals("Updated Name", contract.getContractName());
-        assertEquals(new BigDecimal("2000.00"), contract.getAmount());
-        verify(auditService).logChange(eq("CON-001"), eq("contract_name"), any(), eq("Updated Name"), eq("MANUAL"), eq("admin"));
-        verify(contractBaseRepository).save(contract);
+        assertEquals(new BigDecimal("2000.00"), contract.getAmount().getAmount());
+        verify(auditService).logChange(eq("550e8400-e29b-41d4-a716-446655440000"), eq("contract_name"), any(), eq("Updated Name"), eq("MANUAL"), eq("admin"));
+        verify(contractRepository).save(contract);
     }
 
     @Test
     void testGetContractNotFound() {
-        when(contractBaseRepository.findById("NON-EXISTENT")).thenReturn(Optional.empty());
+        when(contractRepository.findById(ContractId.of("00000000-0000-0000-0000-000000000000"))).thenReturn(Optional.empty());
         
-        ContractDTO dto = contractService.getContractById("NON-EXISTENT");
+        ContractDTO dto = contractService.getContractById("00000000-0000-0000-0000-000000000000");
         
         assertNull(dto);
     }

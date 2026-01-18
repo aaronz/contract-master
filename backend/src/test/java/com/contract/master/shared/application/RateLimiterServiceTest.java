@@ -1,4 +1,5 @@
 package com.contract.master.shared.application;
+import com.contract.master.shared.domain.model.TenantId;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;

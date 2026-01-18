@@ -3,6 +3,13 @@ package com.contract.master.contract.metadata.application;
 import com.contract.master.contract.metadata.domain.model.FieldConfig;
 import com.contract.master.contract.metadata.domain.repository.FieldConfigRepository;
 import com.contract.master.security.TenantContext;
+import com.contract.master.shared.domain.model.TenantId;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.contract.master.contract.metadata.domain.event.FieldConfigChangedEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import com.contract.master.contract.application.ContractService;
 
 @Service
 public class FieldConfigService {
@@ -19,20 +25,20 @@ public class FieldConfigService {
     private FieldConfigRepository fieldConfigRepository;
 
     @Autowired
-    private ContractService contractService;
+    private ApplicationEventPublisher eventPublisher;
 
     public List<FieldConfig> getConfigs() {
         String tenantId = TenantContext.getCurrentTenant();
         if (tenantId == null) {
             return Collections.emptyList();
         }
-        return fieldConfigRepository.findByTenantId(tenantId);
+        return fieldConfigRepository.findByTenantId(TenantId.of(tenantId));
     }
 
     @Transactional
     public void saveConfig(FieldConfig config) {
         String tenantId = TenantContext.getCurrentTenant();
-        fieldConfigRepository.findByTenantId(tenantId).stream()
+        fieldConfigRepository.findByTenantId(TenantId.of(tenantId)).stream()
             .filter(c -> c.getFieldCode().equals(config.getFieldCode()) && !Objects.equals(c.getId(), config.getId()))
             .findFirst()
             .ifPresent(existing -> {
@@ -41,20 +47,20 @@ public class FieldConfigService {
 
         if (config.getId() != null) {
             fieldConfigRepository.findById(config.getId()).ifPresent(existing -> {
-                if (!existing.getTenantId().equals(tenantId)) {
+                if (!existing.getTenantId().equals(TenantId.of(tenantId))) {
                     throw new RuntimeException("Unauthorized to update config for another tenant");
                 }
             });
         }
-        config.setTenantId(tenantId);
+        config.setTenantId(TenantId.of(tenantId));
         fieldConfigRepository.save(config);
-        contractService.clearFieldConfigCache();
+        eventPublisher.publishEvent(new FieldConfigChangedEvent(tenantId));
     }
 
     @Transactional
     public void saveConfigs(List<FieldConfig> configs) {
         String tenantId = TenantContext.getCurrentTenant();
-        List<FieldConfig> existingConfigs = fieldConfigRepository.findByTenantId(tenantId);
+        List<FieldConfig> existingConfigs = fieldConfigRepository.findByTenantId(TenantId.of(tenantId));
 
         for (FieldConfig config : configs) {
             FieldConfig existing = null;
@@ -74,10 +80,10 @@ public class FieldConfigService {
                 existing.setRequiredRole(config.getRequiredRole());
                 fieldConfigRepository.save(existing);
             } else {
-                config.setTenantId(tenantId);
+                config.setTenantId(TenantId.of(tenantId));
                 fieldConfigRepository.save(config);
             }
         }
-        contractService.clearFieldConfigCache();
+        eventPublisher.publishEvent(new FieldConfigChangedEvent(tenantId));
     }
 }

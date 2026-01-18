@@ -1,40 +1,38 @@
 package com.contract.master.identity.domain.model;
 
-import jakarta.persistence.*;
-import lombok.Data;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.LocalDateTime;
+import com.contract.master.shared.domain.base.AggregateRoot;
+import com.contract.master.shared.domain.base.BaseDomainEntity;
+import com.contract.master.shared.domain.model.TenantId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
+import java.util.Objects;
 
 @Entity
 @Table(name = "tenant_info")
-@Data
-@EntityListeners(AuditingEntityListener.class)
-public class Tenant {
-    @Id
+public class Tenant extends BaseDomainEntity implements AggregateRoot {
     @Column(name = "tenant_id", length = 64)
     private String tenantId;
 
     @Column(name = "tenant_name", length = 128)
-    private String tenantName;
+    private String name;
 
-    @Column(name = "contact_person", length = 64)
-    private String contactPerson;
+    @Column(name = "status", length = 32)
+    private String status;
 
-    @Column(name = "contact_phone", length = 20)
-    private String contactPhone;
+    public Tenant() {}
 
-    @Enumerated(EnumType.ORDINAL)
-    @Column(name = "status")
-    private com.contract.master.constant.TenantStatus status;
+    public Tenant(String tenantId, String name) {
+        this.tenantId = tenantId;
+        this.name = Objects.requireNonNull(name);
+        this.status = "ACTIVE";
+    }
 
-    @CreatedDate
-    @Column(name = "create_time", updatable = false)
-    private LocalDateTime createTime;
+    public String getTenantId() { return tenantId; }
+    public void setTenantId(String tenantId) { this.tenantId = tenantId; }
 
-    @LastModifiedDate
-    @Column(name = "update_time")
-    private LocalDateTime updateTime;
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

@@ -10,7 +10,7 @@
   - `config` (JSON): Tenant-specific integration settings (API keys, etc.).
   - `status` (Enum): ACTIVE, DISABLED.
 
-### 2. ContractBase (Extends BaseTenantEntity)
+### 2. Contract (Extends BaseTenantEntity)
 - **Description**: Core contract information synchronized from CRM.
 - **Fields**:
   - `contract_id` (String, PK): System-generated unique ID.
@@ -64,7 +64,7 @@
   - `action_type` (Enum): CREATE, UPDATE, DELETE.
 
 ## Relationships
-- One **Tenant** has many **ContractBase** records.
+- One **Tenant** has many **Contract** records.
 - One **Tenant** has many **ContractExtendField** definitions.
-- One **ContractBase** has many **ContractExtendData** records (one per field).
-- One **ContractBase** has many **AuditLog** entries.
+- One **Contract** has many **ContractExtendData** records (one per field).
+- One **Contract** has many **AuditLog** entries.

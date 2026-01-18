@@ -1,22 +1,17 @@
 package com.contract.master.contract.domain.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
 import com.contract.master.shared.domain.model.BaseTenantEntity;
 import com.contract.master.shared.infrastructure.persistence.TenantEntityListener;
 
+import java.util.Objects;
+
 @Entity
 @Table(name = "contract_attachment")
-@Data
-@EqualsAndHashCode(callSuper = true)
 @EntityListeners({AuditingEntityListener.class, TenantEntityListener.class})
 public class ContractAttachment extends BaseTenantEntity {
-    @Id
     @Column(name = "attachment_id", length = 64)
     private String attachmentId;
 
@@ -44,12 +39,89 @@ public class ContractAttachment extends BaseTenantEntity {
     @Column(name = "upload_user", length = 64)
     private String uploadUser;
 
-    @CreatedDate
-    @Column(name = "upload_time", updatable = false)
-    private LocalDateTime uploadTime;
+    public String getAttachmentId() {
+        return attachmentId;
+    }
 
-    public void setAttachmentId(String attachmentId) { this.attachmentId = attachmentId; }
-    public void setContractId(String contractId) { this.contractId = contractId; }
-    public void setAttachmentName(String attachmentName) { this.attachmentName = attachmentName; }
-    public void setStoragePath(String storagePath) { this.storagePath = storagePath; }
+    public void setAttachmentId(String attachmentId) {
+        this.attachmentId = attachmentId;
+    }
+
+    public String getContractId() {
+        return contractId;
+    }
+
+    public void setContractId(String contractId) {
+        this.contractId = contractId;
+    }
+
+    public String getAttachmentName() {
+        return attachmentName;
+    }
+
+    public void setAttachmentName(String attachmentName) {
+        this.attachmentName = attachmentName;
+    }
+
+    public String getAttachmentType() {
+        return attachmentType;
+    }
+
+    public void setAttachmentType(String attachmentType) {
+        this.attachmentType = attachmentType;
+    }
+
+    public String getFileFormat() {
+        return fileFormat;
+    }
+
+    public void setFileFormat(String fileFormat) {
+        this.fileFormat = fileFormat;
+    }
+
+    public Long getFileSize() {
+        return fileSize;
+    }
+
+    public void setFileSize(Long fileSize) {
+        this.fileSize = fileSize;
+    }
+
+    public String getStoragePath() {
+        return storagePath;
+    }
+
+    public void setStoragePath(String storagePath) {
+        this.storagePath = storagePath;
+    }
+
+    public Boolean getIsMain() {
+        return isMain;
+    }
+
+    public void setIsMain(Boolean main) {
+        isMain = main;
+    }
+
+    public String getUploadUser() {
+        return uploadUser;
+    }
+
+    public void setUploadUser(String uploadUser) {
+        this.uploadUser = uploadUser;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        ContractAttachment that = (ContractAttachment) o;
+        return Objects.equals(attachmentId, that.attachmentId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), attachmentId);
+    }
 }

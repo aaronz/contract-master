@@ -3,29 +3,17 @@ package com.contract.master.contract.metadata.domain.model;
 import com.contract.master.shared.domain.model.BaseTenantEntity;
 import com.contract.master.shared.infrastructure.persistence.TenantEntityListener;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import java.util.Objects;
 
 @Entity
 @Table(name = "field_config")
-@Data
-@EqualsAndHashCode(callSuper = true)
 @EntityListeners({TenantEntityListener.class})
 public class FieldConfig extends BaseTenantEntity {
-    @Override
-    public String getTenantId() { return super.getTenantId(); }
-    @Override
-    public void setTenantId(String tenantId) { super.setTenantId(tenantId); }
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    // ID is now inherited from BaseEntity
+    // No need for explicit ID field here
 
     @NotBlank(message = "Config type is required")
     @Column(name = "config_type", length = 32)
@@ -57,23 +45,97 @@ public class FieldConfig extends BaseTenantEntity {
     @Column(name = "api_return")
     private Boolean apiReturn;
 
-    public void setFieldCode(String fieldCode) { this.fieldCode = fieldCode; }
-    public void setConfigType(String configType) { this.configType = configType; }
-    public void setFieldAlias(String fieldAlias) { this.fieldAlias = fieldAlias; }
-    public void setIsVisible(Boolean isVisible) { this.isVisible = isVisible; }
-    public Integer getDisplayOrder() { return displayOrder; }
-    public void setDisplayOrder(Integer displayOrder) { this.displayOrder = displayOrder; }
-    public void setRequiredRole(String requiredRole) { this.requiredRole = requiredRole; }
-    public void setFieldColor(String fieldColor) { this.fieldColor = fieldColor; }
-    public void setFieldStyles(String fieldStyles) { this.fieldStyles = fieldStyles; }
-    public void setApiReturn(Boolean apiReturn) { this.apiReturn = apiReturn; }
+    public String getConfigType() {
+        return configType;
+    }
 
-    public String getConfigType() { return configType; }
-    public String getFieldCode() { return fieldCode; }
-    public String getFieldAlias() { return fieldAlias; }
-    public Boolean getIsVisible() { return isVisible; }
-    public String getRequiredRole() { return requiredRole; }
-    public String getFieldColor() { return fieldColor; }
-    public String getFieldStyles() { return fieldStyles; }
-    public Boolean getApiReturn() { return apiReturn; }
+    public void setConfigType(String configType) {
+        this.configType = configType;
+    }
+
+    public String getFieldCode() {
+        return fieldCode;
+    }
+
+    public void setFieldCode(String fieldCode) {
+        this.fieldCode = fieldCode;
+    }
+
+    public String getFieldAlias() {
+        return fieldAlias;
+    }
+
+    public void setFieldAlias(String fieldAlias) {
+        this.fieldAlias = fieldAlias;
+    }
+
+    public Boolean getIsVisible() {
+        return isVisible;
+    }
+
+    public void setIsVisible(Boolean visible) {
+        isVisible = visible;
+    }
+
+    public Integer getDisplayOrder() {
+        return displayOrder;
+    }
+
+    public void setDisplayOrder(Integer displayOrder) {
+        this.displayOrder = displayOrder;
+    }
+
+    public String getRequiredRole() {
+        return requiredRole;
+    }
+
+    public void setRequiredRole(String requiredRole) {
+        this.requiredRole = requiredRole;
+    }
+
+    public String getFieldColor() {
+        return fieldColor;
+    }
+
+    public void setFieldColor(String fieldColor) {
+        this.fieldColor = fieldColor;
+    }
+
+    public String getFieldStyles() {
+        return fieldStyles;
+    }
+
+    public void setFieldStyles(String fieldStyles) {
+        this.fieldStyles = fieldStyles;
+    }
+
+    public Boolean getApiReturn() {
+        return apiReturn;
+    }
+
+    public void setApiReturn(Boolean apiReturn) {
+        this.apiReturn = apiReturn;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false; // Compare parent class fields, including inherited ID
+        FieldConfig that = (FieldConfig) o;
+        return Objects.equals(configType, that.configType) &&
+               Objects.equals(fieldCode, that.fieldCode) &&
+               Objects.equals(fieldAlias, that.fieldAlias) &&
+               Objects.equals(isVisible, that.isVisible) &&
+               Objects.equals(displayOrder, that.displayOrder) &&
+               Objects.equals(requiredRole, that.requiredRole) &&
+               Objects.equals(fieldColor, that.fieldColor) &&
+               Objects.equals(fieldStyles, that.fieldStyles) &&
+               Objects.equals(apiReturn, that.apiReturn);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), configType, fieldCode, fieldAlias, isVisible, displayOrder, requiredRole, fieldColor, fieldStyles, apiReturn);
+    }
 }

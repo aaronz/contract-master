@@ -2,7 +2,7 @@ package com.contract.master.ai.application;
 
 import com.contract.master.contract.domain.model.ContractAttachment;
 import com.contract.master.contract.domain.repository.ContractAttachmentRepository;
-import com.contract.master.dto.ContractDTO;
+import com.contract.master.contract.dto.ContractDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

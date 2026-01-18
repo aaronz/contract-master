@@ -2,20 +2,16 @@ package com.contract.master.identity.domain.model;
 
 import com.contract.master.shared.domain.model.BaseTenantEntity;
 import jakarta.persistence.*;
-import lombok.Data;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Table(name = "role_permission_rel")
-@Data
 @EntityListeners(AuditingEntityListener.class)
 public class RolePermissionRel extends BaseTenantEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    // ID is now inherited from BaseEntity
+    // No need for explicit ID field here
 
     @Column(name = "role_id", length = 64)
     private String roleId;
@@ -26,12 +22,43 @@ public class RolePermissionRel extends BaseTenantEntity {
     @Column(name = "data_scope", length = 32)
     private String dataScope;
 
-    @CreatedDate
-    @Column(name = "create_time", updatable = false)
-    private LocalDateTime createTime;
+    public String getRoleId() {
+        return roleId;
+    }
+
+    public void setRoleId(String roleId) {
+        this.roleId = roleId;
+    }
+
+    public String getPermId() {
+        return permId;
+    }
+
+    public void setPermId(String permId) {
+        this.permId = permId;
+    }
+
+    public String getDataScope() {
+        return dataScope;
+    }
+
+    public void setDataScope(String dataScope) {
+        this.dataScope = dataScope;
+    }
 
     @Override
-    public String getTenantId() { return super.getTenantId(); }
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false; // Compare parent class fields, including inherited ID
+        RolePermissionRel that = (RolePermissionRel) o;
+        return Objects.equals(roleId, that.roleId) &&
+               Objects.equals(permId, that.permId) &&
+               Objects.equals(dataScope, that.dataScope);
+    }
+
     @Override
-    public void setTenantId(String tenantId) { super.setTenantId(tenantId); }
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), roleId, permId, dataScope);
+    }
 }

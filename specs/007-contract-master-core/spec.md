@@ -72,7 +72,7 @@ As a tenant administrator, I want to define custom fields and configure which fi
 ### Key Entities
 
 - **Tenant**: Represents a logical organization with isolated data and configuration.
-- **ContractBase**: Stores core contract fields synchronized from CRM.
+- **Contract**: Stores core contract fields synchronized from CRM.
 - **ContractExtendField**: Definition of custom fields per tenant.
 - **ContractExtendData**: Values for custom fields linked to a contract.
 - **RuleConfig**: Tenant-specific validation rules.

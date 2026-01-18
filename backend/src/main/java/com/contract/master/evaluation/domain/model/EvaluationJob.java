@@ -3,13 +3,14 @@ package com.contract.master.evaluation.domain.model;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+import com.contract.master.shared.domain.base.BaseDomainEntity;
+
 @Entity
 @Table(name = "evaluation_jobs")
-public class EvaluationJob {
+public class EvaluationJob extends BaseDomainEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    @Column(name = "job_id", unique = true)
+    private String jobId;
 
     @Column(name = "tenant_id", nullable = false)
     private String tenantId;
@@ -37,8 +38,14 @@ public class EvaluationJob {
     @Column(name = "target_contracts", length = 4096)
     private String targetContracts;
 
-    // Constructors
-    public EvaluationJob() {
+    public EvaluationJob() {}
+
+    public EvaluationJob(String tenantId, TriggerType triggerType, String triggeredBy) {
+        this.tenantId = tenantId;
+        this.status = JobStatus.PENDING;
+        this.triggerType = triggerType;
+        this.createdAt = LocalDateTime.now();
+        this.triggeredBy = triggeredBy;
     }
 
     public EvaluationJob(String tenantId, JobStatus status, TriggerType triggerType, LocalDateTime createdAt, String triggeredBy) {
@@ -49,85 +56,43 @@ public class EvaluationJob {
         this.triggeredBy = triggeredBy;
     }
 
-    // Getters and Setters
-    public String getTargetRules() {
-        return targetRules;
+    public void start() {
+        if (this.status != JobStatus.PENDING) {
+            throw new IllegalStateException("Only pending jobs can be started");
+        }
+        this.status = JobStatus.IN_PROGRESS;
     }
 
-    public void setTargetRules(String targetRules) {
-        this.targetRules = targetRules;
+    public void complete() {
+        this.status = JobStatus.COMPLETED;
+        this.completedAt = LocalDateTime.now();
     }
 
-    public String getTargetContracts() {
-        return targetContracts;
+    public void fail() {
+        this.status = JobStatus.FAILED;
+        this.completedAt = LocalDateTime.now();
     }
 
-    public void setTargetContracts(String targetContracts) {
-        this.targetContracts = targetContracts;
-    }
+    public String getJobId() { return jobId; }
+    public void setJobId(String jobId) { this.jobId = jobId; }
+    public String getTenantId() { return tenantId; }
+    public JobStatus getStatus() { return status; }
+    public void setStatus(JobStatus status) { this.status = status; }
+    public TriggerType getTriggerType() { return triggerType; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public LocalDateTime getCompletedAt() { return completedAt; }
+    public void setCompletedAt(LocalDateTime completedAt) { this.completedAt = completedAt; }
+    public String getTriggeredBy() { return triggeredBy; }
+    public String getTargetRules() { return targetRules; }
+    public void setTargetRules(String targetRules) { this.targetRules = targetRules; }
+    public String getTargetContracts() { return targetContracts; }
+    public void setTargetContracts(String targetContracts) { this.targetContracts = targetContracts; }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getTenantId() {
-        return tenantId;
-    }
-
-    public void setTenantId(String tenantId) {
-        this.tenantId = tenantId;
-    }
-
-    public JobStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(JobStatus status) {
-        this.status = status;
-    }
-
-    public TriggerType getTriggerType() {
-        return triggerType;
-    }
-
-    public void setTriggerType(TriggerType triggerType) {
-        this.triggerType = triggerType;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getCompletedAt() {
-        return completedAt;
-    }
-
-    public void setCompletedAt(LocalDateTime completedAt) {
-        this.completedAt = completedAt;
-    }
-
-    public String getTriggeredBy() {
-        return triggeredBy;
-    }
-
-    public void setTriggeredBy(String triggeredBy) {
-        this.triggeredBy = triggeredBy;
-    }
-
-    // Enums
     public enum JobStatus {
         PENDING, IN_PROGRESS, COMPLETED, FAILED
     }
 
     public enum TriggerType {
-        MANUAL, AUTOMATIC
+        MANUAL, SCHEDULED, API
     }
 }

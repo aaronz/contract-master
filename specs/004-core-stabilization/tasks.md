@@ -22,7 +22,7 @@
 **Purpose**: Support structured validation and verification states.
 
 - [x] T006 Add `READY_TO_PUBLISH`, `PUBLISHING`, `PUBLISHED` to `ContractStatus` enum in `backend/src/main/java/com/contract/master/constant/`
-- [x] T007 Add `validation_results` JSONB column to `ContractBase` entity in `backend/src/main/java/com/contract/master/domain/`
+- [x] T007 Add `validation_results` JSONB column to `Contract` entity in `backend/src/main/java/com/contract/master/domain/`
 - [x] T008 [US2] Implement `/api/v1/contracts/{id}/verify` endpoint in `backend/src/main/java/com/contract/master/api/ContractController.java`
 - [x] T009 [US2] Update `ContractService` to handle `VERIFIED` state transitions and `fill_type` updates
 

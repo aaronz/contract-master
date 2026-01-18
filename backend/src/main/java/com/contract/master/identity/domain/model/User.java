@@ -1,25 +1,26 @@
 package com.contract.master.identity.domain.model;
 
-import com.contract.master.shared.domain.model.BaseTenantEntity;
-
+import com.contract.master.shared.domain.base.BaseDomainEntity;
+import com.contract.master.shared.domain.model.TenantId;
 import jakarta.persistence.*;
-import lombok.Data;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Objects;
 
 @Entity
 @Table(name = "user_info")
-@Data
-@EntityListeners(AuditingEntityListener.class)
-public class User extends BaseTenantEntity {
-    @Id
+public class User extends BaseDomainEntity implements UserDetails {
+
     @Column(name = "user_id", length = 64)
     private String userId;
 
-    @Column(name = "user_name", length = 64, unique = true)
+    @Embedded
+    private TenantId tenantId;
+
+    @Column(name = "user_name", length = 64)
     private String userName;
 
     @Column(name = "password", length = 128)
@@ -28,31 +29,48 @@ public class User extends BaseTenantEntity {
     @Column(name = "real_name", length = 64)
     private String realName;
 
-    @Column(name = "email", length = 128)
-    private String email;
-
-    @Column(name = "user_type", length = 32)
-    private String userType;
-
     @Column(name = "status")
     private Integer status;
 
-    @CreatedDate
-    @Column(name = "create_time", updatable = false)
-    private LocalDateTime createTime;
+    public User() {
+        
+    }
 
-    @LastModifiedDate
-    @Column(name = "update_time")
-    private LocalDateTime updateTime;
-
-    public String getUserName() { return userName; }
-    public void setUserName(String userName) { this.userName = userName; }
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
     public String getUserId() { return userId; }
     public void setUserId(String userId) { this.userId = userId; }
+
+    public TenantId getTenantId() { return tenantId; }
+    public void setTenantId(TenantId tenantId) { this.tenantId = tenantId; }
+
+    @Override
+    public String getUsername() { return userName; }
+    public String getUserName() { return userName; }
+    public void setUserName(String userName) { this.userName = userName; }
+
+    @Override
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+
     public String getRealName() { return realName; }
     public void setRealName(String realName) { this.realName = realName; }
+
     public Integer getStatus() { return status; }
     public void setStatus(Integer status) { this.status = status; }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public boolean isAccountNonExpired() { return true; }
+
+    @Override
+    public boolean isAccountNonLocked() { return true; }
+
+    @Override
+    public boolean isCredentialsNonExpired() { return true; }
+
+    @Override
+    public boolean isEnabled() { return status != null && status == 1; }
 }

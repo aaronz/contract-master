@@ -6,7 +6,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import com.contract.master.shared.domain.model.TenantId;
+
 @Repository
 public interface FieldConfigRepository extends JpaRepository<FieldConfig, Long> {
-    List<FieldConfig> findByTenantId(String tenantId);
+    List<FieldConfig> findByTenantId(TenantId tenantId);
 }

@@ -26,6 +26,7 @@ public class NotificationService {
     public void resolveIssue(Long id) {
         notificationRepository.findById(id).ifPresent(n -> {
             n.setIsRead(true);
+            n.setStatus("RESOLVED");
             notificationRepository.save(n);
             auditService.logChange(id.toString(), "notification", "OPEN", "RESOLVED", "MANUAL", "admin");
         });

@@ -62,7 +62,7 @@ As a compliance auditor, I want to verify that the audit logs capture field-leve
 
 **Acceptance Scenarios**:
 
-1. **Given** an update to `ContractBase` or `ContractExtendData`, **When** the change is persisted, **Then** the `AuditLog` MUST include a JSON detail of the fields changed.
+1. **Given** an update to `Contract` or `ContractExtendData`, **When** the change is persisted, **Then** the `AuditLog` MUST include a JSON detail of the fields changed.
 
 ---
 

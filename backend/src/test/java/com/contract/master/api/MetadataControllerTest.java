@@ -1,4 +1,5 @@
 package com.contract.master.api;
+import com.contract.master.shared.domain.model.TenantId;
 
 import com.contract.master.contract.metadata.application.MetadataService;
 import org.junit.jupiter.api.Test;

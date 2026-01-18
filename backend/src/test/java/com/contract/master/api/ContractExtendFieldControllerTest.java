@@ -1,7 +1,9 @@
 package com.contract.master.api;
+import com.contract.master.shared.domain.model.TenantId;
 
 import com.contract.master.contract.domain.model.ContractExtendField;
 import com.contract.master.contract.domain.repository.ContractExtendFieldRepository;
+import com.contract.master.shared.domain.model.TenantId;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -57,7 +59,7 @@ public class ContractExtendFieldControllerTest {
         field.setFieldCode("private");
         field.setFieldName("Private");
         field.setFieldType("TEXT");
-        field.setTenantId("tenant_a");
+        field.setTenantId(TenantId.of("tenant_a"));
         repository.save(field);
 
         mockMvc.perform(delete("/api/settings/extend-fields/f-100")

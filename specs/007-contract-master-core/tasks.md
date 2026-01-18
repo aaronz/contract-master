@@ -35,7 +35,7 @@
 
 ### Implementation for User Story 1
 
-- [x] T011 [P] [US1] Create `ContractBase` entity and repository in backend/src/main/java/com/contract/master/domain/
+- [x] T011 [P] [US1] Create `Contract` entity and repository in backend/src/main/java/com/contract/master/domain/
 - [x] T012 [US1] Implement `WebHookSignatureFilter` for CRM signature verification in backend/src/main/java/com/contract/master/integration/
 - [x] T013 [US1] Implement `CrmIntegrationService` for data mapping and persistence in backend/src/main/java/com/contract/master/service/
 - [x] T014 [US1] Create `WebHookController` for Salesforce, HubSpot, and DingTalk endpoints in backend/src/main/java/com/contract/master/api/

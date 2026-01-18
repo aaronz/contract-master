@@ -78,6 +78,6 @@ frontend/
 **Structure Decision**: Standard Spring Boot + Vue 3 layout.
 
 ## Phase 0: Research Findings
-- **Metadata**: Unified service merging `ContractBase` reflection and `ContractExtendField` DB records.
+- **Metadata**: Unified service merging `Contract` reflection and `ContractExtendField` DB records.
 - **Rules**: Add `rule_type` column to `rule_config` table.
 - **Integration**: Ensure API key is returned in response only upon creation (security best practice).

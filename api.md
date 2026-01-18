@@ -1,5 +1,18 @@
 # Global API Registry
 
+## Implementation Mapping (Domain-Centric)
+
+| Domain | Controller Package | Responsibilities |
+|--------|--------------------|------------------|
+| Identity | `com.contract.master.identity.interfaces.rest` | Auth, User & Tenant Management |
+| Contract | `com.contract.master.contract.interfaces.rest` | Contract Lifecycle, Metadata, Import/Publish |
+| Integration | `com.contract.master.integration.interfaces.rest` | WebHooks, External Sync, Mappings |
+| Dashboard | `com.contract.master.dashboard.interfaces.rest` | Stats & Analytics |
+| Notification | `com.contract.master.notification.interfaces.rest` | Alerts & Messages |
+| Evaluation | `com.contract.master.evaluation.interfaces.rest` | Rule Engine & Evaluation Jobs |
+
+## Endpoints
+
 | Endpoint | Method | Description | Version |
 |----------|--------|-------------|---------|
 | `/api/auth/login` | POST | User login and authentication | 1.0.0 |

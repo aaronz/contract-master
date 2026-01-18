@@ -8,5 +8,9 @@ public enum ContractStatus {
     PUBLISHING,
     PUBLISHED,
     RISK_FLAGGED,
-    MANDATORY_GATE_VIOLATION
+    MANDATORY_GATE_VIOLATION,
+    DRAFT,
+    SIGNED,
+    ACTIVE,
+    TERMINATED
 }

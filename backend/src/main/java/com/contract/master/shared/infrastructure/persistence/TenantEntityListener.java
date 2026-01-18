@@ -5,6 +5,7 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import org.springframework.stereotype.Component;
 import com.contract.master.shared.domain.model.TenantAware;
+import com.contract.master.shared.domain.model.TenantId;
 
 @Component
 public class TenantEntityListener {
@@ -15,7 +16,7 @@ public class TenantEntityListener {
         if (entity instanceof TenantAware tenantAware) {
             String tenantId = TenantContext.getCurrentTenant();
             if (tenantId != null) {
-                tenantAware.setTenantId(tenantId);
+                tenantAware.setTenantId(TenantId.of(tenantId));
             }
         }
     }

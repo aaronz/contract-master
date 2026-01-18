@@ -5,6 +5,7 @@ import com.contract.master.audit.domain.repository.AuditLogRepository;
 import com.contract.master.security.TenantContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.contract.master.shared.domain.model.TenantId;
 
 import java.util.List;
 @Service
@@ -29,7 +30,7 @@ public class AuditService {
         log.setNewValue(newVal);
         log.setModifyType(type);
         log.setModifyUser(user);
-        log.setTenantId(TenantContext.getCurrentTenant()); // Ensure tenantId is set
+        log.setTenantId(TenantId.of(TenantContext.getCurrentTenant())); // Ensure tenantId is set
         auditLogRepository.save(log);
     }
 
@@ -40,7 +41,7 @@ public class AuditService {
         log.setNewValue("Rules: " + ruleIds); // Details about the re-evaluation
         log.setModifyType(RE_EVALUATION_TRIGGERED);
         log.setModifyUser(user);
-        log.setTenantId(TenantContext.getCurrentTenant()); // Ensure tenantId is set
+        log.setTenantId(TenantId.of(TenantContext.getCurrentTenant())); // Ensure tenantId is set
         auditLogRepository.save(log);
     }
 

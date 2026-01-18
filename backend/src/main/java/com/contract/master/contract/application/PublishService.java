@@ -1,6 +1,6 @@
 package com.contract.master.contract.application;
 
-import com.contract.master.dto.ContractDTO;
+import com.contract.master.contract.dto.ContractDTO;
 import com.contract.master.integration.domain.model.DownstreamSystem;
 import com.contract.master.integration.domain.repository.DownstreamSystemRepository;
 import org.springframework.beans.factory.annotation.Autowired;

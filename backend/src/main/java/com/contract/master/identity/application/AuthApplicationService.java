@@ -1,7 +1,7 @@
 package com.contract.master.identity.application;
 
-import com.contract.master.dto.AuthResponse;
-import com.contract.master.dto.LoginRequest;
+import com.contract.master.identity.dto.AuthResponse;
+import com.contract.master.identity.dto.LoginRequest;
 import com.contract.master.security.JwtTokenProvider;
 import com.contract.master.security.TenantContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ public class AuthApplicationService {
                     new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
             );
             String token = jwtTokenProvider.generateToken(authentication);
-            return AuthResponse.builder().token(token).build();
+            return new AuthResponse(token);
         } finally {
             TenantContext.clear();
         }

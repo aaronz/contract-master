@@ -1,8 +1,11 @@
 package com.contract.master;
+import com.contract.master.shared.domain.model.TenantId;
 
-import com.contract.master.contract.domain.model.ContractBase;
-import com.contract.master.contract.domain.repository.ContractBaseRepository;
+import com.contract.master.contract.domain.model.ContractId;
+import com.contract.master.contract.domain.model.Contract;
+import com.contract.master.contract.domain.repository.ContractRepository;
 import com.contract.master.security.TenantContext;
+import com.contract.master.shared.domain.model.TenantId;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -23,7 +26,7 @@ public class BackendStabilizationTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private ContractBaseRepository contractBaseRepository;
+    private ContractRepository contractRepository;
 
     @Test
     void testTenantIsolationAtApiLevel() throws Exception {
@@ -35,12 +38,13 @@ public class BackendStabilizationTest {
 
     @Test
     void testContractVerificationLogic() throws Exception {
-        ContractBase contract = new ContractBase();
-        contract.setContractId("TEST-VERIFY-1");
-        contract.setTenantId("tenant-1");
-        contractBaseRepository.save(contract);
+        String contractIdStr = "550e8400-e29b-41d4-a716-446655440001";
+        Contract contract = new Contract();
+        contract.setContractId(ContractId.of(contractIdStr));
+        contract.setTenantId(TenantId.of("tenant-1"));
+        contractRepository.save(contract);
 
-        mockMvc.perform(post("/api/contracts/TEST-VERIFY-1/verify")
+        mockMvc.perform(post("/api/contracts/" + contractIdStr + "/verify")
                 .header("X-Tenant-ID", "tenant-1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"verified\": true}"))

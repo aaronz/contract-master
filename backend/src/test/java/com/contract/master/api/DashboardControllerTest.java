@@ -1,6 +1,7 @@
 package com.contract.master.api;
+import com.contract.master.shared.domain.model.TenantId;
 
-import com.contract.master.dto.DashboardStatsDTO;
+import com.contract.master.dashboard.dto.DashboardStatsDTO;
 import com.contract.master.dashboard.application.DashboardService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

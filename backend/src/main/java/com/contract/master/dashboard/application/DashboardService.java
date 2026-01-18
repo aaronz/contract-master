@@ -1,7 +1,8 @@
 package com.contract.master.dashboard.application;
 
-import com.contract.master.contract.domain.repository.ContractBaseRepository;
-import com.contract.master.dto.DashboardStatsDTO;
+import com.contract.master.shared.domain.model.TenantId;
+import com.contract.master.contract.domain.repository.ContractRepository;
+import com.contract.master.dashboard.dto.DashboardStatsDTO;
 import com.contract.master.security.TenantContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,17 +16,17 @@ import java.util.List;
 public class DashboardService {
 
     @Autowired
-    private ContractBaseRepository contractBaseRepository;
+    private ContractRepository contractRepository;
 
     public DashboardStatsDTO getStats() {
-        String tenantId = TenantContext.getCurrentTenant();
+        TenantId tenantId = TenantId.of(TenantContext.getCurrentTenant());
         DashboardStatsDTO stats = new DashboardStatsDTO();
         
-        stats.setTotalContracts(contractBaseRepository.countByTenantId(tenantId));
-        stats.setPendingApprovals(contractBaseRepository.countPendingApprovalsByTenantId(tenantId));
-        BigDecimal activeValue = contractBaseRepository.sumActiveValueByTenantId(tenantId);
+        stats.setTotalContracts(contractRepository.countByTenantId(tenantId));
+        stats.setPendingApprovals(contractRepository.countPendingApprovalsByTenantId(tenantId));
+        BigDecimal activeValue = contractRepository.sumActiveValueByTenantId(tenantId);
         stats.setActiveValue(activeValue != null ? activeValue : BigDecimal.ZERO);
-        stats.setRiskAlerts(contractBaseRepository.countRiskAlertsByTenantId(tenantId));
+        stats.setRiskAlerts(contractRepository.countRiskAlertsByTenantId(tenantId));
 
         List<DashboardStatsDTO.DailyCountDTO> trend = new ArrayList<>();
         trend.add(new DashboardStatsDTO.DailyCountDTO("Mon", 10L));

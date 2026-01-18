@@ -1,11 +1,13 @@
 package com.contract.master.contract.metadata.application;
+import com.contract.master.shared.domain.model.TenantId;
 
 import com.contract.master.contract.domain.model.ContractExtendField;
 import com.contract.master.contract.domain.repository.ContractExtendFieldRepository;
 import com.contract.master.contract.metadata.domain.model.FieldConfig;
 import com.contract.master.contract.metadata.domain.repository.FieldConfigRepository;
-import com.contract.master.dto.FieldMetadataDTO;
+import com.contract.master.contract.metadata.dto.FieldMetadataDTO;
 import com.contract.master.security.TenantContext;
+import com.contract.master.shared.domain.model.TenantId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +56,7 @@ public class FieldMetadataIntegrationTest {
         config.setFieldCode("contract_no"); // Corrected to snake_case
         config.setFieldAlias("Custom Contract No");
         config.setIsVisible(false);
-        config.setTenantId("test-tenant");
+        config.setTenantId(TenantId.of("test-tenant"));
         config.setConfigType("CONTRACT"); // Add configType
         fieldConfigRepository.save(config);
 
@@ -63,7 +65,7 @@ public class FieldMetadataIntegrationTest {
         extendField.setFieldCode("project_code");
         extendField.setFieldName("Project Code");
         extendField.setFieldType("TEXT");
-        extendField.setTenantId("test-tenant");
+        extendField.setTenantId(TenantId.of("test-tenant"));
         extendFieldRepository.save(extendField);
 
         List<FieldMetadataDTO> fields = metadataService.getContractFields();

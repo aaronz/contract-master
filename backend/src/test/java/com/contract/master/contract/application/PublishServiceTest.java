@@ -1,8 +1,9 @@
 package com.contract.master.contract.application;
+import com.contract.master.shared.domain.model.TenantId;
 
 import com.contract.master.integration.domain.model.DownstreamSystem;
 import com.contract.master.integration.domain.repository.DownstreamSystemRepository;
-import com.contract.master.dto.ContractDTO;
+import com.contract.master.contract.dto.ContractDTO;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

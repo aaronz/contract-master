@@ -2,6 +2,7 @@ package com.contract.master.security;
 
 import com.contract.master.shared.domain.model.DataPermissionRule;
 import com.contract.master.shared.domain.repository.DataPermissionRuleRepository;
+import com.contract.master.shared.domain.model.TenantId;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.contract.master.contract.domain.repository.ContractBaseRepository;
 
 @Aspect
 @Component
@@ -29,14 +29,14 @@ public class DataScopeAspect {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Pointcut("execution(* com.contract.master.contract.domain.model.ContractBaseRepository..*(..))")
+    @Pointcut("execution(* com.contract.master.contract.domain.repository.ContractRepository..*(..))")
     public void contractRepositoryMethods() {}
 
     @Before("contractRepositoryMethods()")
     public void applyDataScope() {
-        String tenantId = TenantContext.getCurrentTenant();
-        if (tenantId != null) {
-            List<DataPermissionRule> rules = ruleRepository.findByTenantIdAndIsEnabled(tenantId, true);
+        String tenantIdStr = TenantContext.getCurrentTenant();
+        if (tenantIdStr != null) {
+            List<DataPermissionRule> rules = ruleRepository.findByTenantIdAndIsEnabled(TenantId.of(tenantIdStr), true);
             Session session = entityManager.unwrap(Session.class);
             
             for (DataPermissionRule rule : rules) {

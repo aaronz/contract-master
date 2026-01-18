@@ -21,7 +21,7 @@
 - **Findings**:
   - `DroolsRuleEngine.java` has a basic large-amount check.
   - **Gap**: The rule engine results are stored in a `remark` field instead of a structured `validation_results` JSON column, making multi-rule violation displays difficult.
-  - **Decision**: Propose adding a structured `validation_results` field to `ContractBase`.
+  - **Decision**: Propose adding a structured `validation_results` field to `Contract`.
 
 ### 4. Field-Level Audit Diffing
 - **Context**: Capturing "Old" and "New" values for every change.

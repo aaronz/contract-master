@@ -1,7 +1,9 @@
 package com.contract.master.api;
+import com.contract.master.shared.domain.model.TenantId;
 
-import com.contract.master.evaluation.domain.model.RuleConfig;
+import com.contract.master.rule.domain.model.RuleConfig;
 import com.contract.master.evaluation.domain.repository.RuleConfigRepository;
+import com.contract.master.shared.domain.model.TenantId;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -30,7 +32,7 @@ public class RuleEngineControllerTest {
         RuleConfig rule = new RuleConfig();
         rule.setRuleId("test-rule-1");
         rule.setRuleName("Test Rule");
-        rule.setTenantId("tenant-1");
+        rule.setTenantId(TenantId.of("tenant-1"));
         rule.setIsEnabled(true);
         ruleRepository.save(rule);
 

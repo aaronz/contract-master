@@ -3,20 +3,15 @@ package com.contract.master.identity.domain.model;
 import com.contract.master.shared.domain.model.BaseTenantEntity;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Table(name = "role_info")
-@Data
 @EntityListeners(AuditingEntityListener.class)
 public class Role extends BaseTenantEntity {
-    @Id
-    @Column(name = "role_id", length = 64)
+    @Column(name = "role_id", length = 64) // roleId is now a regular field
     private String roleId;
 
     @Column(name = "role_name", length = 64)
@@ -28,16 +23,52 @@ public class Role extends BaseTenantEntity {
     @Column(name = "status")
     private Integer status;
 
-    @CreatedDate
-    @Column(name = "create_time", updatable = false)
-    private LocalDateTime createTime;
+    public String getRoleId() {
+        return roleId;
+    }
 
-    @LastModifiedDate
-    @Column(name = "update_time")
-    private LocalDateTime updateTime;
+    public void setRoleId(String roleId) {
+        this.roleId = roleId;
+    }
+
+    public String getRoleName() {
+        return roleName;
+    }
+
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
+    }
+
+    public String getRoleType() {
+        return roleType;
+    }
+
+    public void setRoleType(String roleType) {
+        this.roleType = roleType;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
 
     @Override
-    public String getTenantId() { return super.getTenantId(); }
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false; // Compare parent class fields, including inherited ID
+        Role role = (Role) o;
+        return Objects.equals(roleId, role.roleId) &&
+               Objects.equals(roleName, role.roleName) &&
+               Objects.equals(roleType, role.roleType) &&
+               Objects.equals(status, role.status);
+    }
+
     @Override
-    public void setTenantId(String tenantId) { super.setTenantId(tenantId); }
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), roleId, roleName, roleType, status);
+    }
 }

@@ -19,7 +19,7 @@
 ### Metadata API (Refined)
 `GET /api/metadata/fields`
 - Returns list of `ContractMetadata` objects.
-- Merges `ContractBase` reflection with `ContractExtendField` records.
+- Merges `Contract` reflection with `ContractExtendField` records.
 
 ### Rule Configuration API
 `POST /api/rules`

@@ -1,9 +1,10 @@
 package com.contract.master.problemcenter.api;
 
 import com.contract.master.evaluation.domain.model.EvaluationJob;
-import com.contract.master.evaluation.domain.model.EvaluationResult; // Import EvaluationResult
+import com.contract.master.evaluation.domain.model.EvaluationResult;
 import com.contract.master.evaluation.domain.repository.EvaluationJobRepository;
-import com.contract.master.evaluation.domain.repository.EvaluationResultRepository; // Import EvaluationResultRepository
+import com.contract.master.evaluation.domain.repository.EvaluationResultRepository;
+import com.contract.master.shared.domain.model.TenantId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,7 +19,7 @@ import java.util.List;
 public class ProblemCenterController {
 
     private final EvaluationJobRepository evaluationJobRepository;
-    private final EvaluationResultRepository evaluationResultRepository; // Inject EvaluationResultRepository
+    private final EvaluationResultRepository evaluationResultRepository;
 
     public ProblemCenterController(EvaluationJobRepository evaluationJobRepository, EvaluationResultRepository evaluationResultRepository) {
         this.evaluationJobRepository = evaluationJobRepository;
@@ -34,8 +35,7 @@ public class ProblemCenterController {
             throw new IllegalArgumentException("Page size must not be less than one");
         }
 
-        // Placeholder for tenantId, to be fetched from security context
-        String tenantId = "default-tenant"; // Replace with actual tenant ID from security context
+        TenantId tenantId = TenantId.of("default-tenant"); 
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<EvaluationJob> evaluationJobs = evaluationJobRepository.findByTenantId(tenantId, pageable);
@@ -46,8 +46,7 @@ public class ProblemCenterController {
     @GetMapping("/evaluation-jobs/{jobId}/results")
     public ResponseEntity<List<EvaluationResult>> getEvaluationResults(
             @PathVariable String jobId) {
-        // Placeholder for tenantId, to be fetched from security context
-        String tenantId = "default-tenant"; // Replace with actual tenant ID from security context
+        TenantId tenantId = TenantId.of("default-tenant");
 
         List<EvaluationResult> results = evaluationResultRepository.findByJobIdAndTenantId(jobId, tenantId);
         return ResponseEntity.ok(results);

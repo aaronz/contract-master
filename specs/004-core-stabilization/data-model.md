@@ -7,7 +7,7 @@
 - **Structure**: `{ "field_name": { "old": "X", "new": "Y" } }`
 - **Rationale**: Support granular history reconstruction.
 
-### 2. ContractBase (Lifecycle Support)
+### 2. Contract (Lifecycle Support)
 - **New Field**: `validation_results` (JSONB)
 - **Structure**: `[{ "rule_id": "R001", "level": "SEVERE", "message": "..." }]`
 - **New Statuses**: `READY_TO_PUBLISH`, `PUBLISHING`, `PUBLISHED`.

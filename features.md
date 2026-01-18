@@ -13,3 +13,5 @@
 | 010 | Multi-tenant Isolation | Strict data and configuration isolation across different organizations. | Live |
 | 011 | Immutable Audit Logging | Comprehensive tracking of modifications to all contract fields for compliance. | Live |
 | 012 | Operational Dashboards | Real-time monitoring of processing health and integration sync status. | Live |
+| 001-backend-ddd-refactor | Backend DDD Refactor | Refactored backend architecture using DDD principles for improved maintainability. | Live |
+| 013-ddd-domain-restructure | DDD Domain Restructure | Standardized domain-centric directory structure and resolved circular dependencies. | Active |
