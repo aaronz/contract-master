@@ -74,12 +74,12 @@ const handleContractChange = async (val) => {
 
 const loadContracts = async () => {
   try {
-    const response = await contractApi.getContracts()
-    const contractList = Array.isArray(response.data) ? response.data : response.data.content;
+    const response = await contractApi.getContracts();
+    const contractList = response && response.data ? (Array.isArray(response.data) ? response.data : response.data.content) : [];
     contracts.value = contractList.map(c => ({
       value: c.contractId,
       label: c.contractNo
-    }))
+    }));
   } catch (error) {
     console.error('Failed to load contracts', error)
   }
