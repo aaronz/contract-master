@@ -75,7 +75,10 @@ const handleContractChange = async (val) => {
 const loadContracts = async () => {
   try {
     const response = await contractApi.getContracts();
-    const contractList = response && response.data ? (Array.isArray(response.data) ? response.data : response.data.content) : [];
+    let contractList = response && response.data ? (Array.isArray(response.data) ? response.data : response.data.content) : [];
+    if (!contractList) {
+      contractList = [];
+    }
     contracts.value = contractList.map(c => ({
       value: c.contractId,
       label: c.contractNo
