@@ -10,6 +10,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
+
 @Service
 public class AuthApplicationService {
 
@@ -29,6 +33,8 @@ public class AuthApplicationService {
             );
             String token = jwtTokenProvider.generateToken(authentication);
             return new AuthResponse(token);
+        } catch (BadCredentialsException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid username or password");
         } finally {
             TenantContext.clear();
         }
