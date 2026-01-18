@@ -154,7 +154,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { Plus, Delete, Warning, InfoFilled, Bell, Edit } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import evaluationApi from '../../services/evaluationApi'
