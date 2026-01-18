@@ -112,20 +112,41 @@ const emit = defineEmits(['update:modelValue', 'save', 'cancel'])
 
 const localConfig = reactive({
   ...props.modelValue,
-  conditions: typeof props.modelValue.conditions === 'string' 
-    ? JSON.parse(props.modelValue.conditions || '{"type":"group","operator":"AND","children":[]}')
-    : (props.modelValue.conditions || { type: 'group', operator: 'AND', children: [] })
+  // Initialize conditions from logicContent if in LOGIC mode
+  conditions: (props.modelValue.ruleType === 'LOGIC' && props.modelValue.logicContent)
+    ? tryParseJSON(props.modelValue.logicContent)
+    : { type: 'group', operator: 'AND', children: [] }
 })
 
+function tryParseJSON(str) {
+  try {
+    return JSON.parse(str)
+  } catch (e) {
+    return { type: 'group', operator: 'AND', children: [] }
+  }
+}
+
 watch(() => props.modelValue, (newVal) => {
-  const parsedConditions = typeof newVal.conditions === 'string'
-    ? JSON.parse(newVal.conditions || '{"type":"group","operator":"AND","children":[]}')
-    : (newVal.conditions || { type: 'group', operator: 'AND', children: [] })
-    
+  const isLogic = newVal.ruleType === 'LOGIC'
+  
   Object.assign(localConfig, {
     ...newVal,
-    conditions: parsedConditions
+    conditions: (isLogic && newVal.logicContent)
+      ? tryParseJSON(newVal.logicContent)
+      : { type: 'group', operator: 'AND', children: [] }
   })
+}, { deep: true })
+
+watch(localConfig, (newVal) => {
+  // Sync back to logicContent field for parent
+  const updatedValue = { ...newVal }
+  
+  if (newVal.ruleType === 'LOGIC') {
+    updatedValue.logicContent = JSON.stringify(newVal.conditions)
+  }
+  // For GROOVY/REGEX, logicContent is bound directly in template
+  
+  emit('update:modelValue', updatedValue)
 }, { deep: true })
 
 watch(localConfig, (newVal) => {
