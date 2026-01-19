@@ -84,7 +84,7 @@
       <div class="chart-card glass-card">
         <div class="card-header">
           <span>{{ $t('dashboard.riskRadar') }}</span>
-          <el-button link type="primary">View Details</el-button>
+          <el-button link type="primary" @click="router.push('/compliance/problems')">{{ $t('common.details') }}</el-button>
         </div>
         <div ref="radarChartRef" class="chart-container"></div>
       </div>
@@ -125,7 +125,7 @@
       <div class="list-card glass-card">
         <div class="card-header">
           <span>{{ $t('dashboard.myTasks') }}</span>
-          <el-button type="primary" link>View All</el-button>
+          <el-button type="primary" link @click="router.push('/contracts')">{{ $t('common.all') }}</el-button>
         </div>
         <div class="task-list">
           <div v-for="task in myTasks" :key="task.id" class="task-item">
