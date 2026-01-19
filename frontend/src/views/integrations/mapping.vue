@@ -15,7 +15,7 @@
         <el-table-column prop="transformation" :label="$t('common.transformation')" />
         <el-table-column :label="$t('common.status')" width="120">
           <template #default="{ row }">
-            <el-tag :type="row.enabled ? 'success' : 'info'">{{ row.enabled ? 'Active' : 'Disabled' }}</el-tag>
+            <el-tag :type="row.enabled ? 'success' : 'info'">{{ row.enabled ? $t('contract.enums.status.active') : $t('common.hide') }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column :label="$t('common.actions')" width="150">
@@ -30,7 +30,7 @@
     <el-dialog v-model="dialogVisible" :title="$t('menu.fieldMapping')" width="500px">
       <el-form :model="form" label-position="top">
         <el-form-item :label="$t('common.internalField')">
-          <el-select v-model="form.internalField" style="width: 100%" placeholder="Select contract field">
+          <el-select v-model="form.internalField" style="width: 100%" :placeholder="$t('common.selectPlaceholder')">
             <el-option 
               v-for="field in contractFields" 
               :key="field.fieldCode" 
@@ -45,7 +45,7 @@
           </el-select>
         </el-form-item>
         <el-form-item :label="$t('common.downstreamField')">
-          <el-input v-model="form.externalField" placeholder="e.g. amount_total" />
+          <el-input v-model="form.externalField" :placeholder="$t('common.placeholder')" />
         </el-form-item>
         <el-form-item :label="$t('common.transformation')">
           <el-select v-model="form.transformation" style="width: 100%">

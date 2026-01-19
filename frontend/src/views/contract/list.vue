@@ -25,9 +25,9 @@
               <div class="flex items-center justify-between">
                 <div>
                   <h4 class="m-0 text-blue-600 flex items-center gap-2">
-                    <el-icon><MagicStick /></el-icon> AI Auto-Extraction
+                    <el-icon><MagicStick /></el-icon> {{ $t('ai.extractionAreaTitle') }}
                   </h4>
-                  <p class="text-xs text-gray-500 m-0 mt-1">Upload a contract document to automatically fill out the form using AI.</p>
+                  <p class="text-xs text-gray-500 m-0 mt-1">{{ $t('ai.extractionAreaSubtitle') }}</p>
                 </div>
                 <div class="flex gap-2">
                   <el-upload
@@ -36,7 +36,7 @@
                     :show-file-list="false"
                     :on-change="handleAiFileChange"
                   >
-                    <el-button type="primary" plain size="small" icon="Upload">Choose File</el-button>
+                    <el-button type="primary" plain size="small" icon="Upload">{{ $t('ai.chooseFile') }}</el-button>
                   </el-upload>
                   <el-button 
                     type="primary" 
@@ -45,7 +45,7 @@
                     :disabled="!selectedAiFile"
                     @click="runAiExtraction"
                   >
-                    Start Analysis
+                    {{ $t('ai.startAnalysis') }}
                   </el-button>
                 </div>
               </div>
@@ -86,9 +86,9 @@
                 <div class="field-group" v-if="fieldStore.isFieldVisible('contract_status')">
                   <label>{{ fieldStore.getFieldByCode('contract_status')?.fieldName || $t('contract.status') }}</label>
                   <el-select v-model="newContractForm.contractStatus" style="width: 100%">
-                    <el-option label="Draft" value="Draft" />
-                    <el-option label="Active" value="Active" />
-                    <el-option label="Pending" value="Pending" />
+                    <el-option :label="$t('contract.enums.status.draft')" value="Draft" />
+                    <el-option :label="$t('contract.enums.status.active')" value="Active" />
+                    <el-option :label="$t('contract.enums.status.pending')" value="Pending" />
                   </el-select>
                 </div>
               </div>
@@ -181,9 +181,9 @@
                 <div class="field-group" v-if="fieldStore.isFieldVisible('currency_type')">
                   <label>{{ fieldStore.getFieldByCode('currency_type')?.fieldName || 'Currency' }}</label>
                   <el-select v-model="newContractForm.currencyType" style="width: 100%">
-                    <el-option label="USD" value="USD" />
-                    <el-option label="CNY" value="CNY" />
-                    <el-option label="EUR" value="EUR" />
+                    <el-option :label="$t('contract.enums.currency.usd')" value="USD" />
+                    <el-option :label="$t('contract.enums.currency.cny')" value="CNY" />
+                    <el-option :label="$t('contract.enums.currency.eur')" value="EUR" />
                   </el-select>
                 </div>
                 <div class="field-group" v-if="fieldStore.isFieldVisible('contract_amount')">
@@ -210,9 +210,9 @@
                 <div class="field-group" v-if="fieldStore.isFieldVisible('payment_method')">
                   <label>{{ fieldStore.getFieldByCode('payment_method')?.fieldName || 'Payment Method' }}</label>
                   <el-select v-model="newContractForm.paymentMethod" style="width: 100%">
-                    <el-option label="Bank Transfer" value="Bank Transfer" />
-                    <el-option label="Check" value="Check" />
-                    <el-option label="Cash" value="Cash" />
+                    <el-option :label="$t('contract.enums.payment.bank')" value="Bank Transfer" />
+                    <el-option :label="$t('contract.enums.payment.check')" value="Check" />
+                    <el-option :label="$t('contract.enums.payment.cash')" value="Cash" />
                   </el-select>
                 </div>
                 <div class="field-group full-width" v-if="fieldStore.isFieldVisible('payment_term')">
@@ -248,8 +248,8 @@
                 <div class="field-group" v-if="fieldStore.isFieldVisible('subject_type')">
                   <label>{{ fieldStore.getFieldByCode('subject_type')?.fieldName || 'Type' }}</label>
                   <el-select v-model="newContractForm.subjectType" style="width: 100%">
-                    <el-option label="Goods" value="Goods" />
-                    <el-option label="Services" value="Services" />
+                    <el-option :label="$t('contract.enums.subject.goods')" value="Goods" />
+                    <el-option :label="$t('contract.enums.subject.services')" value="Services" />
                   </el-select>
                 </div>
                 <div class="field-group" v-if="fieldStore.isFieldVisible('subject_quantity')">
@@ -320,9 +320,9 @@
                 <div class="field-group" v-if="fieldStore.isFieldVisible('dispute_resolution')">
                   <label>{{ fieldStore.getFieldByCode('dispute_resolution')?.fieldName || 'Dispute Resolution' }}</label>
                   <el-select v-model="newContractForm.disputeResolution" style="width: 100%">
-                    <el-option label="Negotiation" value="Negotiation" />
-                    <el-option label="Arbitration" value="Arbitration" />
-                    <el-option label="Litigation" value="Litigation" />
+                    <el-option :label="$t('contract.enums.resolution.negotiation')" value="Negotiation" />
+                    <el-option :label="$t('contract.enums.resolution.arbitration')" value="Arbitration" />
+                    <el-option :label="$t('contract.enums.resolution.litigation')" value="Litigation" />
                   </el-select>
                 </div>
                 <div class="field-group" v-if="fieldStore.isFieldVisible('governing_law')">
@@ -488,13 +488,20 @@
           />
         </el-form-item>
         <el-form-item :label="$t('contract.type')">
-          <el-select v-model="filterForm.type" placeholder="Select type" style="width: 100%">
+          <el-select v-model="filterForm.type" :placeholder="$t('common.selectPlaceholder')" style="width: 100%">
             <el-option label="NDA" value="nda" />
             <el-option label="Service Agreement" value="service" />
             <el-option label="Sales Contract" value="sales" />
           </el-select>
         </el-form-item>
-        <el-form-item label="Amount Range">
+        <el-form-item :label="$t('contract.amount') + ' ' + $t('common.filter')">
+          <div class="amount-range">
+            <el-input v-model="filterForm.minAmount" :placeholder="$t('contract.min')" />
+            <span class="separator">-</span>
+            <el-input v-model="filterForm.maxAmount" :placeholder="$t('contract.max')" />
+          </div>
+        </el-form-item>
+        <el-form-item :label="$t('contract.amount') + ' ' + $t('common.filter')">
           <div class="amount-range">
             <el-input v-model="filterForm.minAmount" :placeholder="$t('contract.min')" />
             <span class="separator">-</span>

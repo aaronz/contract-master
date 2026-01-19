@@ -22,7 +22,7 @@
           <span class="stat-label">{{ $t('dashboard.totalContracts') }}</span>
           <div class="stat-value">{{ stats.totalContracts }}</div>
           <div class="stat-trend positive">
-            <el-icon><Top /></el-icon> 12% from last month
+            <el-icon><Top /></el-icon> 12% {{ $t('dashboard.last30Days') }}
           </div>
         </div>
       </div>
@@ -35,7 +35,7 @@
           <span class="stat-label">{{ $t('dashboard.pendingApprovals') }}</span>
           <div class="stat-value">{{ stats.pendingApprovals }}</div>
           <div class="stat-trend negative">
-            <el-icon><Top /></el-icon> 4 new today
+            <el-icon><Top /></el-icon> 4 {{ $t('common.to') }}day
           </div>
         </div>
       </div>
@@ -61,7 +61,7 @@
           <span class="stat-label">{{ $t('dashboard.riskAlerts') }}</span>
           <div class="stat-value">{{ stats.riskAlerts }}</div>
           <div class="stat-trend negative">
-            <el-icon><Top /></el-icon> 2 critical
+            <el-icon><Top /></el-icon> 2 {{ $t('compliance.severity.severe') }}
           </div>
         </div>
       </div>

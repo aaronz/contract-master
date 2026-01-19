@@ -11,6 +11,39 @@
           <div class="logo-icon"></div>
           <h1>{{ $t('common.appTitle') }}</h1>
         </div>
+        <p class="brand-subtitle">{{ $t('login.subtitle') }}</p>
+        
+        <div class="feature-list">
+          <div class="feature-item"><el-icon><Check /></el-icon> {{ $t('login.aiAnalysis') }}</div>
+          <div class="feature-item"><el-icon><Check /></el-icon> {{ $t('login.riskDetection') }}</div>
+          <div class="feature-item"><el-icon><Check /></el-icon> {{ $t('login.smartWorkflows') }}</div>
+        </div>
+      </div>
+
+      <!-- Login Form Side -->
+      <div class="form-side">
+        <div class="login-box">
+          <h2>{{ $t('login.login') }}</h2>
+          <el-form :model="loginForm" label-position="top" @submit.prevent="handleLogin">
+            <el-form-item :label="$t('login.username')">
+              <el-input v-model="loginForm.username" name="username" placeholder="admin@example.com">
+                <template #prefix><el-icon><User /></el-icon></template>
+              </el-input>
+            </el-form-item>
+            <el-form-item :label="$t('login.password')">
+              <el-input v-model="loginForm.password" name="password" type="password" :placeholder="$t('common.placeholder')" show-password>
+                <template #prefix><el-icon><Lock /></el-icon></template>
+              </el-input>
+            </el-form-item>
+            <el-form-item :label="$t('login.tenant')">
+              <el-input v-model="loginForm.tenantId" name="tenantId" placeholder="tenant-1" />
+            </el-form-item>
+            <el-button type="primary" native-type="submit" class="login-btn" :loading="loading">
+              {{ $t('login.login') }}
+            </el-button>
+          </el-form>
+        </div>
+      </div>
         <p class="brand-slogan">Enterprise Contract Lifecycle Management</p>
         <div class="brand-features">
           <div class="feature-item"><el-icon><Check /></el-icon> AI Analysis</div>

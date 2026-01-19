@@ -16,17 +16,17 @@
     <!-- Add Field Dialog -->
     <el-dialog v-model="showAddDialog" :title="$t('menu.fieldConfig')" width="450px">
       <el-form :model="newField" label-position="top">
-        <el-form-item :label="$t('common.field') + ' Code (Technical ID)'" required>
-          <el-input v-model="newField.fieldCode" placeholder="e.g. project_manager" />
+        <el-form-item :label="$t('common.field') + ' Code'" required>
+          <el-input v-model="newField.fieldCode" :placeholder="$t('common.placeholder')" />
         </el-form-item>
-        <el-form-item :label="$t('common.field') + ' Name (Display)'" required>
-          <el-input v-model="newField.fieldName" placeholder="e.g. Project Manager" />
+        <el-form-item :label="$t('common.name')" required>
+          <el-input v-model="newField.fieldName" :placeholder="$t('common.placeholder')" />
         </el-form-item>
-        <el-form-item :label="$t('common.field') + ' Type'" required>
+        <el-form-item :label="$t('contract.type')" required>
           <el-select v-model="newField.fieldType" style="width: 100%">
-            <el-option label="Text" value="TEXT" />
-            <el-option label="Number" value="NUMBER" />
-            <el-option label="Date" value="DATE" />
+            <el-option :label="$t('common.field') + ' (Text)'" value="TEXT" />
+            <el-option :label="$t('contract.enums.subject.goods') + ' (Number)'" value="NUMBER" />
+            <el-option :label="$t('contract.date')" value="DATE" />
           </el-select>
         </el-form-item>
       </el-form>
@@ -37,7 +37,7 @@
     </el-dialog>
 
     <el-alert
-      title="Drag and drop rows to reorder fields."
+      :title="$t('common.info')"
       type="info"
       show-icon
       :closable="false"
@@ -60,11 +60,11 @@
         
         <el-table-column :label="$t('common.name')" width="250">
           <template #default="{ row }">
-            <el-input v-model="row.fieldAlias" placeholder="Enter custom name" />
+            <el-input v-model="row.fieldAlias" :placeholder="$t('common.placeholder')" />
           </template>
         </el-table-column>
 
-        <el-table-column label="Visual Style" min-width="300">
+        <el-table-column :label="$t('common.details')" min-width="300">
            <template #default="{ row }">
              <div class="style-picker">
                <el-color-picker v-model="row.color" size="small" show-alpha />

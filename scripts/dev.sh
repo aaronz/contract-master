@@ -57,12 +57,17 @@ if [ ! -d "node_modules" ]; then
     log_info "node_modules not found, installing..."
     npm install
 fi
-npm run dev &
+npm run dev -- --host &
 FRONTEND_PID=$!
 
 log_success "Setup initiated!"
-printf "${BLUE}Backend: http://localhost:8080${NC}\n"
-printf "${BLUE}Frontend: http://localhost:5173 (or similar)${NC}\n"
+LOCAL_IP=$(ifconfig | grep -E "inet " | grep -v 127.0.0.1 | awk '{print $2}' | head -n 1)
+if [ -z "$LOCAL_IP" ]; then
+    LOCAL_IP="localhost"
+fi
+
+printf "${BLUE}Backend: http://$LOCAL_IP:8080${NC}\n"
+printf "${BLUE}Frontend: http://$LOCAL_IP:5173${NC}\n"
 log_warn "Press Ctrl+C to stop."
 
 wait

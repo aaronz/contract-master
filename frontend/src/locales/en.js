@@ -53,6 +53,11 @@ export default {
     targetUrl: 'Target URL',
     events: 'Events',
     moduleAction: 'Module & Action',
+    placeholder: 'Please enter',
+    selectPlaceholder: 'Please select',
+    all: 'All',
+    records: 'Records',
+    duration: 'Duration',
     roles: {
       admin: 'System Admin',
       legal_mgr: 'Legal Manager',
@@ -60,6 +65,17 @@ export default {
       sales: 'Sales Rep',
       finance: 'Finance Audit'
     }
+  },
+  login: {
+    title: 'Contract Master',
+    subtitle: 'Enterprise Contract Compliance Middleware',
+    username: 'Email or Username',
+    password: 'Password',
+    tenant: 'Tenant ID',
+    login: 'Login',
+    aiAnalysis: 'AI Analysis',
+    riskDetection: 'Risk Detection',
+    smartWorkflows: 'Smart Workflows'
   },
   menu: {
     coreOperations: 'Core Operations',
@@ -79,6 +95,7 @@ export default {
     evaluationRules: 'Evaluation Rules',
     roleManagement: 'Role Management',
     aiConfiguration: 'AI Configuration',
+    userManagement: 'User Management',
     systemSettings: 'System Settings',
     permissionMatrix: 'Permission Matrix',
     fieldConfig: 'Field Config',
@@ -133,7 +150,41 @@ export default {
     applyFilters: 'Apply Filters',
     assign: 'Assign',
     archive: 'Archive',
-    date: 'Date'
+    date: 'Date',
+    enums: {
+      status: {
+        active: 'Active',
+        draft: 'Draft',
+        pending: 'Pending',
+        expired: 'Expired',
+        ai_extracted: 'AI Extracted',
+        verified: 'Verified',
+        published: 'Published'
+      },
+      currency: {
+        cny: 'CNY',
+        usd: 'USD',
+        eur: 'EUR'
+      },
+      payment: {
+        bank: 'Bank Transfer',
+        check: 'Check',
+        cash: 'Cash'
+      },
+      subject: {
+        goods: 'Goods',
+        services: 'Services'
+      },
+      resolution: {
+        negotiation: 'Negotiation',
+        arbitration: 'Arbitration',
+        litigation: 'Litigation'
+      },
+      roleType: {
+        standard: 'Standard',
+        system: 'System'
+      }
+    }
   },
   compliance: {
     problems: 'Problem Cockpit',
@@ -159,7 +210,37 @@ export default {
     notes: 'Notes',
     changeDetail: 'Change Detail',
     oldValue: 'Old Value',
-    newValue: 'New Value'
+    newValue: 'New Value',
+    severityShort: '!',
+    actions: 'Actions'
+  },
+  ai: {
+    configTitle: 'AI Configuration',
+    configSubtitle: 'Configure LLM providers and prompts for automated contract extraction.',
+    modelConnection: 'Model Connection',
+    extractionLogic: 'Extraction Logic',
+    provider: 'Provider',
+    modelName: 'Model Name',
+    apiKey: 'API Key',
+    endpointUrl: 'Endpoint URL',
+    systemPrompt: 'System Prompt',
+    promptTip: 'Tip: Use keywords like "Extract JSON", "Include contractNo", etc.',
+    extractionAreaTitle: 'AI Auto-Extraction',
+    extractionAreaSubtitle: 'Upload a contract document to automatically fill out the form using AI.',
+    startAnalysis: 'Start Analysis',
+    reExtract: 'Re-extract',
+    chooseFile: 'Choose File',
+    newVersion: 'New Version',
+    syncFromDoc: 'AI Sync from Document'
+  },
+  settings: {
+    dataScope: 'Data Scope',
+    roleMatrix: 'Permission Matrix',
+    scopes: {
+      all: 'Global (All Data)',
+      dept: 'Department Only',
+      self: 'My Records Only'
+    }
   },
   guide: {
     subtitle: 'Master the Contract Compliance & Management System',

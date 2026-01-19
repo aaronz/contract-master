@@ -2,8 +2,8 @@
   <div class="ai-config-page p-6">
     <div class="page-header mb-6">
       <div>
-        <h1 class="page-title">{{ $t('menu.aiConfiguration') }}</h1>
-        <p class="page-subtitle">Configure LLM providers and prompts for automated contract extraction.</p>
+        <h1 class="page-title">{{ $t('ai.configTitle') }}</h1>
+        <p class="page-subtitle">{{ $t('ai.configSubtitle') }}</p>
       </div>
       <el-button type="primary" :loading="saving" icon="Check" @click="handleSave">
         {{ $t('common.save') }}
@@ -15,8 +15,8 @@
         <el-row :gutter="40">
           <!-- LLM Connection -->
           <el-col :span="12">
-            <h3 class="section-title mb-4">Model Connection</h3>
-            <el-form-item label="Provider">
+            <h3 class="section-title mb-4">{{ $t('ai.modelConnection') }}</h3>
+            <el-form-item :label="$t('ai.provider')">
               <el-select v-model="form.provider" style="width: 100%">
                 <el-option label="Mock (Demo Mode)" value="MOCK" />
                 <el-option label="SiliconFlow" value="SILICONFLOW" />
@@ -26,31 +26,31 @@
               </el-select>
             </el-form-item>
             
-            <el-form-item label="Model Name">
-              <el-input v-model="form.modelName" placeholder="e.g. gpt-4o, deepseek-chat" />
+            <el-form-item :label="$t('ai.modelName')">
+              <el-input v-model="form.modelName" :placeholder="$t('common.placeholder')" />
             </el-form-item>
 
-            <el-form-item label="API Key">
-              <el-input v-model="form.apiKey" type="password" show-password />
+            <el-form-item :label="$t('ai.apiKey')">
+              <el-input v-model="form.apiKey" type="password" show-password :placeholder="$t('common.placeholder')" />
             </el-form-item>
 
-            <el-form-item label="Endpoint URL">
-              <el-input v-model="form.endpointUrl" placeholder="https://api.openai.com/v1/chat/completions" />
+            <el-form-item :label="$t('ai.endpointUrl')">
+              <el-input v-model="form.endpointUrl" :placeholder="$t('common.placeholder')" />
             </el-form-item>
           </el-col>
 
           <!-- Prompt Engineering -->
           <el-col :span="12">
-            <h3 class="section-title mb-4">Extraction Logic</h3>
-            <el-form-item label="System Prompt">
+            <h3 class="section-title mb-4">{{ $t('ai.extractionLogic') }}</h3>
+            <el-form-item :label="$t('ai.systemPrompt')">
               <el-input 
                 v-model="form.extractionPrompt" 
                 type="textarea" 
                 :rows="12" 
-                placeholder="Describe how the AI should extract fields..."
+                :placeholder="$t('ai.promptTip')"
               />
               <div class="text-xs text-gray-400 mt-2">
-                Tip: Use keywords like "Extract JSON", "Include contractNo", etc.
+                {{ $t('ai.promptTip') }}
               </div>
             </el-form-item>
           </el-col>

@@ -19,13 +19,13 @@
         </el-table-column>
         <el-table-column :label="$t('common.status')" width="120">
           <template #default="{ row }">
-            <el-tag :type="row.enabled ? 'success' : 'info'">{{ row.enabled ? 'Active' : 'Disabled' }}</el-tag>
+            <el-tag :type="row.enabled ? 'success' : 'info'">{{ row.enabled ? $t('contract.enums.status.active') : $t('common.hide') }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column :label="$t('common.actions')" width="180">
           <template #default="{ row }">
             <el-button link type="primary" @click="handleEdit(row)">{{ $t('common.edit') }}</el-button>
-            <el-button link type="success" @click="testWebHook(row)">Test</el-button>
+            <el-button link type="success" @click="testWebHook(row)">{{ $t('common.view') }}</el-button>
             <el-button link type="danger" @click="handleDelete(row)">{{ $t('common.delete') }}</el-button>
           </template>
         </el-table-column>
@@ -35,16 +35,16 @@
     <el-dialog v-model="dialogVisible" :title="$t('menu.webhooks')" width="600px">
       <el-form :model="form" label-position="top">
         <el-form-item :label="$t('common.name')">
-          <el-input v-model="form.name" placeholder="e.g. ERP Finance Sync" />
+          <el-input v-model="form.name" :placeholder="$t('common.placeholder')" />
         </el-form-item>
         <el-form-item :label="$t('common.targetUrl')">
           <el-input v-model="form.url" placeholder="https://api.yourcompany.com/webhooks/contracts" />
         </el-form-item>
         <el-form-item :label="$t('common.events')">
           <el-checkbox-group v-model="form.events">
-            <el-checkbox value="CONTRACT_VERIFIED">Verification Completed</el-checkbox>
-            <el-checkbox value="CONTRACT_PUBLISHED">Contract Published</el-checkbox>
-            <el-checkbox value="AI_EXTRACTION_FAILED">Extraction Failure</el-checkbox>
+            <el-checkbox value="CONTRACT_VERIFIED">{{ $t('contract.enums.status.verified') }}</el-checkbox>
+            <el-checkbox value="CONTRACT_PUBLISHED">{{ $t('contract.enums.status.published') }}</el-checkbox>
+            <el-checkbox value="AI_EXTRACTION_FAILED">{{ $t('common.error') }}</el-checkbox>
           </el-checkbox-group>
         </el-form-item>
         <el-form-item :label="$t('common.authType')">

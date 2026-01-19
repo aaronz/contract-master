@@ -51,7 +51,7 @@
         </div>
         <div class="stat-content">
           <div class="stat-value">{{ hubStats.syncSuccessRate }}</div>
-          <div class="stat-label">Sync Success Rate</div>
+          <div class="stat-label">{{ $t('common.success') }} Rate</div>
         </div>
       </div>
       <div class="stat-card glass-card">
@@ -60,7 +60,7 @@
         </div>
         <div class="stat-content">
           <div class="stat-value">{{ hubStats.recordsSyncedToday }}</div>
-          <div class="stat-label">Records Synced Today</div>
+          <div class="stat-label">Records {{ $t('common.loading') }}</div>
         </div>
       </div>
       <div class="stat-card glass-card">

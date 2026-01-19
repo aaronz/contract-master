@@ -53,6 +53,9 @@ export default {
     targetUrl: '目标地址',
     events: '事件',
     moduleAction: '模块与操作',
+    placeholder: '请输入',
+    selectPlaceholder: '请选择',
+    all: '全部',
     roles: {
       admin: '系统管理员',
       legal_mgr: '法务经理',
@@ -60,6 +63,17 @@ export default {
       sales: '销售代表',
       finance: '财务审计'
     }
+  },
+  login: {
+    title: '合同大师',
+    subtitle: '企业级合同合规中间件',
+    username: '邮箱或用户名',
+    password: '密码',
+    tenant: '租户 ID',
+    login: '登录',
+    aiAnalysis: 'AI 自动分析',
+    riskDetection: '风险实时检测',
+    smartWorkflows: '智能审批流'
   },
   menu: {
     coreOperations: '核心业务',
@@ -79,6 +93,7 @@ export default {
     evaluationRules: '合规规则库',
     roleManagement: '角色管理',
     aiConfiguration: 'AI模型配置',
+    userManagement: '用户管理',
     systemSettings: '系统设置',
     permissionMatrix: '权限矩阵',
     fieldConfig: '字段配置',
@@ -119,7 +134,7 @@ export default {
     legalDates: '法律条款',
     attachments: '附件管理',
     comments: '协作讨论',
-    auditLog: '变更审计',
+    auditLog: '审计日志',
     subtitle: '轻松管理您的合同全生命周期，包括审批、执行与归档。',
     allContracts: '全部合同',
     myPending: '我的待办',
@@ -133,7 +148,41 @@ export default {
     applyFilters: '应用筛选',
     assign: '指派',
     archive: '归档',
-    date: '日期'
+    date: '日期',
+    enums: {
+      status: {
+        active: '生效中',
+        draft: '草稿',
+        pending: '待审批',
+        expired: '已逾期',
+        ai_extracted: 'AI 已提取',
+        verified: '已验证',
+        published: '已发布'
+      },
+      currency: {
+        cny: '人民币 (CNY)',
+        usd: '美元 (USD)',
+        eur: '欧元 (EUR)'
+      },
+      payment: {
+        bank: '银行转账',
+        check: '支票',
+        cash: '现金'
+      },
+      subject: {
+        goods: '货物',
+        services: '服务'
+      },
+      resolution: {
+        negotiation: '协商',
+        arbitration: '仲裁',
+        litigation: '诉讼'
+      },
+      roleType: {
+        standard: '标准',
+        system: '系统'
+      }
+    }
   },
   compliance: {
     problems: '合规驾驶舱',
@@ -160,6 +209,34 @@ export default {
     changeDetail: '变更详情',
     oldValue: '原始值',
     newValue: '新值'
+  },
+  ai: {
+    configTitle: 'AI 模型配置',
+    configSubtitle: '配置大语言模型 (LLM) 服务商及合同提取提示词。',
+    modelConnection: '模型连接',
+    extractionLogic: '提取逻辑',
+    provider: '服务商',
+    modelName: '模型名称',
+    apiKey: 'API 密钥',
+    endpointUrl: '接口地址',
+    systemPrompt: '系统提示词',
+    promptTip: '提示：使用 “JSON格式”、“提取合同号” 等关键词来引导 AI。',
+    extractionAreaTitle: 'AI 自动提取',
+    extractionAreaSubtitle: '上传合同文档，系统将通过 AI 自动识别并填充表单。',
+    startAnalysis: '开始分析',
+    reExtract: '重新提取',
+    chooseFile: '选择文件',
+    newVersion: '上传新版本',
+    syncFromDoc: '从文档同步 AI 识别结果'
+  },
+  settings: {
+    dataScope: '数据范围',
+    roleMatrix: '权限矩阵',
+    scopes: {
+      all: '全局 (所有数据)',
+      dept: '部门级',
+      self: '仅限个人'
+    }
   },
   guide: {
     subtitle: '全面掌握 AI 驱动的合同合规与管理系统',

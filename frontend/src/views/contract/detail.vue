@@ -17,11 +17,11 @@
         <el-divider direction="vertical" />
 
         <el-button type="warning" @click="confirmAiSuggestions" v-if="form.contractStatus === 'AI_EXTRACTED'">
-          Confirm Suggestions
+          {{ $t('common.confirm') }}
         </el-button>
         
         <el-button type="success" @click="publishContract" v-if="form.contractStatus === 'VERIFIED'">
-          Publish to Downstream
+          {{ $t('menu.hubOverview') }}
         </el-button>
 
         <el-button type="primary" @click="openRuleSelector" class="glass-btn">
@@ -98,10 +98,10 @@
                   <div class="field-group" v-if="isFieldVisible('contract_status')">
                     <label>{{ getFieldName('contract_status') }}</label>
                     <el-select v-if="isEditMode" v-model="form.contractStatus" style="width: 100%">
-                      <el-option label="Active" value="Active" />
-                      <el-option label="Draft" value="Draft" />
-                      <el-option label="Pending" value="Pending" />
-                      <el-option label="Expired" value="Expired" />
+                      <el-option :label="$t('contract.enums.status.active')" value="Active" />
+                      <el-option :label="$t('contract.enums.status.draft')" value="Draft" />
+                      <el-option :label="$t('contract.enums.status.pending')" value="Pending" />
+                      <el-option :label="$t('contract.enums.status.expired')" value="Expired" />
                     </el-select>
                     <el-tag v-else :type="getStatusType(form.contractStatus)" round :style="getFieldStyle('contract_status')">{{ form.contractStatus }}</el-tag>
                   </div>
@@ -209,9 +209,9 @@
                 <div class="field-group" v-if="isFieldVisible('currency_type')">
                   <label>{{ getFieldName('currency_type') }}</label>
                   <el-select v-if="isEditMode" v-model="form.currencyType" style="width: 100%">
-                    <el-option label="CNY" value="CNY" />
-                    <el-option label="USD" value="USD" />
-                    <el-option label="EUR" value="EUR" />
+                    <el-option :label="$t('contract.enums.currency.cny')" value="CNY" />
+                    <el-option :label="$t('contract.enums.currency.usd')" value="USD" />
+                    <el-option :label="$t('contract.enums.currency.eur')" value="EUR" />
                   </el-select>
                   <div v-else class="display-val" :style="getFieldStyle('currency_type')">{{ form.currencyType }}</div>
                 </div>
@@ -238,9 +238,9 @@
                 <div class="field-group" v-if="isFieldVisible('payment_method')">
                   <label>{{ getFieldName('payment_method') }}</label>
                   <el-select v-if="isEditMode" v-model="form.paymentMethod" style="width: 100%">
-                    <el-option label="Bank Transfer" value="Bank Transfer" />
-                    <el-option label="Check" value="Check" />
-                    <el-option label="Cash" value="Cash" />
+                    <el-option :label="$t('contract.enums.payment.bank')" value="Bank Transfer" />
+                    <el-option :label="$t('contract.enums.payment.check')" value="Check" />
+                    <el-option :label="$t('contract.enums.payment.cash')" value="Cash" />
                   </el-select>
                   <div v-else class="display-val" :style="getFieldStyle('payment_method')">{{ form.paymentMethod }}</div>
                 </div>
@@ -260,8 +260,8 @@
                  <div class="field-group" v-if="isFieldVisible('subject_type')">
                    <label>{{ getFieldName('subject_type') }}</label>
                    <el-select v-if="isEditMode" v-model="form.subjectType" style="width: 100%">
-                     <el-option label="Goods" value="Goods" />
-                     <el-option label="Services" value="Services" />
+                     <el-option :label="$t('contract.enums.subject.goods')" value="Goods" />
+                     <el-option :label="$t('contract.enums.subject.services')" value="Services" />
                    </el-select>
                    <div v-else class="display-val" :style="getFieldStyle('subject_type')">{{ form.subjectType }}</div>
                  </div>
@@ -343,9 +343,9 @@
                 <div class="field-group" v-if="isFieldVisible('dispute_resolution')">
                   <label>{{ getFieldName('dispute_resolution') }}</label>
                   <el-select v-if="isEditMode" v-model="form.disputeResolution" style="width: 100%">
-                    <el-option label="Negotiation" value="Negotiation" />
-                    <el-option label="Arbitration" value="Arbitration" />
-                    <el-option label="Litigation" value="Litigation" />
+                    <el-option :label="$t('contract.enums.resolution.negotiation')" value="Negotiation" />
+                    <el-option :label="$t('contract.enums.resolution.arbitration')" value="Arbitration" />
+                    <el-option :label="$t('contract.enums.resolution.litigation')" value="Litigation" />
                   </el-select>
                   <div v-else class="display-val" :style="getFieldStyle('dispute_resolution')">{{ form.disputeResolution }}</div>
                 </div>
@@ -397,9 +397,9 @@
                    <el-button link type="primary" @click="downloadAttachment(item)">Download</el-button>
                  </div>
                </div>
-               <div v-if="attachments.length === 0" class="text-center p-10 text-gray-400">
-                 No attachments found.
-               </div>
+        <div v-if="attachments.length === 0" class="text-center p-10 text-gray-400">
+          {{ $t('common.noNotifications') }}
+        </div>
             </div>
           </el-tab-pane>
         </el-tabs>
@@ -507,7 +507,7 @@ const runAiExtraction = async () => {
           aiUpdatedFields.value.add(key)
         }
       })
-      ElMessage.success('Fields updated via AI extraction')
+      ElMessage.success(t('common.success'))
       // Important: if we didn't have a contractId before, refresh everything
       if (!form.contractId) {
         fetchContractDetail()
@@ -517,7 +517,7 @@ const runAiExtraction = async () => {
     }
   } catch (error) {
     console.error('AI Extraction failed', error)
-    ElMessage.error('AI Extraction failed')
+    ElMessage.error(t('common.error'))
   } finally {
     extracting.value = false
   }

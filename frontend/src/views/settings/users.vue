@@ -9,14 +9,14 @@
 
     <div class="glass-card table-container" v-loading="loading">
       <el-table :data="users" style="width: 100%">
-        <el-table-column prop="realName" label="Full Name" />
-        <el-table-column prop="userName" label="Username" />
+        <el-table-column prop="realName" :label="$t('common.user')" />
+        <el-table-column prop="userName" :label="$t('login.username')" />
         <el-table-column prop="userId" label="User ID" width="200">
           <template #default="{ row }">
             <span class="font-mono text-xs">{{ row.userId }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="Assigned Roles" min-width="250">
+        <el-table-column :label="$t('common.roles.admin')" min-width="250">
           <template #default="{ row }">
             <div class="flex flex-wrap gap-1">
               <el-tag 
@@ -27,31 +27,31 @@
               >
                 {{ getRoleName(role) }}
               </el-tag>
-              <span v-if="!userRoles[row.userId] || userRoles[row.userId].length === 0" class="text-gray-400 text-xs">No roles assigned</span>
+              <span v-if="!userRoles[row.userId] || userRoles[row.userId].length === 0" class="text-gray-400 text-xs">{{ $t('common.noNotifications') }}</span>
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="Actions" width="150" align="right">
+        <el-table-column :label="$t('common.actions')" width="150" align="right">
           <template #default="{ row }">
-            <el-button link type="primary" @click="handleEditRoles(row)">Manage Roles</el-button>
+            <el-button link type="primary" @click="handleEditRoles(row)">{{ $t('common.edit') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
     </div>
 
     <!-- Role Assignment Dialog -->
-    <el-dialog v-model="dialogVisible" title="Assign Roles" width="450px">
+    <el-dialog v-model="dialogVisible" :title="$t('menu.roleManagement')" width="450px">
       <div v-if="selectedUser" class="mb-4">
-        <p class="text-sm text-gray-500">User: <b>{{ selectedUser.realName }}</b> ({{ selectedUser.userName }})</p>
+        <p class="text-sm text-gray-500">{{ $t('common.user') }}: <b>{{ selectedUser.realName }}</b> ({{ selectedUser.userName }})</p>
       </div>
       <el-form label-position="top">
-        <el-form-item label="Select Roles">
+        <el-form-item :label="$t('menu.roleManagement')">
           <el-select 
             v-model="selectedRoleIds" 
             multiple 
             collapse-tags 
             collapse-tags-indicator
-            placeholder="Select roles for user"
+            :placeholder="$t('common.selectPlaceholder')"
             style="width: 100%"
           >
             <el-option 

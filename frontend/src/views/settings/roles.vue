@@ -10,43 +10,43 @@
 
     <div class="glass-card table-container" v-loading="loading">
       <el-table :data="roles" style="width: 100%">
-        <el-table-column prop="roleName" label="Role Name" />
+        <el-table-column prop="roleName" :label="$t('common.name')" />
         <el-table-column prop="roleId" label="Role ID" width="250">
           <template #default="{ row }">
             <span class="font-mono text-xs">{{ row.roleId }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="roleType" label="Type" width="150" />
-        <el-table-column prop="status" label="Status" width="120">
+        <el-table-column prop="roleType" :label="$t('contract.type')" width="150" />
+        <el-table-column prop="status" :label="$t('common.status')" width="120">
           <template #default="{ row }">
             <el-tag :type="row.status === 1 ? 'success' : 'info'">
               {{ row.status === 1 ? 'Active' : 'Disabled' }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="Actions" width="150" align="right">
+        <el-table-column :label="$t('common.actions')" width="150" align="right">
           <template #default="{ row }">
-            <el-button link type="danger" @click="handleDelete(row)" :disabled="row.roleId === 'admin'">Delete</el-button>
+            <el-button link type="danger" @click="handleDelete(row)" :disabled="row.roleId === 'admin'">{{ $t('common.delete') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
     </div>
 
-    <el-dialog v-model="dialogVisible" title="Add New Role" width="400px">
+    <el-dialog v-model="dialogVisible" :title="$t('menu.roleManagement')" width="400px">
       <el-form :model="form" label-position="top">
-        <el-form-item label="Role Name" required>
-          <el-input v-model="form.roleName" placeholder="e.g. Finance Auditor" />
+        <el-form-item :label="$t('common.name')" required>
+          <el-input v-model="form.roleName" :placeholder="$t('common.placeholder')" />
         </el-form-item>
-        <el-form-item label="Role Type">
+        <el-form-item :label="$t('contract.type')">
           <el-select v-model="form.roleType" style="width: 100%">
-            <el-option label="Standard" value="STANDARD" />
-            <el-option label="System" value="SYSTEM" />
+            <el-option :label="$t('contract.enums.roleType.standard')" value="STANDARD" />
+            <el-option :label="$t('contract.enums.roleType.system')" value="SYSTEM" />
           </el-select>
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="dialogVisible = false">Cancel</el-button>
-        <el-button type="primary" @click="handleSave" :loading="saving">Save</el-button>
+        <el-button @click="dialogVisible = false">{{ $t('common.cancel') }}</el-button>
+        <el-button type="primary" @click="handleSave" :loading="saving">{{ $t('common.save') }}</el-button>
       </template>
     </el-dialog>
   </div>

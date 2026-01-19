@@ -2,8 +2,8 @@
   <div class="problem-table-container">
     <div class="table-header">
       <el-form :inline="true" :model="filters" size="small">
-        <el-form-item :label="$t('contract.status')">
-          <el-select v-model="filters.status" placeholder="All" clearable @change="loadProblems" style="width: 120px">
+        <el-form-item :label="$t('common.status')">
+          <el-select v-model="filters.status" :placeholder="$t('common.all')" clearable @change="loadProblems" style="width: 120px">
             <el-option :label="$t('compliance.status.new')" value="NEW" />
             <el-option :label="$t('compliance.status.acknowledged')" value="ACKNOWLEDGED" />
             <el-option :label="$t('compliance.status.resolved')" value="RESOLVED" />

@@ -28,9 +28,15 @@ if not exist node_modules (
     echo node_modules not found, installing...
     call npm install
 )
-start "Frontend" npm run dev
+start "Frontend" npm run dev -- --host
 
 echo Setup initiated!
-echo Backend: http://localhost:8080
-echo Frontend: http://localhost:5173
+for /f "tokens=2 delims=:" %%a in ('ipconfig ^| findstr "IPv4"') do (
+    set ip=%%a
+    goto :show
+)
+:show
+set ip=%ip: =%
+echo Backend: http://%ip%:8080
+echo Frontend: http://%ip%:5173
 echo Close the separate windows to stop.

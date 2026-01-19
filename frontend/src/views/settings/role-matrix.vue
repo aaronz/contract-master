@@ -1,5 +1,5 @@
 <template>
-  <div class="role-matrix-page">
+  <div class="role-matrix-page p-6">
     <div class="page-header">
       <div>
         <h1 class="page-title">{{ $t('menu.permissionMatrix') }}</h1>
@@ -32,11 +32,9 @@
 
         <el-table-column v-for="role in roles" :key="role.id" :label="$t('common.roles.' + role.id)" width="180" align="center">
           <template #default="{ row }">
-            <div v-if="!row.children" class="permission-cell">
-              <!-- Access Checkbox -->
+            <div v-if="!row.children" class="cell-action">
               <el-checkbox 
                 v-model="permissionMap[role.id][row.id].enabled" 
-                :disabled="role.id === 'admin'"
                 @change="(val) => handleCheckChange(val, role.id, row.id)"
               />
               
@@ -44,7 +42,7 @@
               <el-popover
                 v-if="permissionMap[role.id][row.id].enabled"
                 placement="bottom"
-                title="Data Scope"
+                :title="$t('settings.dataScope')"
                 :width="250"
                 trigger="click"
                 popper-class="scope-popover"
@@ -58,17 +56,13 @@
                 <!-- Popover Content -->
                 <div class="scope-selector">
                   <div class="scope-option" @click="setScope(role.id, row.id, 'all')">
-                    <div class="dot all"></div> All Data
+                    <div class="dot all"></div> {{ $t('settings.scopes.all') }}
                   </div>
                   <div class="scope-option" @click="setScope(role.id, row.id, 'dept')">
-                    <div class="dot dept"></div> Department Only
+                    <div class="dot dept"></div> {{ $t('settings.scopes.dept') }}
                   </div>
                   <div class="scope-option" @click="setScope(role.id, row.id, 'self')">
-                    <div class="dot self"></div> Self Only
-                  </div>
-                  <div class="scope-divider"></div>
-                  <div class="scope-option" @click="setScope(role.id, row.id, 'custom')">
-                    <div class="dot custom"></div> Custom Region...
+                    <div class="dot self"></div> {{ $t('settings.scopes.self') }}
                   </div>
                 </div>
               </el-popover>
@@ -82,12 +76,14 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
 import { 
   Document, Connection, Warning, Operation, Setting, Refresh, Check 
 } from '@element-plus/icons-vue'
 import request from '@/utils/request'
 
+const { t } = useI18n()
 const saving = ref(false)
 const loading = ref(false)
 
@@ -168,11 +164,6 @@ const fetchRoles = async () => {
   }
 }
 
-// Initialize Data structure
-const initMap = () => {
-  // We'll init as we fetch roles now
-}
-
 const fetchPermissions = async () => {
   loading.value = true
   try {
@@ -224,9 +215,9 @@ const getScopeClass = (scope) => {
 
 const getScopeLabel = (scope) => {
    const map = {
-    'all': 'Global',
-    'dept': 'Dept',
-    'self': 'Self',
+    'all': t('settings.scopes.all'),
+    'dept': t('settings.scopes.dept'),
+    'self': t('settings.scopes.self'),
     'custom': 'Custom'
   }
   return map[scope]
@@ -277,93 +268,50 @@ const savePermissions = async () => {
   flex: 1;
 }
 
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-}
-
-.page-title {
-  font-size: 28px;
-  font-weight: 700;
-  color: #1E293B;
-  margin: 0 0 8px 0;
-  letter-spacing: -0.5px;
-}
-
-.page-subtitle {
-  color: #64748B;
-  margin: 0;
-  font-size: 14px;
-}
-
-.table-container {
-  overflow: hidden;
-  border-radius: 16px;
-}
-
 .module-cell {
   display: flex;
   align-items: center;
 }
 
-.font-bold {
-  font-weight: 700;
-  color: #1E293B;
-  font-size: 14px;
-}
-
 .text-secondary {
   color: #64748B;
   font-size: 13px;
-  padding-left: 8px;
 }
 
-.permission-cell {
+.cell-action {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 12px;
-  height: 28px;
+  gap: 8px;
 }
 
-/* Scope Badge Styles */
 .scope-badge {
   font-size: 10px;
+  font-weight: 700;
   padding: 2px 8px;
   border-radius: 10px;
   cursor: pointer;
-  font-weight: 600;
   text-transform: uppercase;
   transition: all 0.2s;
-  border: 1px solid transparent;
 }
 
-.scope-badge:hover {
-  transform: scale(1.05);
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
+.scope-all { background: #DBEAFE; color: #2563EB; }
+.scope-dept { background: #FEF3C7; color: #D97706; }
+.scope-self { background: #F1F5F9; color: #475569; }
 
-.scope-all { background: #ECFDF5; color: #059669; border-color: #A7F3D0; }
-.scope-dept { background: #EFF6FF; color: #2563EB; border-color: #BFDBFE; }
-.scope-self { background: #F1F5F9; color: #64748B; border-color: #E2E8F0; }
-.scope-custom { background: #FFF7ED; color: #EA580C; border-color: #FED7AA; }
-
-/* Popover Content */
 .scope-selector {
-  padding: 4px 0;
+  padding: 8px 0;
 }
 
 .scope-option {
   display: flex;
   align-items: center;
-  padding: 8px 12px;
+  gap: 12px;
+  padding: 10px 16px;
   cursor: pointer;
-  font-size: 13px;
-  border-radius: 6px;
   transition: background 0.2s;
-  color: #334155;
+  font-size: 13px;
+  font-weight: 500;
 }
 
 .scope-option:hover {
@@ -374,25 +322,15 @@ const savePermissions = async () => {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  margin-right: 10px;
 }
 
-.dot.all { background: #10B981; }
-.dot.dept { background: #3B82F6; }
-.dot.self { background: #94A3B8; }
-.dot.custom { background: #F97316; }
+.dot.all { background: #2563EB; }
+.dot.dept { background: #D97706; }
+.dot.self { background: #475569; }
 
-.scope-divider {
-  height: 1px;
-  background: #F1F5F9;
-  margin: 4px 0;
-}
-
-:deep(.el-table) {
-  --el-table-header-bg-color: rgba(248, 250, 252, 0.5);
-}
-
-:deep(.el-checkbox__inner) {
-  border-radius: 4px;
+.glass-card {
+  background: white;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 </style>
