@@ -35,8 +35,15 @@ public class AIExtractionService {
     @Autowired
     private com.contract.master.contract.domain.repository.ContractAttachmentRepository attachmentRepository;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    public AIExtractionService() {
+        org.springframework.http.client.SimpleClientHttpRequestFactory factory = new org.springframework.http.client.SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(10000);
+        factory.setReadTimeout(120000);
+        this.restTemplate = new RestTemplate(factory);
+    }
 
     public Map<String, Object> extract(MultipartFile file, String contractId) {
         String currentTenant = TenantContext.getCurrentTenant();
