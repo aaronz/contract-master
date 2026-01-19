@@ -32,6 +32,9 @@ public class IntegrationPushService {
     @Autowired
     private FieldMappingRepository mappingRepository;
 
+    @Autowired
+    private com.contract.master.integration.domain.repository.IntegrationLogRepository logRepository;
+
     private final RestTemplate restTemplate = new RestTemplate();
 
     @Async
@@ -42,6 +45,13 @@ public class IntegrationPushService {
 
         for (DownstreamSystem system : systems) {
             if (!Boolean.TRUE.equals(system.getIsEnabled())) continue;
+
+            long start = System.currentTimeMillis();
+            com.contract.master.integration.domain.model.IntegrationLog integrationLog = new com.contract.master.integration.domain.model.IntegrationLog();
+            integrationLog.setSourceSystem(system.getSystemName());
+            integrationLog.setEventType("OUTBOUND_PUSH");
+            integrationLog.setTenantId(tenantId);
+            integrationLog.setRecordsCount(1);
 
             try {
                 log.info("Pushing contract {} to downstream system: {}", contract.getContractId().value(), system.getSystemName());
@@ -56,9 +66,15 @@ public class IntegrationPushService {
                 HttpEntity<Map<String, Object>> entity = new HttpEntity<>(payload, headers);
                 restTemplate.postForEntity(system.getEndpointUrl(), entity, String.class);
                 
+                integrationLog.setStatus("SUCCESS");
                 log.info("Successfully pushed to {}", system.getSystemName());
             } catch (Exception e) {
+                integrationLog.setStatus("FAILED");
+                integrationLog.setErrorMessage(e.getMessage());
                 log.error("Failed to push to system {}: {}", system.getSystemName(), e.getMessage());
+            } finally {
+                integrationLog.setDurationMs(System.currentTimeMillis() - start);
+                logRepository.save(integrationLog);
             }
         }
     }

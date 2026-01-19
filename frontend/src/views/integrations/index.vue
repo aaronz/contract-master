@@ -35,13 +35,13 @@
     </el-dialog>
 
     <!-- Stats Row -->
-    <div class="stats-grid health-metrics">
+    <div class="stats-grid health-metrics" v-loading="statsLoading">
       <div class="stat-card glass-card">
         <div class="stat-icon bg-blue-100 text-blue-600">
           <el-icon><Connection /></el-icon>
         </div>
         <div class="stat-content">
-          <div class="stat-value">12</div>
+          <div class="stat-value">{{ hubStats.activeConnectors }}</div>
           <div class="stat-label">{{ $t('menu.connectors') }}</div>
         </div>
       </div>
@@ -50,7 +50,7 @@
           <el-icon><Check /></el-icon>
         </div>
         <div class="stat-content">
-          <div class="stat-value">98.5%</div>
+          <div class="stat-value">{{ hubStats.syncSuccessRate }}</div>
           <div class="stat-label">Sync Success Rate</div>
         </div>
       </div>
@@ -59,7 +59,7 @@
           <el-icon><DataAnalysis /></el-icon>
         </div>
         <div class="stat-content">
-          <div class="stat-value">45k</div>
+          <div class="stat-value">{{ hubStats.recordsSyncedToday }}</div>
           <div class="stat-label">Records Synced Today</div>
         </div>
       </div>
@@ -68,7 +68,7 @@
           <el-icon><Warning /></el-icon>
         </div>
         <div class="stat-content">
-          <div class="stat-value">3</div>
+          <div class="stat-value">{{ hubStats.pendingIssues }}</div>
           <div class="stat-label">{{ $t('compliance.problems') }}</div>
         </div>
       </div>
@@ -115,37 +115,45 @@
     <!-- Recent Activity Table -->
     <div class="section-title mt-8">{{ $t('dashboard.recentActivity') }}</div>
     <div class="glass-card table-wrapper">
-      <el-table :data="activities" style="width: 100%">
-        <el-table-column prop="source" :label="$t('common.resource')" width="180">
+      <el-table :data="activities" style="width: 100%" v-loading="activitiesLoading">
+        <el-table-column prop="sourceSystem" :label="$t('common.resource')" width="180">
           <template #default="{ row }">
             <div class="flex items-center gap-2">
-              <div class="mini-dot" :style="{ background: row.color }"></div>
-              <span class="font-medium">{{ row.source }}</span>
+              <div class="mini-dot" :style="{ background: '#3B82F6' }"></div>
+              <span class="font-medium">{{ row.sourceSystem }}</span>
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="type" :label="$t('common.action')" width="180">
+        <el-table-column prop="eventType" :label="$t('common.action')" width="180">
           <template #default="{ row }">
-            <el-tag size="small" :type="row.type === 'Full Sync' ? 'primary' : 'success'" effect="plain" round>
-              {{ row.type }}
+            <el-tag size="small" :type="row.eventType === 'OUTBOUND_PUSH' ? 'primary' : 'success'" effect="plain" round>
+              {{ row.eventType }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="records" label="Records" />
-        <el-table-column prop="duration" label="Duration" />
+        <el-table-column prop="recordsCount" label="Records" />
+        <el-table-column prop="durationMs" label="Duration">
+          <template #default="{ row }">
+            {{ row.durationMs }}ms
+          </template>
+        </el-table-column>
         <el-table-column prop="status" :label="$t('common.status')">
            <template #default="{ row }">
             <div class="flex items-center gap-2">
-              <span :class="['status-text', row.status === 'Success' ? 'text-green' : 'text-red']">
+              <span :class="['status-text', row.status === 'SUCCESS' ? 'text-green' : 'text-red']">
                 {{ row.status }}
               </span>
-              <el-button v-if="row.status === 'Failed'" size="small" circle class="retry-btn" @click="handleRetry(row)">
+              <el-button v-if="row.status === 'FAILED'" size="small" circle class="retry-btn" @click="handleRetry(row)">
                 <el-icon><Refresh /></el-icon>
               </el-button>
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="time" :label="$t('common.time')" align="right" />
+        <el-table-column prop="createTime" :label="$t('common.time')" align="right">
+          <template #default="{ row }">
+            {{ row.createTime ? new Date(row.createTime).toLocaleTimeString() : '-' }}
+          </template>
+        </el-table-column>
       </el-table>
     </div>
   </div>
@@ -157,56 +165,21 @@ import { Connection, Check, DataAnalysis, Warning, Plus, Refresh } from '@elemen
 import { ElMessage } from 'element-plus'
 import request from '@/utils/request'
 
-const connectors = ref([
-  { 
-    id: 1, 
-    name: 'Salesforce', 
-    description: 'Main CRM for North America Sales Team.', 
-    status: 'online', 
-    lastSync: '2 mins ago', 
-    active: true,
-    color: '#00A1E0' 
-  },
-  { 
-    id: 2, 
-    name: 'HubSpot', 
-    description: 'Marketing automation and lead tracking.', 
-    status: 'online', 
-    lastSync: '15 mins ago', 
-    active: true,
-    color: '#FF7A59' 
-  },
-  { 
-    id: 3, 
-    name: 'DingTalk', 
-    description: 'Internal approval workflows sync.', 
-    status: 'syncing', 
-    lastSync: 'Syncing...', 
-    active: true,
-    color: '#0089FF' 
-  },
-  { 
-    id: 4, 
-    name: 'SAP ERP', 
-    description: 'Financial data and invoice reconciliation.', 
-    status: 'offline', 
-    lastSync: '2 days ago', 
-    active: false,
-    color: '#0FAAFF' 
-  },
-])
+const connectors = ref([])
+const activities = ref([])
+const hubStats = ref({
+  activeConnectors: 0,
+  syncSuccessRate: '0%',
+  recordsSyncedToday: 0,
+  pendingIssues: 0
+})
 
-const activities = ref([
-  { source: 'Salesforce', color: '#00A1E0', type: 'Incremental', records: '124', duration: '1.2s', status: 'Success', time: '10:42 AM' },
-  { source: 'HubSpot', color: '#FF7A59', type: 'Full Sync', records: '4,521', duration: '45s', status: 'Success', time: '10:30 AM' },
-  { source: 'DingTalk', color: '#0089FF', type: 'Webhook', records: '1', duration: '0.4s', status: 'Success', time: '10:15 AM' },
-  { source: 'SAP ERP', color: '#0FAAFF', type: 'Scheduled', records: '0', duration: '0s', status: 'Failed', time: '09:00 AM' },
-  { source: 'Salesforce', color: '#00A1E0', type: 'Incremental', records: '45', duration: '0.8s', status: 'Success', time: '08:45 AM' },
-])
-
+const statsLoading = ref(false)
+const activitiesLoading = ref(false)
 const showConnectorDialog = ref(false)
 const isEdit = ref(false)
 const saving = ref(false)
+
 const connectorForm = ref({
   systemId: '',
   systemName: '',
@@ -215,6 +188,34 @@ const connectorForm = ref({
   accessKey: '',
   isEnabled: true
 })
+
+const fetchHubStats = async () => {
+  statsLoading.value = true
+  try {
+    const res = await request.get('/integration-hub/stats')
+    if (res.data && res.data.data) {
+      hubStats.value = res.data.data
+    }
+  } catch (e) {
+    console.error('Failed to fetch hub stats', e)
+  } finally {
+    statsLoading.value = false
+  }
+}
+
+const fetchActivities = async () => {
+  activitiesLoading.value = true
+  try {
+    const res = await request.get('/integration-hub/activities')
+    if (res.data && res.data.data) {
+      activities.value = res.data.data
+    }
+  } catch (e) {
+    console.error('Failed to fetch hub activities', e)
+  } finally {
+    activitiesLoading.value = false
+  }
+}
 
 const handleAddConnector = () => {
   isEdit.value = false
@@ -232,11 +233,11 @@ const handleAddConnector = () => {
 const handleEditConnector = (connector) => {
   isEdit.value = true
   connectorForm.value = {
-    systemId: connector.systemId || connector.id,
+    systemId: connector.systemId,
     systemName: connector.name,
-    endpointUrl: connector.endpointUrl || '',
-    authType: connector.authType || 'API_KEY',
-    accessKey: connector.accessKey || '',
+    endpointUrl: connector.endpointUrl,
+    authType: connector.authType,
+    accessKey: connector.accessKey,
     isEnabled: connector.active
   }
   showConnectorDialog.value = true
@@ -260,6 +261,7 @@ const handleSaveConnector = async () => {
       ElMessage.success(isEdit.value ? 'Connector updated' : 'Connector created')
       showConnectorDialog.value = false
       fetchConnectors()
+      fetchHubStats()
     } else {
       ElMessage.error('Failed to save connector')
     }
@@ -274,7 +276,7 @@ const fetchConnectors = async () => {
   try {
     const res = await request.get('/v1/settings/downstream')
     if (res.data && res.data.data) {
-      const backendConnectors = res.data.data.map(sys => ({
+      connectors.value = res.data.data.map(sys => ({
         id: sys.systemId,
         systemId: sys.systemId,
         name: sys.systemName,
@@ -287,8 +289,6 @@ const fetchConnectors = async () => {
         accessKey: sys.accessKey,
         endpointUrl: sys.endpointUrl
       }))
-      // Merge or replace
-      connectors.value = backendConnectors
     }
   } catch (error) {
     console.error('Failed to fetch connectors', error)
@@ -297,10 +297,12 @@ const fetchConnectors = async () => {
 
 onMounted(() => {
   fetchConnectors()
+  fetchHubStats()
+  fetchActivities()
 })
 
 const handleRetry = (row) => {
-  ElMessage.success('Retry initiated for ' + row.source)
+  ElMessage.success('Retry initiated for ' + row.sourceSystem)
 }
 </script>
 
