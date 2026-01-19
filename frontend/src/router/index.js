@@ -89,6 +89,11 @@ const routes = [
         name: 'CardGenerator',
         component: () => import('@/views/developer/card-generator.vue'),
       },
+      {
+        path: 'guide',
+        name: 'UserGuide',
+        component: () => import('@/views/guide/index.vue'),
+      },
     ],
   },
 ]

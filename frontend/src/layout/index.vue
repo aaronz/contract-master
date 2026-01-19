@@ -112,6 +112,10 @@
           <div class="header-actions">
             <el-divider direction="vertical" />
             
+            <el-button circle text class="icon-btn" @click="$router.push('/guide')">
+              <el-icon><QuestionFilled /></el-icon>
+            </el-button>
+
             <el-dropdown trigger="click" popper-class="notification-popper">
               <el-badge :value="unreadCount" :hidden="unreadCount === 0" class="notification-badge" type="danger">
                 <el-button circle text class="icon-btn">
@@ -163,7 +167,8 @@
 <script setup>
 import { 
   DataLine, Document, Setting, Bell, InfoFilled, 
-  Warning, Connection, Hide, DocumentChecked, Operation, Tools 
+  Warning, Connection, Hide, DocumentChecked, Operation, Tools,
+  QuestionFilled
 } from '@element-plus/icons-vue'
 import { ref, onMounted, computed, onUnmounted } from 'vue'
 import request from '@/utils/request'
