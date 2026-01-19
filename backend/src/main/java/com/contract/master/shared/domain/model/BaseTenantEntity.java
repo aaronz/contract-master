@@ -20,8 +20,10 @@ import java.util.Objects;
 @MappedSuperclass
 @FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = String.class))
 @FilterDef(name = "dataScopeFilter", parameters = @ParamDef(name = "deptIds", type = String.class))
+@FilterDef(name = "ownerScopeFilter", parameters = @ParamDef(name = "userId", type = String.class))
 @Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 @Filter(name = "dataScopeFilter", condition = "owner_dept_id IN (:deptIds)")
+@Filter(name = "ownerScopeFilter", condition = "owner_user_id = :userId")
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseTenantEntity extends BaseDomainEntity implements TenantAware { 
 

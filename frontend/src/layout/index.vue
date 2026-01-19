@@ -72,6 +72,8 @@
               <el-icon><Setting /></el-icon>
               <span>{{ $t('menu.systemSettings') }}</span>
             </template>
+            <el-menu-item index="/settings/roles">{{ $t('menu.roleManagement') }}</el-menu-item>
+            <el-menu-item index="/settings/users">User Management</el-menu-item>
             <el-menu-item index="/settings/permissions">{{ $t('menu.permissionMatrix') }}</el-menu-item>
             <el-menu-item index="/settings/fields">{{ $t('menu.fieldConfig') }}</el-menu-item>
           </el-sub-menu>

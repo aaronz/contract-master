@@ -35,11 +35,25 @@ public class DataScopeAspect {
     @Before("contractRepositoryMethods()")
     public void applyDataScope() {
         String tenantIdStr = TenantContext.getCurrentTenant();
-        if (tenantIdStr != null) {
+        org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        
+        if (tenantIdStr != null && auth != null) {
+            List<String> roles = auth.getAuthorities().stream()
+                    .map(a -> a.getAuthority().replace("ROLE_", ""))
+                    .collect(java.util.stream.Collectors.toList());
+            
             List<DataPermissionRule> rules = ruleRepository.findByTenantIdAndIsEnabled(TenantId.of(tenantIdStr), true);
             Session session = entityManager.unwrap(Session.class);
             
-            for (DataPermissionRule rule : rules) {
+            List<DataPermissionRule> applicableRules = rules.stream()
+                    .filter(r -> roles.contains(r.getRoleId()))
+                    .collect(java.util.stream.Collectors.toList());
+
+            if (roles.contains("admin")) {
+                return;
+            }
+
+            for (DataPermissionRule rule : applicableRules) {
                 try {
                     JsonNode condition = objectMapper.readTree(rule.getFilterCondition());
                     if (condition.has("dept_id")) {
@@ -48,6 +62,13 @@ public class DataScopeAspect {
                         if (!deptIds.isEmpty()) {
                             session.enableFilter("dataScopeFilter").setParameterList("deptIds", deptIds);
                         }
+                    }
+                    if (condition.has("owner_id")) {
+                        String userId = condition.get("owner_id").asText();
+                        if ("CURRENT_USER".equals(userId)) {
+                            userId = auth.getName();
+                        }
+                        session.enableFilter("ownerScopeFilter").setParameter("userId", userId);
                     }
                 } catch (Exception e) {
                 }

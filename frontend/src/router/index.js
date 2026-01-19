@@ -77,7 +77,17 @@ const routes = [
       {
         path: 'settings/permissions',
         name: 'PermissionMatrix',
-        component: () => import('@/views/settings/role-matrix.vue'), // Keep existing file for now, might refactor
+        component: () => import('@/views/settings/role-matrix.vue'),
+      },
+      {
+        path: 'settings/roles',
+        name: 'RoleManagement',
+        component: () => import('@/views/settings/roles.vue'),
+      },
+      {
+        path: 'settings/users',
+        name: 'UserManagement',
+        component: () => import('@/views/settings/users.vue'),
       },
       {
         path: 'settings/fields',

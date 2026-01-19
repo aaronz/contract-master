@@ -14,6 +14,9 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 
+import java.util.stream.Collectors;
+import java.util.List;
+
 @Service
 public class AuthApplicationService {
 
@@ -23,6 +26,9 @@ public class AuthApplicationService {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
+    @Autowired
+    private com.contract.master.identity.domain.repository.UserRoleRelRepository userRoleRelRepository;
+
     public AuthResponse authenticate(LoginRequest request) {
         if (request.getTenantId() != null) {
             TenantContext.setCurrentTenant(request.getTenantId());
@@ -31,6 +37,16 @@ public class AuthApplicationService {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
             );
+            
+            List<String> roles = userRoleRelRepository.findByUserIdAndTenantId(
+                request.getUsername(), 
+                com.contract.master.shared.domain.model.TenantId.of(request.getTenantId())
+            ).stream().map(com.contract.master.identity.domain.model.UserRoleRel::getRoleId).collect(Collectors.toList());
+            
+            if ("admin".equals(request.getUsername()) && roles.isEmpty()) {
+                roles.add("admin");
+            }
+
             String token = jwtTokenProvider.generateToken(authentication);
             return new AuthResponse(token);
         } catch (BadCredentialsException e) {

@@ -76,6 +76,7 @@ export default {
     auditLogs: 'Audit Logs',
     ruleEngine: 'Rule Engine',
     evaluationRules: 'Evaluation Rules',
+    roleManagement: 'Role Management',
     systemSettings: 'System Settings',
     permissionMatrix: 'Permission Matrix',
     fieldConfig: 'Field Config',

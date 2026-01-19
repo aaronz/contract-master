@@ -11,7 +11,7 @@
       </div>
     </div>
 
-    <div class="glass-card table-container">
+    <div class="glass-card table-container" v-loading="loading">
       <el-table 
         :data="modules" 
         style="width: 100%" 
@@ -19,6 +19,7 @@
         default-expand-all
         :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
         class="matrix-table"
+        height="100%"
       >
         <el-table-column prop="name" :label="$t('common.moduleAction')" width="300" fixed>
            <template #default="{ row }">
@@ -80,21 +81,17 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { 
   Document, Connection, Warning, Operation, Setting, Refresh, Check 
 } from '@element-plus/icons-vue'
+import request from '@/utils/request'
 
 const saving = ref(false)
+const loading = ref(false)
 
-const roles = [
-  { id: 'admin', name: 'System Admin' },
-  { id: 'legal_mgr', name: 'Legal Manager' },
-  { id: 'sales_lead', name: 'Sales Director' },
-  { id: 'sales', name: 'Sales Rep' },
-  { id: 'finance', name: 'Finance Audit' }
-]
+const roles = ref([])
 
 const modules = [
   {
@@ -143,43 +140,70 @@ const modules = [
 // Structure: { roleId: { moduleId: { enabled: boolean, scope: 'all'|'dept'|'self'|'custom' } } }
 const permissionMap = reactive({})
 
-// Initialize Data
-roles.forEach(role => {
-  permissionMap[role.id] = {}
-  modules.forEach(mod => {
-    if (mod.children) {
-      mod.children.forEach(child => {
-        let enabled = false
-        let scope = 'self'
-
-        if (role.id === 'admin') {
-          enabled = true
-          scope = 'all'
-        } else if (role.id === 'legal_mgr') {
-           enabled = true
-           scope = 'all'
-           if (child.id.includes('integration')) enabled = false
-        } else if (role.id === 'sales_lead') {
-           if (child.id.includes('contract')) {
-             enabled = true
-             scope = 'dept'
-           }
-        } else if (role.id === 'sales') {
-           if (child.id === 'contract_view' || child.id === 'contract_create') {
-             enabled = true
-             scope = 'self'
-           }
+const fetchRoles = async () => {
+  try {
+    const res = await request.get('/roles')
+    if (res.data && res.data.data) {
+      roles.value = res.data.data.map(r => ({
+        id: r.roleId,
+        name: r.roleName
+      }))
+      
+      // Initialize map for fetched roles
+      roles.value.forEach(role => {
+        if (!permissionMap[role.id]) {
+          permissionMap[role.id] = {}
+          modules.forEach(mod => {
+            if (mod.children) {
+              mod.children.forEach(child => {
+                permissionMap[role.id][child.id] = { enabled: false, scope: 'self' }
+              })
+            }
+          })
         }
-        
-        permissionMap[role.id][child.id] = { enabled, scope }
       })
     }
-  })
+  } catch (e) {
+    console.error('Failed to fetch roles', e)
+  }
+}
+
+// Initialize Data structure
+const initMap = () => {
+  // We'll init as we fetch roles now
+}
+
+const fetchPermissions = async () => {
+  loading.value = true
+  try {
+    await fetchRoles()
+    const res = await request.get('/permissions/matrix')
+    if (res.data && res.data.data) {
+      const backendMatrix = res.data.data
+      // Merge with map
+      Object.keys(backendMatrix).forEach(roleId => {
+        if (permissionMap[roleId]) {
+          Object.keys(backendMatrix[roleId]).forEach(modId => {
+            if (permissionMap[roleId][modId]) {
+              permissionMap[roleId][modId] = backendMatrix[roleId][modId]
+            }
+          })
+        }
+      })
+    }
+  } catch (error) {
+    console.error('Failed to fetch permissions', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  fetchPermissions()
 })
 
 const handleCheckChange = (val, roleId, modId) => {
   if (val) {
-    // Default scope when enabling
     permissionMap[roleId][modId].scope = 'self'
   }
 }
@@ -208,16 +232,21 @@ const getScopeLabel = (scope) => {
   return map[scope]
 }
 
-const savePermissions = () => {
+const savePermissions = async () => {
   saving.value = true
-  setTimeout(() => {
-    saving.value = false
+  try {
+    await request.post('/permissions/matrix', permissionMap)
     ElMessage.success({
       message: 'Permissions and data scopes updated successfully',
       type: 'success',
       plain: true,
     })
-  }, 1000)
+  } catch (error) {
+    console.error('Failed to save permissions', error)
+    ElMessage.error('Failed to save permissions')
+  } finally {
+    saving.value = false
+  }
 }
 </script>
 
@@ -225,7 +254,27 @@ const savePermissions = () => {
 .role-matrix-page {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: calc(100vh - 120px);
+}
+
+.page-header {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.table-container {
+  flex: 1;
+  overflow: hidden;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.matrix-table {
+  flex: 1;
 }
 
 .page-header {

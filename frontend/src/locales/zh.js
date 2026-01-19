@@ -76,6 +76,7 @@ export default {
     auditLogs: '审计日志',
     ruleEngine: '规则引擎',
     evaluationRules: '合规规则库',
+    roleManagement: '角色管理',
     systemSettings: '系统设置',
     permissionMatrix: '权限矩阵',
     fieldConfig: '字段配置',

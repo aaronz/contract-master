@@ -15,7 +15,9 @@ import com.contract.master.rule.domain.model.RuleStatus;
 import com.contract.master.rule.domain.repository.RuleRepository;
 import com.contract.master.evaluation.domain.repository.RuleConfigRepository;
 import com.contract.master.identity.domain.model.User;
+import com.contract.master.identity.domain.model.Role;
 import com.contract.master.identity.domain.repository.UserRepository;
+import com.contract.master.identity.domain.repository.RoleRepository;
 import com.contract.master.shared.domain.model.TenantId;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -58,8 +60,30 @@ public class ContractManagementApplication {
     
 
     @Bean
-    public CommandLineRunner initData(UserRepository userRepository, ContractRepository contractRepository, RuleConfigRepository ruleConfigRepository, RuleRepository ruleRepository, PasswordEncoder passwordEncoder) {
+    public CommandLineRunner initData(UserRepository userRepository, RoleRepository roleRepository, ContractRepository contractRepository, RuleConfigRepository ruleConfigRepository, RuleRepository ruleRepository, PasswordEncoder passwordEncoder) {
         return args -> {
+            System.out.println(">>> CHECKING ROLES...");
+            TenantId t1 = TenantId.of("tenant-1");
+            if (roleRepository.findByTenantId(t1).isEmpty()) {
+                System.out.println(">>> CREATING DEFAULT ROLES...");
+                String[][] defaultRoles = {
+                    {"admin", "System Admin", "SYSTEM"},
+                    {"legal_mgr", "Legal Manager", "STANDARD"},
+                    {"sales_lead", "Sales Director", "STANDARD"},
+                    {"sales", "Sales Rep", "STANDARD"},
+                    {"finance", "Finance Audit", "STANDARD"}
+                };
+                for (String[] r : defaultRoles) {
+                    Role role = new Role();
+                    role.setRoleId(r[0]);
+                    role.setRoleName(r[1]);
+                    role.setRoleType(r[2]);
+                    role.setStatus(1);
+                    role.setTenantId(t1);
+                    roleRepository.save(role);
+                }
+            }
+
             System.out.println(">>> CHECKING ADMIN USER...");
             if (userRepository.findByUserName("admin").isEmpty()) {
                 System.out.println(">>> CREATING ADMIN USER...");
