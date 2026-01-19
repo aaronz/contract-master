@@ -23,5 +23,5 @@ public interface EvaluationJobRepository extends JpaRepository<EvaluationJob, Lo
     Optional<EvaluationJob> findByJobId(String jobId);
 
     @Query(value = "SELECT ej FROM EvaluationJob ej WHERE ej.tenantId.id = :id AND ej.targetContracts LIKE %:contractIdJson% AND ej.status = :status")
-    List<EvaluationJob> findByTenantIdAndTargetContractsContainingAndStatus(@org.springframework.data.repository.query.Param("id") String id, String contractIdJson, EvaluationJob.JobStatus status);
+    List<EvaluationJob> findByTenantIdAndTargetContractsContainingAndStatus(@org.springframework.data.repository.query.Param("id") String id, String contractIdJson, JobStatus status);
 }

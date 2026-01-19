@@ -14,16 +14,7 @@
     </div>
 
     <div class="cockpit-content">
-      <div class="pdf-pane glass-card" :style="{ width: splitWidth + '%' }">
-        <PdfViewer 
-          ref="pdfViewerRef"
-          :url="pdfUrl"
-          :highlights="currentHighlights"
-          :fileName="selectedContractNo"
-        />
-      </div>
-      <div class="resizer" @mousedown="startResizing"></div>
-      <div class="list-pane glass-card" :style="{ width: (100 - splitWidth) + '%' }">
+      <div class="list-pane glass-card full-width">
         <ProblemTable 
           ref="problemTableRef"
           :contract-id="selectedContractId"
@@ -35,9 +26,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import PdfViewer from '@/components/pdf/PdfViewer.vue'
 import ProblemTable from './ProblemTable.vue'
 import contractApi from '@/services/contractApi'
 import problemApi from '@/services/problemApi'
@@ -46,26 +36,15 @@ const selectedContractId = ref(null)
 const selectedContractNo = ref('')
 const contracts = ref([])
 const evaluating = ref(false)
-const splitWidth = ref(60)
-const pdfViewerRef = ref(null)
 const problemTableRef = ref(null)
-const pdfUrl = ref('')
-
-const currentHighlights = ref([])
 
 const handleContractChange = async (val) => {
   if (!val) {
-    pdfUrl.value = ''
     selectedContractNo.value = ''
-    currentHighlights.value = []
     return
   }
   const contract = contracts.value.find(c => c.value === val)
   selectedContractNo.value = contract?.label || ''
-  
-  // In a real app, we'd get the actual PDF URL from the contract detail
-  // For demo, we'll use a placeholder or assume a standard path
-  pdfUrl.value = `/api/contracts/${val}/pdf`
   
   if (problemTableRef.value) {
     problemTableRef.value.loadProblems()
@@ -74,17 +53,25 @@ const handleContractChange = async (val) => {
 
 const loadContracts = async () => {
   try {
-    const response = await contractApi.getContracts();
-    let contractList = response && response.data ? (Array.isArray(response.data) ? response.data : response.data.content) : [];
-    if (!contractList) {
-      contractList = [];
+    const response = await contractApi.getContracts({ size: 1000 });
+    const result = response.data?.data || response.data;
+    let contractList = [];
+    
+    if (result) {
+      if (Array.isArray(result)) {
+        contractList = result;
+      } else if (result.content && Array.isArray(result.content)) {
+        contractList = result.content;
+      }
     }
+    
     contracts.value = contractList.map(c => ({
       value: c.contractId,
-      label: c.contractNo
+      label: c.contractNo + ' - ' + c.contractName
     }));
   } catch (error) {
     console.error('Failed to load contracts', error)
+    ElMessage.error('Failed to load contracts for selection')
   }
 }
 
@@ -128,36 +115,7 @@ const triggerEvaluation = async () => {
 }
 
 const handleProblemSelected = (problem) => {
-  if (!problem.locationInContract) return
-  
-  try {
-    const location = JSON.parse(problem.locationInContract)
-    currentHighlights.value = [location]
-    
-    if (pdfViewerRef.value) {
-      pdfViewerRef.value.scrollToPage(location.page)
-    }
-  } catch (e) {
-    console.error('Failed to parse location data', e)
-  }
-}
-
-const startResizing = (e) => {
-  const startX = e.clientX
-  const startWidth = splitWidth.value
-  
-  const handleMouseMove = (moveEvent) => {
-    const delta = ((moveEvent.clientX - startX) / window.innerWidth) * 100
-    splitWidth.value = Math.max(20, Math.min(80, startWidth + delta))
-  }
-  
-  const handleMouseUp = () => {
-    document.removeEventListener('mousemove', handleMouseMove)
-    document.removeEventListener('mouseup', handleMouseUp)
-  }
-  
-  document.addEventListener('mousemove', handleMouseMove)
-  document.addEventListener('mouseup', handleMouseUp)
+  // Logic for highlighting in PDF removed as PDF view is disabled
 }
 
 onMounted(() => {
@@ -205,22 +163,12 @@ onMounted(() => {
   min-height: 0;
 }
 
-.pdf-pane, .list-pane {
+.list-pane {
   display: flex;
   flex-direction: column;
   overflow: hidden;
   border-radius: 12px;
-}
-
-.resizer {
-  width: 8px;
-  cursor: col-resize;
-  background: transparent;
-  transition: background 0.2s;
-}
-
-.resizer:hover {
-  background: rgba(59, 130, 246, 0.2);
+  width: 100%;
 }
 
 .glass-panel {

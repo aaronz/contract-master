@@ -14,7 +14,7 @@ export default {
   },
 
   triggerEvaluation(contractId) {
-    return request.post('/evaluations', { contractIds: [contractId] })
+    return request.post('/problem-center/evaluations', { contractId })
   },
 
   getRules() {

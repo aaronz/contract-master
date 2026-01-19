@@ -13,7 +13,14 @@ public class KafkaProducerService {
         this.kafkaTemplate = kafkaTemplate;
     }
 
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(KafkaProducerService.class);
+
     public void sendMessage(String message) {
-        kafkaTemplate.send(TOPIC, message);
+        try {
+            logger.info("Sending message to Kafka topic {}: {}", TOPIC, message);
+            kafkaTemplate.send(TOPIC, message);
+        } catch (Exception e) {
+            logger.error("CRITICAL: Failed to send message to Kafka topic {}. Is Kafka running at localhost:9092?", TOPIC, e);
+        }
     }
 }

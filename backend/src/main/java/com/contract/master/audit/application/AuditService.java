@@ -22,6 +22,11 @@ public class AuditService {
         this.auditLogRepository = auditLogRepository;
     }
 
+    private TenantId getCurrentTenantId() {
+        String tenantId = TenantContext.getCurrentTenant();
+        return TenantId.of(tenantId != null ? tenantId : "tenant-1");
+    }
+
     public void logChange(String contractId, String field, String oldVal, String newVal, String type, String user) {
         AuditLog log = new AuditLog();
         log.setContractId(contractId);
@@ -30,7 +35,7 @@ public class AuditService {
         log.setNewValue(newVal);
         log.setModifyType(type);
         log.setModifyUser(user);
-        log.setTenantId(TenantId.of(TenantContext.getCurrentTenant())); // Ensure tenantId is set
+        log.setTenantId(getCurrentTenantId());
         auditLogRepository.save(log);
     }
 
@@ -41,7 +46,7 @@ public class AuditService {
         log.setNewValue("Rules: " + ruleIds); // Details about the re-evaluation
         log.setModifyType(RE_EVALUATION_TRIGGERED);
         log.setModifyUser(user);
-        log.setTenantId(TenantId.of(TenantContext.getCurrentTenant())); // Ensure tenantId is set
+        log.setTenantId(getCurrentTenantId());
         auditLogRepository.save(log);
     }
 

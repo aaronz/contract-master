@@ -103,7 +103,7 @@ public class ContractManagementApplication {
                   c3.setContractId(ContractId.of(UUID.randomUUID().toString()));
                   c3.setContractNo(new ContractNo("CON-2026-STAB"));
                   c3.setContractName("Stabilization Contract");
-                  c3.setPartyA(new ContractParty(null, "Acme Corp", null, null, null));
+                  c3.setPartyA(new ContractParty(null, "Internal HQ", null, null, null));
                   c3.setPartyB(new ContractParty(null, "TechSolutions Inc", null, null, null));
                   c3.setAmount(ContractAmount.of(new BigDecimal("2000000.00"), "USD"));
                   c3.setStatus("DRAFT");
@@ -124,7 +124,7 @@ public class ContractManagementApplication {
                 rule1.setRuleType("RISK_CHECK");
                 rule1.setRuleLevel("HIGH");
                 rule1.setTriggerTime("BEFORE_APPROVAL");
-                rule1.setRuleCondition("amount > 1000000");
+                rule1.setRuleCondition("contractAmount > 500000");
                 rule1.setExecutionActions("REQUIRE_LEGAL_REVIEW");
                 rule1.setIsEnabled(true);
                 rule1.setTenantId(TenantId.of("tenant-1"));
@@ -132,12 +132,12 @@ public class ContractManagementApplication {
 
                 RuleConfig rule2 = new RuleConfig();
                 rule2.setRuleId(UUID.randomUUID().toString());
-                rule2.setRuleName("Missing Attachment Check");
+                rule2.setRuleName("Internal Party Compliance Check");
                 rule2.setRuleType("COMPLIANCE");
                 rule2.setRuleLevel("MEDIUM");
                 rule2.setTriggerTime("BEFORE_SUBMIT");
-                rule2.setRuleCondition("attachmentCount == 0");
-                rule2.setExecutionActions("BLOCK_SUBMISSION");
+                rule2.setRuleCondition("partyAName == 'Internal HQ'");
+                rule2.setExecutionActions("NOTIFY");
                 rule2.setIsEnabled(true);
                 rule2.setTenantId(TenantId.of("tenant-1"));
                 ruleConfigRepository.save(rule2);
@@ -149,9 +149,9 @@ public class ContractManagementApplication {
                 System.out.println(">>> CREATING DEFAULT RULES...");
                 Rule rule1 = new Rule();
                 rule1.setName("High Value Contract Check");
-                rule1.setDescription("Check if contract amount is greater than 1,000,000");
+                rule1.setDescription("Check if contract amount is greater than 500,000");
                 rule1.setLogicType(RuleLogicType.LOGIC);
-                rule1.setLogicContent("{\"type\":\"group\",\"operator\":\"AND\",\"children\":[{\"type\":\"rule\",\"field\":\"contractAmount\",\"operator\":\"gt\",\"value\":\"1000000\"}]}");
+                rule1.setLogicContent("{\"type\":\"group\",\"operator\":\"AND\",\"children\":[{\"type\":\"rule\",\"field\":\"contractAmount\",\"operator\":\"gt\",\"value\":\"500000\"}]}");
                 rule1.setSeverity(Severity.SEVERE);
                 rule1.setStatus(RuleStatus.ACTIVE);
                 rule1.setTenantId(TenantId.of("tenant-1"));
@@ -159,13 +159,24 @@ public class ContractManagementApplication {
 
                 Rule rule2 = new Rule();
                 rule2.setName("Internal Entity Match");
-                rule2.setDescription("Check if Party A and Party B are the same");
+                rule2.setDescription("Check if Party A is Internal HQ");
                 rule2.setLogicType(RuleLogicType.LOGIC);
                 rule2.setLogicContent("{\"type\":\"group\",\"operator\":\"AND\",\"children\":[{\"type\":\"rule\",\"field\":\"partyAName\",\"operator\":\"eq\",\"value\":\"Internal HQ\"}]}");
                 rule2.setSeverity(Severity.WARNING);
                 rule2.setStatus(RuleStatus.ACTIVE);
                 rule2.setTenantId(TenantId.of("tenant-1"));
                 ruleRepository.save(rule2);
+
+                Rule rule3 = new Rule();
+                rule3.setName("Acme Corp Monitoring");
+                rule3.setDescription("Flag all contracts with Acme Corp as Party A");
+                rule3.setLogicType(RuleLogicType.LOGIC);
+                rule3.setLogicContent("{\"type\":\"group\",\"operator\":\"AND\",\"children\":[{\"type\":\"rule\",\"field\":\"partyAName\",\"operator\":\"eq\",\"value\":\"Acme Corp\"}]}");
+                rule3.setSeverity(Severity.INFO);
+                rule3.setStatus(RuleStatus.ACTIVE);
+                rule3.setTenantId(TenantId.of("tenant-1"));
+                ruleRepository.save(rule3);
+
                 System.out.println(">>> DEFAULT RULES CREATED SUCCESSFULLY.");
             }
         };

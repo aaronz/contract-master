@@ -3,6 +3,7 @@ package com.contract.master.evaluation.application;
 import com.contract.master.evaluation.domain.model.EvaluationJob;
 import com.contract.master.evaluation.domain.model.EvaluationResult;
 import com.contract.master.evaluation.domain.model.ResultStatus;
+import com.contract.master.evaluation.domain.model.JobStatus;
 import com.contract.master.evaluation.domain.repository.EvaluationJobRepository;
 import com.contract.master.evaluation.domain.repository.EvaluationResultRepository;
 import com.contract.master.evaluation.domain.service.RuleEngineDomainService;
@@ -128,8 +129,14 @@ public class EvaluationApplicationService {
     @Transactional
     public String triggerReEvaluationForSingleContract(String contractId, List<String> ruleIds, String triggeredBy) {
         String tenantId = TenantContext.getCurrentTenant();
+        if (tenantId == null) {
+            logger.warn("Tenant ID missing from context, falling back to tenant-1");
+            tenantId = "tenant-1";
+        }
 
-        contractService.getContractById(contractId);
+        if (contractService.getContractById(contractId) == null) {
+            throw new IllegalArgumentException("Contract with ID " + contractId + " not found.");
+        }
 
         String contractIdJson;
         try {
@@ -140,7 +147,7 @@ public class EvaluationApplicationService {
         }
         
         List<EvaluationJob> inProgressJobs = jobRepository.findByTenantIdAndTargetContractsContainingAndStatus(
-                tenantId, contractIdJson, EvaluationJob.JobStatus.IN_PROGRESS);
+                tenantId, contractIdJson, JobStatus.IN_PROGRESS);
 
         if (!inProgressJobs.isEmpty()) {
             throw new IllegalStateException("An evaluation for this contract is already in progress.");
@@ -148,7 +155,8 @@ public class EvaluationApplicationService {
 
         EvaluationJob job = createAndPublishEvaluationJob(ruleIds, List.of(contractId), tenantId, triggeredBy);
         
-        auditService.logReEvaluationTriggered(contractId, String.join(",", ruleIds), triggeredBy);
+        String rulesStr = ruleIds != null ? String.join(",", ruleIds) : "all";
+        auditService.logReEvaluationTriggered(contractId, rulesStr, triggeredBy);
 
         return job.getJobId();
     }

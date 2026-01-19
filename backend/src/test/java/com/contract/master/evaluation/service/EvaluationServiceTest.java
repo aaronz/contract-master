@@ -3,6 +3,7 @@ import com.contract.master.shared.domain.model.TenantId;
 
 import com.contract.master.evaluation.domain.model.EvaluationJob;
 import com.contract.master.evaluation.domain.model.EvaluationResult;
+import com.contract.master.evaluation.domain.model.JobStatus;
 import com.contract.master.evaluation.domain.repository.EvaluationJobRepository;
 import com.contract.master.evaluation.domain.repository.EvaluationResultRepository;
 import com.contract.master.audit.application.AuditService;
@@ -68,7 +69,7 @@ class EvaluationServiceTest {
         ruleIds = Arrays.asList("rule1", "rule2");
         contractIds = Arrays.asList("contract1", "contract2");
 
-        testJob = new EvaluationJob(tenantId, EvaluationJob.JobStatus.PENDING, EvaluationJob.TriggerType.MANUAL, LocalDateTime.now(), triggeredBy);
+        testJob = new EvaluationJob(tenantId, JobStatus.PENDING, EvaluationJob.TriggerType.MANUAL, LocalDateTime.now(), triggeredBy);
         testJob.setJobId("job-123");
     }
 
@@ -80,7 +81,7 @@ class EvaluationServiceTest {
 
         assertNotNull(createdJob);
         assertNotNull(createdJob.getJobId());
-        assertEquals(EvaluationJob.JobStatus.PENDING, createdJob.getStatus());
+        assertEquals(JobStatus.PENDING, createdJob.getStatus());
 
         verify(jobRepository, times(1)).save(any(EvaluationJob.class));
         verify(kafkaProducerService, times(1)).sendMessage(anyString());
@@ -88,7 +89,7 @@ class EvaluationServiceTest {
 
     @Test
     void testListen_jobCompletion() throws Exception {
-        EvaluationJob existingJob = new EvaluationJob(tenantId, EvaluationJob.JobStatus.PENDING, EvaluationJob.TriggerType.MANUAL, LocalDateTime.now(), triggeredBy);
+        EvaluationJob existingJob = new EvaluationJob(tenantId, JobStatus.PENDING, EvaluationJob.TriggerType.MANUAL, LocalDateTime.now(), triggeredBy);
         existingJob.setJobId("job-123");
         existingJob.setTargetRules(objectMapper.writeValueAsString(ruleIds));
         existingJob.setTargetContracts(objectMapper.writeValueAsString(contractIds));
@@ -101,7 +102,7 @@ class EvaluationServiceTest {
 
         evaluationService.listen(existingJob.getJobId());
 
-        assertEquals(EvaluationJob.JobStatus.COMPLETED, existingJob.getStatus());
+        assertEquals(JobStatus.COMPLETED, existingJob.getStatus());
         assertNotNull(existingJob.getCompletedAt());
         verify(jobRepository, times(2)).save(any(EvaluationJob.class));
         verify(resultRepository, times(2)).save(any(EvaluationResult.class));
@@ -128,7 +129,7 @@ class EvaluationServiceTest {
         when(contractService.getContractById(singleContractId)).thenReturn(mockContract);
 
         when(jobRepository.findByTenantIdAndTargetContractsContainingAndStatus(
-                eq(tenantId), anyString(), eq(EvaluationJob.JobStatus.IN_PROGRESS)))
+                eq(tenantId), anyString(), eq(JobStatus.IN_PROGRESS)))
                 .thenReturn(Collections.emptyList());
 
         when(jobRepository.save(any(EvaluationJob.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -141,7 +142,7 @@ class EvaluationServiceTest {
             assertNotNull(jobId);
             verify(contractService, times(1)).getContractById(singleContractId);
             verify(jobRepository, times(1)).findByTenantIdAndTargetContractsContainingAndStatus(
-                    eq(tenantId), anyString(), eq(EvaluationJob.JobStatus.IN_PROGRESS));
+                    eq(tenantId), anyString(), eq(JobStatus.IN_PROGRESS));
             verify(jobRepository, times(1)).save(any(EvaluationJob.class));
             verify(auditService, times(1)).logReEvaluationTriggered(singleContractId, String.join(",", rulesForReEval), reEvalTriggeredBy);
             verify(kafkaProducerService, times(1)).sendMessage(anyString());

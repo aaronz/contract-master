@@ -345,7 +345,70 @@ const tenantId = ref('default-tenant')
   padding: 32px 40px;
 }
 
-/* Transitions */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.notification-dropdown {
+  width: 320px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.dropdown-header {
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color);
+  font-weight: 600;
+  background: rgba(248, 250, 252, 0.5);
+}
+
+.notify-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.notify-item {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+  border-bottom: 1px solid rgba(0,0,0,0.02);
+}
+
+.notify-item:hover {
+  background: rgba(59, 130, 246, 0.05);
+}
+
+.notify-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #EFF6FF;
+  color: #3B82F6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.notify-content b {
+  display: block;
+  font-size: 13px;
+  color: #1E293B;
+  margin-bottom: 2px;
+}
+
+.notify-content p {
+  margin: 0;
+  font-size: 12px;
+  color: #64748B;
+  line-height: 1.4;
+}
+
+/* Custom transitions and other styles... */
 .fade-slide-enter-active,
 .fade-slide-leave-active {
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);

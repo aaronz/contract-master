@@ -55,13 +55,15 @@ public class EvaluationResult extends BaseTenantEntity {
     public String getResultId() { return resultId; }
     public void setResultId(String resultId) { this.resultId = resultId; }
     public String getJobId() { return jobId; }
+    public void setJobId(String jobId) { this.jobId = jobId; }
     public String getRuleId() { return ruleId; }
+    public void setRuleId(String ruleId) { this.ruleId = ruleId; }
     public String getContractId() { return contractId; }
+    public void setContractId(String contractId) { this.contractId = contractId; }
     public ResultStatus getStatus() { return status; }
+    public void setStatus(ResultStatus status) { this.status = status; }
     public String getDetails() { return details; }
+    public void setDetails(String details) { this.details = details; }
     public LocalDateTime getTimestamp() { return timestamp; }
-
-    public enum ResultStatus {
-        PASS, FAIL
-    }
+    public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
 }

@@ -85,9 +85,26 @@ public class ContractController {
 
     @GetMapping("/{id}/pdf")
     public org.springframework.http.ResponseEntity<byte[]> getPdf(@PathVariable String id) {
-        // Mock PDF generation for demonstration
-        byte[] pdfContent = "Mock PDF Content".getBytes();
-        // In real impl: applicationService.generatePdf(id);
+        // Simple valid 1-page PDF
+        String pdfContentStr = "%PDF-1.4\n" +
+                "1 0 obj < < /Type /Catalog /Pages 2 0 R > > endobj\n" +
+                "2 0 obj < < /Type /Pages /Kids [3 0 R] /Count 1 > > endobj\n" +
+                "3 0 obj < < /Type /Page /Parent 2 0 R /MediaBox [0 0 600 800] /Contents 4 0 R > > endobj\n" +
+                "4 0 obj < < /Length 50 > > stream\n" +
+                "BT /F1 24 Tf 100 700 Td (Contract Preview Document) Tj ET\n" +
+                "endstream endobj\n" +
+                "xref\n" +
+                "0 5\n" +
+                "0000000000 65535 f\n" +
+                "0000000009 00000 n\n" +
+                "0000000058 00000 n\n" +
+                "0000000115 00000 n\n" +
+                "0000000184 00000 n\n" +
+                "trailer < < /Size 5 /Root 1 0 R > >\n" +
+                "startxref\n" +
+                "285\n" +
+                "%%EOF";
+        byte[] pdfContent = pdfContentStr.getBytes();
         
         return org.springframework.http.ResponseEntity.ok()
                 .header("Content-Type", "application/pdf")

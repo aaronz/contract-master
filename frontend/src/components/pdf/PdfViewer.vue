@@ -79,7 +79,7 @@ const props = defineProps({
   }
 });
 
-const loading = ref(true);
+const loading = ref(false);
 const error = ref(null);
 const pdfDoc = shallowRef(null);
 const numPages = ref(0);
@@ -96,26 +96,13 @@ const setCanvasRef = (el, pageNum) => {
   }
 };
 
-const getPageWidth = (pageNum) => {
-  return pageViewports.value[pageNum]?.width || 0;
-};
-
-const getPageHeight = (pageNum) => {
-  return pageViewports.value[pageNum]?.height || 0;
-};
-
-const getPageViewport = (pageNum) => {
-  return pageViewports.value[pageNum];
-};
-
-const getHighlightsForPage = (pageNum) => {
-  if (!props.highlights) return [];
-  const pageHighlight = props.highlights.find(h => h.page === pageNum);
-  return pageHighlight ? pageHighlight.rects : [];
-};
-
 const loadPdf = async () => {
-  if (!props.url) return;
+  if (!props.url) {
+    loading.value = false;
+    pdfDoc.value = null;
+    numPages.value = 0;
+    return;
+  }
   
   loading.value = true;
   error.value = null;
@@ -136,6 +123,11 @@ const loadPdf = async () => {
     pdfDoc.value = doc;
     numPages.value = doc.numPages;
     
+    if (doc.numPages === 0) {
+      error.value = 'This document has no pages.';
+      return;
+    }
+
     // Pre-fetch viewports to set layout dimensions immediately
     const viewportPromises = [];
     for (let i = 1; i <= doc.numPages; i++) {
@@ -154,7 +146,7 @@ const loadPdf = async () => {
     
   } catch (err) {
     console.error('Error loading PDF:', err);
-    error.value = 'Failed to load PDF document.';
+    error.value = 'Failed to load PDF document. It might be corrupted or missing.';
   } finally {
     loading.value = false;
   }

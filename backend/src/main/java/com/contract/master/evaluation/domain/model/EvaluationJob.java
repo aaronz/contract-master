@@ -85,10 +85,6 @@ public class EvaluationJob extends BaseTenantEntity {
     public String getTargetContracts() { return targetContracts; }
     public void setTargetContracts(String targetContracts) { this.targetContracts = targetContracts; }
 
-    public enum JobStatus {
-        PENDING, IN_PROGRESS, COMPLETED, FAILED
-    }
-
     public enum TriggerType {
         MANUAL, SCHEDULED, API
     }

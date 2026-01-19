@@ -24,20 +24,26 @@
       style="width: 100%; flex: 1"
       height="100%"
     >
-      <el-table-column prop="severity" label="!" width="50">
+      <el-table-column prop="severity" label="!" width="60">
         <template #default="{ row }">
           <el-tag :type="getSeverityType(row.severity)" size="small" effect="dark">{{ row.severity?.substring(0,1) }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="generatedMessage" label="Issue Description" min-width="150" show-overflow-tooltip />
-      <el-table-column prop="status" label="Status" width="100">
+      <el-table-column prop="ruleId" label="Rule ID" width="100" />
+      <el-table-column prop="generatedMessage" label="Issue Description" min-width="400" show-overflow-tooltip />
+      <el-table-column prop="status" label="Status" width="130">
         <template #default="{ row }">
           <el-tag :type="getStatusType(row.status)" size="small">{{ row.status }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="Actions" width="60" fixed="right">
+      <el-table-column prop="createTime" label="Detected At" width="180">
         <template #default="{ row }">
-          <el-button link type="primary" size="small" icon="Edit" @click.stop="handleEdit(row)" />
+          {{ row.createTime ? new Date(row.createTime).toLocaleString() : '-' }}
+        </template>
+      </el-table-column>
+      <el-table-column label="Actions" width="120" fixed="right">
+        <template #default="{ row }">
+          <el-button link type="primary" size="small" icon="Edit" @click.stop="handleEdit(row)">Update Status</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -147,13 +153,15 @@ const loadProblems = async () => {
     if (filters.value.status) params.status = filters.value.status
 
     const response = await problemApi.getProblems(params)
-    // Check if response has content property (Spring Data Page) or is direct array
-    if (response.data && response.data.content) {
-      problems.value = response.data.content
-      pagination.value.total = response.data.totalElements
+    const result = response.data?.data || response.data
+    
+    // Check if result has content property (Spring Data Page) or is direct array
+    if (result && result.content) {
+      problems.value = result.content
+      pagination.value.total = result.totalElements
     } else {
-      problems.value = response.data
-      pagination.value.total = response.data?.length || 0
+      problems.value = Array.isArray(result) ? result : []
+      pagination.value.total = problems.value.length || 0
     }
   } catch (error) {
     ElMessage.error('Failed to load problems')
@@ -213,6 +221,7 @@ defineExpose({
   flex-direction: column;
   height: 100%;
   padding: 12px;
+  min-height: 0;
 }
 
 .table-header {
