@@ -24,10 +24,6 @@
         
         <el-divider direction="vertical" />
 
-        <el-button @click="handleAIAnalysis" class="glass-btn" :loading="analyzing">
-          <el-icon><Cpu /></el-icon> AI Analysis
-        </el-button>
-        
         <el-button type="warning" @click="confirmAiSuggestions" v-if="form.contractStatus === 'AI_EXTRACTED'">
           Confirm Suggestions
         </el-button>
@@ -36,17 +32,6 @@
           Publish to Downstream
         </el-button>
 
-        <el-button type="info" @click="showCardGenerator = true">
-          <el-icon><IdCard /></el-icon> Card Generator
-        </el-button>
-        
-        <el-progress 
-          v-if="analyzing" 
-          :percentage="progress" 
-          :stroke-width="2" 
-          :show-text="false" 
-          class="ai-progress"
-        />
         <el-button type="primary" @click="openRuleSelector" class="glass-btn">
           <el-icon><Refresh /></el-icon> Re-evaluate
         </el-button>
@@ -430,7 +415,7 @@
                   :key="index"
                   :type="log.type"
                   :timestamp="log.time"
-                  size="small"
+                  size="normal"
                 >
                   {{ log.content }}
                 </el-timeline-item>
@@ -440,105 +425,18 @@
         </div>
       </transition>
     </div>
-    <!-- Card Generator Dialog -->
-    <el-dialog v-model="showCardGenerator" title="Contract Card Generator" width="800px">
-      <div class="card-generator-container">
-        <div class="field-selector">
-          <h4 class="mb-4">Select Fields to Include</h4>
-          <el-checkbox-group v-model="cardConfig.selectedFields">
-            <div class="field-selection-grid">
-              <div v-for="field in contractFields" :key="field.fieldCode" class="field-selection-item">
-                <el-checkbox :label="field.fieldCode">{{ field.fieldName }}</el-checkbox>
-                <el-input 
-                  v-if="cardConfig.selectedFields.includes(field.fieldCode)"
-                  v-model="cardConfig.customLabels[field.fieldCode]" 
-                  size="small" 
-                  placeholder="Custom Label"
-                  class="mt-1"
-                />
-              </div>
-            </div>
-          </el-checkbox-group>
-        </div>
-        
-        <div class="card-preview mt-8">
-          <h4 class="mb-4">Preview</h4>
-          <div class="contract-card-visual" :style="cardStyles.container">
-            <div class="card-header" :style="cardStyles.header">
-              <div class="card-title" :style="cardStyles.title">{{ form.contractName }}</div>
-              <div class="card-subtitle" :style="cardStyles.subtitle">{{ form.contractNo }}</div>
-            </div>
-            
-            <div class="card-section" v-if="hasFieldsInGroup('general')">
-              <div class="section-title" :style="cardStyles.sectionTitle">General Info</div>
-              <div class="card-grid" :style="cardStyles.grid">
-                <div v-for="field in getFieldsInGroup('general')" :key="field.fieldCode" class="card-field" :style="cardStyles.field">
-                  <div class="card-label" :style="cardStyles.label">{{ cardConfig.customLabels[field.fieldCode] || field.fieldName }}</div>
-                  <div class="card-value" :style="cardStyles.value">{{ getFieldValue(field.fieldCode) }}</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="card-section" v-if="hasFieldsInGroup('financials')">
-              <div class="section-title" :style="cardStyles.sectionTitle">Financials</div>
-              <div class="card-grid" :style="cardStyles.grid">
-                <div v-for="field in getFieldsInGroup('financials')" :key="field.fieldCode" class="card-field" :style="cardStyles.field">
-                  <div class="card-label" :style="cardStyles.label">{{ cardConfig.customLabels[field.fieldCode] || field.fieldName }}</div>
-                  <div class="card-value" :style="cardStyles.value">{{ getFieldValue(field.fieldCode) }}</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="card-section" v-if="hasFieldsInGroup('performance')">
-              <div class="section-title" :style="cardStyles.sectionTitle">Performance</div>
-              <div class="card-grid" :style="cardStyles.grid">
-                <div v-for="field in getFieldsInGroup('performance')" :key="field.fieldCode" class="card-field" :style="cardStyles.field">
-                  <div class="card-label" :style="cardStyles.label">{{ cardConfig.customLabels[field.fieldCode] || field.fieldName }}</div>
-                  <div class="card-value" :style="cardStyles.value">{{ getFieldValue(field.fieldCode) }}</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="card-section" v-if="hasFieldsInGroup('legal')">
-              <div class="section-title" :style="cardStyles.sectionTitle">Legal</div>
-              <div class="card-grid" :style="cardStyles.grid">
-                <div v-for="field in getFieldsInGroup('legal')" :key="field.fieldCode" class="card-field" :style="cardStyles.field">
-                  <div class="card-label" :style="cardStyles.label">{{ cardConfig.customLabels[field.fieldCode] || field.fieldName }}</div>
-                  <div class="card-value" :style="cardStyles.value">{{ getFieldValue(field.fieldCode) }}</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="card-section" v-if="hasFieldsInGroup('extended')">
-              <div class="section-title" :style="cardStyles.sectionTitle">Additional</div>
-              <div class="card-grid" :style="cardStyles.grid">
-                <div v-for="field in getFieldsInGroup('extended')" :key="field.fieldCode" class="card-field" :style="cardStyles.field">
-                  <div class="card-label" :style="cardStyles.label">{{ cardConfig.customLabels[field.fieldCode] || field.fieldName }}</div>
-                  <div class="card-value" :style="cardStyles.value">{{ getFieldValue(field.fieldCode) }}</div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </div>
-      <template #footer>
-        <el-button @click="showCardGenerator = false">Cancel</el-button>
-        <el-button type="primary" @click="downloadCard">Download Card</el-button>
-      </template>
-    </el-dialog>
   </div>
 </template>
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { ArrowLeft, Cpu, Check, ChatDotRound, UploadFilled, Document, Close, Postcard, Refresh } from '@element-plus/icons-vue'
+import { ArrowLeft, Check, ChatDotRound, UploadFilled, Document, Close, Refresh } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 
 import { useFieldStore } from '@/stores/fieldStore'
-import evaluationApi from '@/services/evaluationApi' // Import evaluationApi
-import RuleSelectorModal from '@/components/RuleSelectorModal.vue' // Import RuleSelectorModal
+import evaluationApi from '@/services/evaluationApi' 
+import RuleSelectorModal from '@/components/RuleSelectorModal.vue' 
 
 const fieldStore = useFieldStore()
 const router = useRouter()
@@ -547,15 +445,7 @@ const showSidePanel = ref(true)
 const panelTab = ref('comments')
 const newComment = ref('')
 const isEditMode = ref(false)
-const analyzing = ref(false)
-const progress = ref(0)
-const showCardGenerator = ref(false)
 const showRuleSelectorModal = ref(false)
-
-const cardConfig = ref({
-  selectedFields: ['contractNo', 'partyAName', 'partyBName', 'contractAmount'],
-  customLabels: {}
-})
 
 const getFieldStyle = (fieldCode) => {
   const field = fieldStore.fields.find(f => f.fieldCode === fieldCode)
@@ -572,94 +462,6 @@ const isFieldVisible = (fieldCode) => fieldStore.isFieldVisible(fieldCode)
 const getFieldName = (code) => {
   const f = fieldStore.fields.find(field => field.fieldCode === code)
   return f ? f.fieldName : code
-}
-
-// Unified visual styles to match detail page
-const cardStyles = {
-  container: {
-    background: 'rgba(255, 255, 255, 0.9)',
-    borderRadius: '16px',
-    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-    padding: '32px',
-    maxWidth: '450px',
-    border: '1px solid rgba(255, 255, 255, 0.5)',
-    backdropFilter: 'blur(12px)',
-    borderTop: '6px solid var(--primary-color)'
-  },
-  header: {
-    marginBottom: '24px',
-    borderBottom: '1px solid rgba(0,0,0,0.05)',
-    paddingBottom: '16px'
-  },
-  title: {
-    fontSize: '20px',
-    fontWeight: '700',
-    color: '#1E293B',
-    marginBottom: '8px',
-    letterSpacing: '-0.5px'
-  },
-  subtitle: {
-    fontFamily: "'Fira Code', monospace",
-    fontSize: '12px',
-    color: '#64748B'
-  },
-  sectionTitle: {
-    fontSize: '14px',
-    fontWeight: '600',
-    color: '#475569',
-    borderBottom: '1px solid rgba(0,0,0,0.05)',
-    paddingBottom: '4px',
-    marginTop: '16px',
-    marginBottom: '8px',
-    textTransform: 'uppercase',
-    letterSpacing: '0.5px'
-  },
-  grid: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
-    gap: '12px',
-    marginBottom: '12px'
-  },
-  field: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '4px',
-    padding: '4px 0'
-  },
-  label: {
-    fontSize: '10px',
-    color: '#94A3B8',
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: '0.5px'
-  },
-  value: {
-    fontSize: '13px',
-    fontWeight: '500',
-    color: '#334155',
-    wordBreak: 'break-word'
-  }
-}
-
-// Field Groups for Card Layout
-const fieldGroups = {
-  general: ['contract_no', 'contract_name', 'contract_type', 'contract_status', 'crm_contract_id', 'party_a_name', 'party_a_contact', 'party_a_phone', 'party_a_address', 'party_b_name', 'party_b_contact', 'party_b_phone', 'party_b_address'],
-  financials: ['contract_amount', 'tax_rate', 'tax_amount', 'total_amount_with_tax', 'currency_type', 'payment_method', 'payment_term', 'invoice_title', 'invoice_type', 'taxpayer_id'],
-  performance: ['subject_type', 'subject_desc', 'subject_quantity', 'unit_price', 'performance_method', 'performance_location', 'performance_start_date', 'performance_end_date', 'quality_standard'],
-  legal: ['sign_date', 'effective_date', 'expire_date', 'dispute_resolution', 'governing_law', 'legal_review_flag', 'legal_review_opinion', 'remark', 'create_user', 'create_time']
-}
-
-const getFieldsInGroup = (group) => {
-  const selected = cardConfig.value.selectedFields
-  if (group === 'extended') {
-    return fieldStore.fields.filter(f => f.source === 'EXTEND' && selected.includes(f.fieldCode))
-  }
-  const groupFields = fieldGroups[group] || []
-  return fieldStore.fields.filter(f => groupFields.includes(f.fieldCode) && selected.includes(f.fieldCode))
-}
-
-const hasFieldsInGroup = (group) => {
-  return getFieldsInGroup(group).length > 0
 }
 
 const fetchContractDetail = async () => {
@@ -753,20 +555,6 @@ const toggleSidePanel = () => {
   showSidePanel.value = !showSidePanel.value
 }
 
-const handleAIAnalysis = () => {
-  analyzing.value = true
-  progress.value = 0
-  const interval = setInterval(() => {
-    progress.value += 10
-    if (progress.value >= 100) {
-      clearInterval(interval)
-      analyzing.value = false
-      ElMessage.success('AI Analysis completed')
-      form.contractStatus = 'AI_EXTRACTED'
-    }
-  }, 200)
-}
-
 const saveContract = async () => {
   try {
     const response = await fetch(`/api/contracts/${form.contractId}`, {
@@ -849,8 +637,10 @@ const handleReEvaluation = async (ruleIds) => {
   try {
     // Assuming evaluationApi.triggerEvaluation expects contractId first, then ruleIds
     const response = await evaluationApi.triggerEvaluation(form.contractId, ruleIds);
-    if (response.data && response.data.jobId) {
-      ElMessage.success(`Re-evaluation started successfully! Job ID: ${response.data.jobId}`);
+    // Handle nested ApiResponse structure
+    const responseData = response.data.data || response.data;
+    if (responseData && responseData.jobId) {
+      ElMessage.success(`Re-evaluation started successfully! Job ID: ${responseData.jobId}`);
       // Optionally, refresh contract details or update a status
     } else {
       ElMessage.error('Failed to start re-evaluation. No job ID returned.');
@@ -917,13 +707,6 @@ const handleReEvaluation = async (ruleIds) => {
   align-items: center;
   gap: 16px;
   position: relative;
-}
-
-.ai-progress {
-  position: absolute;
-  bottom: -10px;
-  left: 0;
-  right: 0;
 }
 
 .mode-toggle {
@@ -1145,63 +928,5 @@ const handleReEvaluation = async (ruleIds) => {
   width: 0;
   opacity: 0;
   transform: translateX(20px);
-}
-.field-selection-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-}
-
-.field-selection-item {
-  display: flex;
-  flex-direction: column;
-  padding: 8px;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-}
-
-.contract-card-visual {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-  padding: 24px;
-  max-width: 400px;
-  border-top: 4px solid var(--primary-color);
-}
-
-.contract-card-visual .card-header {
-  margin-bottom: 20px;
-}
-
-.contract-card-visual .card-title {
-  font-weight: 700;
-  font-size: 18px;
-  color: var(--text-primary);
-}
-
-.contract-card-visual .card-subtitle {
-  font-size: 12px;
-  color: var(--text-secondary);
-  font-family: monospace;
-}
-
-.contract-card-visual .card-body {
-  display: grid;
-  gap: 12px;
-}
-
-.contract-card-visual .card-field {
-  display: flex;
-  justify-content: space-between;
-  font-size: 13px;
-}
-
-.contract-card-visual .card-label {
-  color: var(--text-secondary);
-}
-
-.contract-card-visual .card-value {
-  font-weight: 500;
-  color: var(--text-primary);
 }
 </style>

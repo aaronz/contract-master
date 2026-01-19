@@ -135,6 +135,7 @@ import { ref, onMounted } from 'vue'
 import { Plus, Delete, Warning, InfoFilled, Bell, Edit } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import evaluationApi from '../../services/evaluationApi'
+import problemApi from '../../services/problemApi'
 import RuleEditorForm from '@/components/rules/RuleEditorForm.vue'
 
 const getIconClass = (level) => {
@@ -257,8 +258,14 @@ const addRule = () => {
 }
 
 const editRule = (rule) => {
-  // Deep copy
-  editingRule.value = JSON.parse(JSON.stringify(rule))
+  // Deep copy and align frontend field names
+  const ruleData = JSON.parse(JSON.stringify(rule))
+  editingRule.value = {
+    ...ruleData,
+    ruleType: ruleData.logicType || 'LOGIC',
+    level: ruleData.severity || 'INFO',
+    trigger: ruleData.trigger || 'ON_SAVE'
+  }
   dialogVisible.value = true
 }
 
@@ -291,10 +298,52 @@ const saveRule = async () => {
 const loadRules = async () => {
   try {
     const response = await problemApi.getRules()
-    rules.value = response.data
+    let rawRules = []
+    if (response.data && response.data.data) {
+      rawRules = response.data.data
+    } else {
+      rawRules = response.data || []
+    }
+
+    if (rawRules.length > 0) {
+      rules.value = rawRules.map(r => ({
+        ...r,
+        level: r.severity || 'INFO',
+        enabled: r.status === 'PUBLISHED' || r.status === 'ACTIVE',
+        conditions: tryParseLogic(r)
+      }))
+    }
+    // If rawRules is empty, we keep the default mock rules or set to empty?
+    // For now, let's keep mock rules ONLY if backend returns nothing AND it's not a successful empty list.
+    // Actually, let's just use the backend data.
+    if (rawRules.length === 0 && !Array.isArray(response.data.data)) {
+        // keep mock
+    } else {
+        rules.value = rawRules.map(r => ({
+          ...r,
+          level: r.severity || 'INFO',
+          enabled: r.status === 'PUBLISHED' || r.status === 'ACTIVE',
+          conditions: tryParseLogic(r)
+        }))
+    }
   } catch (error) {
+    console.error('Failed to load rules', error)
     ElMessage.error('Failed to load rules')
   }
+}
+
+const tryParseLogic = (rule) => {
+  if (rule.logicType === 'LOGIC' && rule.logicContent) {
+    try {
+      const logic = JSON.parse(rule.logicContent)
+      if (logic.children) return logic.children.filter(c => c.type === 'rule')
+      if (Array.isArray(logic)) return logic
+      return []
+    } catch (e) {
+      return []
+    }
+  }
+  return []
 }
 
 onMounted(() => {

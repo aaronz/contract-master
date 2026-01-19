@@ -28,13 +28,21 @@
         <!-- Recursive Group -->
         <condition-group
           v-if="child.type === 'group'"
-          v-model="modelValue.children[index]"
+          :model-value="modelValue.children[index]"
+          @update:model-value="val => handleChildUpdate(index, val)"
           @remove="removeChild(index)"
         />
 
         <!-- Single Rule -->
         <div v-else class="rule-item glass-input">
-          <el-select v-model="child.field" placeholder="Select Field" size="small" style="width: 140px" filterable>
+          <el-select 
+            :model-value="child.field" 
+            @update:model-value="val => { child.field = val; handleChildUpdate(index, child) }"
+            placeholder="Select Field" 
+            size="small" 
+            style="width: 140px" 
+            filterable
+          >
             <el-option 
               v-for="opt in fieldOptions" 
               :key="opt.value" 
@@ -43,7 +51,13 @@
             />
           </el-select>
           
-          <el-select v-model="child.operator" placeholder="Op" size="small" style="width: 100px">
+          <el-select 
+            :model-value="child.operator" 
+            @update:model-value="val => { child.operator = val; handleChildUpdate(index, child) }"
+            placeholder="Op" 
+            size="small" 
+            style="width: 100px"
+          >
             <el-option label="Equals" value="eq" />
             <el-option label="Not Equals" value="neq" />
             <el-option label="Greater Than" value="gt" />
@@ -52,7 +66,13 @@
             <el-option label="Is Empty" value="empty" />
           </el-select>
 
-          <el-input v-model="child.value" placeholder="Value" size="small" style="width: 160px" />
+          <el-input 
+            :model-value="child.value" 
+            @update:model-value="val => { child.value = val; handleChildUpdate(index, child) }"
+            placeholder="Value" 
+            size="small" 
+            style="width: 160px" 
+          />
           
           <el-button 
             type="danger" 
@@ -95,18 +115,21 @@ const fieldOptions = computed(() => {
 })
 
 const updateOperator = (op) => {
-  const newVal = { ...props.modelValue, operator: op }
+  const newVal = JSON.parse(JSON.stringify(props.modelValue))
+  newVal.operator = op
   emit('update:modelValue', newVal)
 }
 
 const addRule = () => {
-  const newVal = { ...props.modelValue }
+  const newVal = JSON.parse(JSON.stringify(props.modelValue))
+  if (!newVal.children) newVal.children = []
   newVal.children.push({ type: 'rule', field: '', operator: 'eq', value: '' })
   emit('update:modelValue', newVal)
 }
 
 const addGroup = () => {
-  const newVal = { ...props.modelValue }
+  const newVal = JSON.parse(JSON.stringify(props.modelValue))
+  if (!newVal.children) newVal.children = []
   newVal.children.push({ 
     type: 'group', 
     operator: 'AND', 
@@ -116,8 +139,14 @@ const addGroup = () => {
 }
 
 const removeChild = (index) => {
-  const newVal = { ...props.modelValue }
+  const newVal = JSON.parse(JSON.stringify(props.modelValue))
   newVal.children.splice(index, 1)
+  emit('update:modelValue', newVal)
+}
+
+const handleChildUpdate = (index, value) => {
+  const newVal = JSON.parse(JSON.stringify(props.modelValue))
+  newVal.children[index] = value
   emit('update:modelValue', newVal)
 }
 </script>

@@ -32,8 +32,10 @@ public class ContractController {
     }
 
     @GetMapping
-    public GlobalExceptionHandler.ApiResponse<Page<ContractDTO>> list(Pageable pageable) {
-        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, contractService.searchContracts(pageable));
+    public GlobalExceptionHandler.ApiResponse<Page<ContractDTO>> list(
+            @RequestParam(required = false) String query,
+            Pageable pageable) {
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, contractService.searchContracts(query, pageable));
     }
 
     @PostMapping

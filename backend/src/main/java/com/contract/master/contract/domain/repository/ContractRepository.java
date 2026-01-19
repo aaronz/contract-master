@@ -25,4 +25,6 @@ public interface ContractRepository {
     BigDecimal sumActiveValueByTenantId(TenantId tenantId);
     Long countRiskAlertsByTenantId(TenantId tenantId);
     long count();
+
+    Page<Contract> findByTenantIdAndQuery(TenantId tenantId, String query, Pageable pageable);
 }

@@ -20,9 +20,15 @@
       @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" width="55" />
-      <el-table-column prop="ruleName" label="Rule Name" />
-      <el-table-column prop="ruleType" label="Type" width="120" />
-      <el-table-column prop="ruleLevel" label="Level" width="100" />
+      <el-table-column prop="name" label="Rule Name" />
+      <el-table-column prop="logicType" label="Type" width="120" />
+      <el-table-column prop="severity" label="Level" width="100">
+        <template #default="{ row }">
+          <el-tag :type="row.severity === 'SEVERE' ? 'danger' : row.severity === 'WARNING' ? 'warning' : 'info'">
+            {{ row.severity }}
+          </el-tag>
+        </template>
+      </el-table-column>
     </el-table>
 
     <template #footer>
@@ -58,8 +64,8 @@ const filteredRules = computed(() => {
   if (!searchQuery.value) return rules.value;
   const lowerQuery = searchQuery.value.toLowerCase();
   return rules.value.filter(r =>
-    (r.ruleName && r.ruleName.toLowerCase().includes(lowerQuery)) ||
-    (r.ruleType && r.ruleType.toLowerCase().includes(lowerQuery))
+    (r.name && r.name.toLowerCase().includes(lowerQuery)) ||
+    (r.logicType && r.logicType.toLowerCase().includes(lowerQuery))
   );
 });
 
@@ -102,7 +108,8 @@ const confirmSelection = () => {
     ElMessage.warning('Please select at least one rule.');
     return;
   }
-  emit('confirm', multipleSelection.value.map(rule => rule.ruleId));
+  // Use 'id' from backend Rule model
+  emit('confirm', multipleSelection.value.map(rule => rule.id));
   handleClose(); // Close modal after confirming
 };
 

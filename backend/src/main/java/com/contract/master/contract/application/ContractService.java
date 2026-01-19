@@ -103,14 +103,21 @@ public class ContractService {
         });
     }
 
-    public Page<ContractDTO> searchContracts(Pageable pageable) {
+    public Page<ContractDTO> searchContracts(String query, Pageable pageable) {
         String tenantId = TenantContext.getCurrentTenant();
         Pageable sortedPageable = org.springframework.data.domain.PageRequest.of(
             pageable.getPageNumber(), 
             pageable.getPageSize(), 
             org.springframework.data.domain.Sort.by("createTime").descending()
         );
-        Page<Contract> basePage = contractRepository.findByTenantId(TenantId.of(tenantId), sortedPageable);
+        
+        Page<Contract> basePage;
+        if (query != null && !query.trim().isEmpty()) {
+            basePage = contractRepository.findByTenantIdAndQuery(TenantId.of(tenantId), query, sortedPageable);
+        } else {
+            basePage = contractRepository.findByTenantId(TenantId.of(tenantId), sortedPageable);
+        }
+        
         List<ContractDTO> dtoList = basePage.getContent().stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());

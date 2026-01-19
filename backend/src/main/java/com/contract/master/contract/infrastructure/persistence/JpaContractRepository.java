@@ -50,4 +50,8 @@ public interface JpaContractRepository extends JpaRepository<Contract, Long>, Co
     @Override
     @Query("SELECT c FROM Contract c WHERE c.tenantId.id = :#{#tenantId.id}")
     List<Contract> findByTenantId(TenantId tenantId);
+
+    @Override
+    @Query("SELECT c FROM Contract c WHERE c.tenantId.id = :#{#tenantId.id} AND (c.contractName LIKE %:query% OR c.contractNo.value LIKE %:query%)")
+    Page<Contract> findByTenantIdAndQuery(TenantId tenantId, String query, Pageable pageable);
 }

@@ -19,13 +19,13 @@
           
           <el-form-item label="Severity Level">
             <el-select v-model="localConfig.level" class="w-full">
-              <el-option label="Info / Hint" value="info">
+              <el-option label="Info / Hint" value="INFO">
                 <span class="text-blue-500">Info / Hint</span>
               </el-option>
-              <el-option label="Warning" value="warning">
+              <el-option label="Warning" value="WARNING">
                 <span class="text-orange-500">Warning</span>
               </el-option>
-              <el-option label="Critical Error" value="error">
+              <el-option label="Critical Error" value="SEVERE">
                 <span class="text-red-500">Critical Error</span>
               </el-option>
             </el-select>
@@ -33,9 +33,9 @@
 
           <el-form-item label="Trigger Event">
              <el-select v-model="localConfig.trigger" class="w-full">
-              <el-option label="On Create" value="create" />
-              <el-option label="On Update" value="update" />
-              <el-option label="Before Approval" value="pre_approval" />
+              <el-option label="On Create" value="ON_CREATE" />
+              <el-option label="On Update" value="ON_UPDATE" />
+              <el-option label="Before Approval" value="BEFORE_APPROVAL" />
             </el-select>
           </el-form-item>
 
@@ -94,7 +94,7 @@
 </template>
 
 <script setup>
-import { reactive, watch, defineProps, defineEmits, ref } from 'vue'
+import { reactive, watch, defineProps, defineEmits } from 'vue'
 import ConditionGroup from '@/components/rules/ConditionGroup.vue'
 
 const props = defineProps({
@@ -110,50 +110,44 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue', 'save', 'cancel'])
 
-const localConfig = reactive({
-  ...props.modelValue,
-  // Initialize conditions from logicContent if in LOGIC mode
-  conditions: (props.modelValue.ruleType === 'LOGIC' && props.modelValue.logicContent)
-    ? tryParseJSON(props.modelValue.logicContent)
-    : { type: 'group', operator: 'AND', children: [] }
-})
+const localConfig = reactive({})
 
 function tryParseJSON(str) {
   try {
-    return JSON.parse(str)
+    return typeof str === 'string' ? JSON.parse(str) : str
   } catch (e) {
     return { type: 'group', operator: 'AND', children: [] }
   }
 }
 
-watch(() => props.modelValue, (newVal) => {
-  const isLogic = newVal.ruleType === 'LOGIC'
+// Initialize local state
+const initLocalConfig = (source) => {
+  if (!source) return
+  Object.assign(localConfig, JSON.parse(JSON.stringify(source)))
   
-  Object.assign(localConfig, {
-    ...newVal,
-    conditions: (isLogic && newVal.logicContent)
-      ? tryParseJSON(newVal.logicContent)
-      : { type: 'group', operator: 'AND', children: [] }
-  })
-}, { deep: true })
-
-watch(localConfig, (newVal) => {
-  // Sync back to logicContent field for parent
-  const updatedValue = { ...newVal }
-  
-  if (newVal.ruleType === 'LOGIC') {
-    updatedValue.logicContent = JSON.stringify(newVal.conditions)
+  if (localConfig.ruleType === 'LOGIC') {
+    if (localConfig.logicContent) {
+      localConfig.conditions = tryParseJSON(localConfig.logicContent)
+    } else if (!localConfig.conditions || Array.isArray(localConfig.conditions)) {
+      localConfig.conditions = { type: 'group', operator: 'AND', children: [] }
+    }
   }
-  // For GROOVY/REGEX, logicContent is bound directly in template
-  
-  emit('update:modelValue', updatedValue)
-}, { deep: true })
+}
 
-watch(localConfig, (newVal) => {
-  emit('update:modelValue', newVal)
+initLocalConfig(props.modelValue)
+
+watch(() => props.modelValue, (newVal) => {
+  if (newVal && newVal.id !== localConfig.id) {
+    initLocalConfig(newVal)
+  }
 }, { deep: true })
 
 const handleSave = () => {
+  const finalValue = JSON.parse(JSON.stringify(localConfig))
+  if (finalValue.ruleType === 'LOGIC' && finalValue.conditions) {
+    finalValue.logicContent = JSON.stringify(finalValue.conditions)
+  }
+  emit('update:modelValue', finalValue)
   emit('save')
 }
 

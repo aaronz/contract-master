@@ -308,7 +308,11 @@
       <div class="toolbar-right">
         <div class="search-input">
           <el-icon><Search /></el-icon>
-          <input v-model="searchQuery" placeholder="Search contracts..." />
+          <input 
+            v-model="searchQuery" 
+            placeholder="Search contracts..." 
+            @keyup.enter="handleSearch"
+          />
         </div>
         <el-dropdown trigger="click" @command="handleTemplateCommand">
           <el-button>
@@ -576,7 +580,11 @@ const fetchMetadata = async () => {
 
 const fetchContracts = async () => {
   try {
-    const response = await fetch(`/api/contracts?page=${currentPage.value - 1}&size=${pageSize.value}`, {
+    let url = `/api/contracts?page=${currentPage.value - 1}&size=${pageSize.value}`
+    if (searchQuery.value) {
+      url += `&query=${encodeURIComponent(searchQuery.value)}`
+    }
+    const response = await fetch(url, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`,
         'X-Tenant-ID': localStorage.getItem('tenantId')
@@ -595,6 +603,11 @@ const fetchContracts = async () => {
   }
 }
 
+const handleSearch = () => {
+  currentPage.value = 1
+  fetchContracts()
+}
+
 const handleCreateContract = async () => {
   if (!newContractFormRef.value) return
   await newContractFormRef.value.validate(async (valid) => {
@@ -610,7 +623,7 @@ const handleCreateContract = async () => {
           },
           body: JSON.stringify({
             ...newContractForm.value,
-            status: 'DRAFT'
+            contractStatus: 'DRAFT'
           })
         })
         if (response.ok) {
