@@ -65,7 +65,7 @@ public class ProblemRuleEngineIntegrationTest {
         rule.setTenantId(tenantId);
         ruleRepository.save(rule);
 
-        evaluationService.startEvaluation(contractId.value());
+        evaluationService.startEvaluation(contractId.value(), null);
 
         await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
             List<Problem> problems = problemRepository.findByContractIdAndTenantId(contractId.value().toString(), tenantId);

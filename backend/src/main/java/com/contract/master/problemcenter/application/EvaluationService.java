@@ -28,6 +28,11 @@ public class EvaluationService {
     }
 
     @Transactional
+    public Long startEvaluation(UUID contractId) {
+        return startEvaluation(contractId, null);
+    }
+
+    @Transactional
     public Long startEvaluation(UUID contractId, java.util.List<String> ruleIds) {
         ProblemEvaluationJob job = new ProblemEvaluationJob();
         job.setContractId(contractId);

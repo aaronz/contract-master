@@ -24,7 +24,7 @@ public class ContractEventListener {
         log.info("Received ContractSavedEvent for contract {}. Triggering evaluation.", event.getContractId());
         try {
             com.contract.master.security.TenantContext.setCurrentTenant(event.getTenantId());
-            evaluationService.startEvaluation(event.getContractId());
+            evaluationService.startEvaluation(event.getContractId(), null);
         } catch (Exception e) {
             log.error("Failed to trigger evaluation on contract saved event", e);
         } finally {

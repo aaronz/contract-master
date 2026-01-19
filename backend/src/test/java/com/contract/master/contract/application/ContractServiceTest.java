@@ -5,6 +5,7 @@ import com.contract.master.contract.domain.model.*;
 import com.contract.master.contract.domain.repository.ContractRepository;
 import com.contract.master.contract.domain.repository.ContractExtendDataRepository;
 import com.contract.master.contract.domain.repository.ContractExtendFieldRepository;
+import com.contract.master.contract.domain.repository.ContractAttachmentRepository;
 import com.contract.master.contract.dto.ContractDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,8 +14,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import org.springframework.context.ApplicationEventPublisher;
+import com.contract.master.contract.domain.event.ContractSavedEvent;
+
 import java.math.BigDecimal;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -34,7 +39,16 @@ public class ContractServiceTest {
     private ContractExtendFieldRepository extendFieldRepository;
 
     @Mock
+    private com.contract.master.contract.metadata.domain.repository.FieldConfigRepository fieldConfigRepository;
+
+    @Mock
+    private ContractAttachmentRepository attachmentRepository;
+
+    @Mock
     private AuditService auditService;
+
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
     private ContractService contractService;
@@ -48,6 +62,7 @@ public class ContractServiceTest {
         contract.setContractNo(new ContractNo("TEST-NO-001"));
         contract.setContractName("Test Contract");
         contract.setAmount(ContractAmount.of(new BigDecimal("1000.00"), "USD"));
+        contract.setTenantId(TenantId.of("tenant-1"));
     }
 
     @Test
@@ -76,6 +91,7 @@ public class ContractServiceTest {
         assertEquals(new BigDecimal("2000.00"), contract.getAmount().getAmount());
         verify(auditService).logChange(eq("550e8400-e29b-41d4-a716-446655440000"), eq("contract_name"), any(), eq("Updated Name"), eq("MANUAL"), eq("admin"));
         verify(contractRepository).save(contract);
+        verify(eventPublisher).publishEvent(any(ContractSavedEvent.class));
     }
 
     @Test

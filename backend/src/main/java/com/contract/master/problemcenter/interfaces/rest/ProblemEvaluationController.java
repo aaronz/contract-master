@@ -19,9 +19,10 @@ public class ProblemEvaluationController {
     }
 
     @PostMapping
-    public GlobalExceptionHandler.ApiResponse<Long> triggerEvaluation(@RequestBody EvaluationTriggerRequest request) {
+    public org.springframework.http.ResponseEntity<GlobalExceptionHandler.ApiResponse<Long>> triggerEvaluation(@RequestBody EvaluationTriggerRequest request) {
         Long jobId = evaluationService.startEvaluation(request.getContractId(), request.getRuleIds());
-        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.ACCEPTED, jobId);
+        return org.springframework.http.ResponseEntity.accepted()
+                .body(GlobalExceptionHandler.ApiResponse.success(HttpStatus.ACCEPTED, jobId));
     }
 
     public static class EvaluationTriggerRequest {
