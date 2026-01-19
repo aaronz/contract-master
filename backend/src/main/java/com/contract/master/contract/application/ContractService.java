@@ -1,6 +1,8 @@
 package com.contract.master.contract.application;
 
 import com.contract.master.contract.metadata.domain.event.FieldConfigChangedEvent;
+import com.contract.master.contract.domain.event.ContractSavedEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import com.contract.master.contract.dto.AttachmentDTO;
 import com.contract.master.contract.dto.ContractDTO;
@@ -45,8 +47,8 @@ public class ContractService {
     @Autowired
     private AuditService auditService;
 
-    @Autowired(required = false)
-    private com.contract.master.problemcenter.application.EvaluationService evaluationService;
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     private final Map<String, List<FieldConfig>> fieldConfigCache = new java.util.concurrent.ConcurrentHashMap<>();
     private static final String FIELD_CONFIG_TYPE_CONTRACT = "CONTRACT";
@@ -140,6 +142,8 @@ public class ContractService {
             existing.setContractName(updated.getContractName());
             existing.setAmount(updated.getAmount());
             contractRepository.save(existing);
+            
+            eventPublisher.publishEvent(new ContractSavedEvent(UUID.fromString(id), existing.getTenantId().getId()));
         });
     }
 
@@ -185,12 +189,7 @@ public class ContractService {
                 saveExtendedData(id, dto.getExtendedFields());
             }
 
-            if (evaluationService != null) {
-                try {
-                    evaluationService.startEvaluation(UUID.fromString(id));
-                } catch (Exception e) {
-                }
-            }
+            eventPublisher.publishEvent(new ContractSavedEvent(UUID.fromString(id), existing.getTenantId().getId()));
         });
     }
 
@@ -239,13 +238,8 @@ public class ContractService {
         
         auditService.logChange(saved.getContractId().value().toString(), "contract", null, "CREATED", "MANUAL", "admin");
         
-        if (evaluationService != null) {
-            try {
-                evaluationService.startEvaluation(saved.getContractId().value());
-            } catch (Exception e) {
-            }
-        }
-        
+        eventPublisher.publishEvent(new ContractSavedEvent(saved.getContractId().value(), tenantId.getId()));
+
         return convertToDTO(saved);
     }
 

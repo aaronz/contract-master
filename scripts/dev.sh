@@ -17,6 +17,8 @@ log_warn() { printf "${YELLOW}>>> %s${NC}\n" "$1"; }
 log_success() { printf "${GREEN}>>> %s${NC}\n" "$1"; }
 log_error() { printf "${RED}>>> %s${NC}\n" "$1"; }
 
+"$SCRIPT_DIR/check_env.sh" || exit 1
+
 if command -v mvn &> /dev/null; then
     MVN_CMD="mvn"
 elif [ -f "$BACKEND_DIR/mvnw" ]; then

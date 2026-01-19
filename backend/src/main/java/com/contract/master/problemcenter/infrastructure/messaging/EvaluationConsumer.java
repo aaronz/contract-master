@@ -87,6 +87,18 @@ public class EvaluationConsumer {
             Map<String, Object> facts = new HashMap<>();
             facts.put("contract", contractDTO);
             facts.put("content", contract.getContractName());
+            
+            facts.put("contractNo", contractDTO.getContractNo());
+            facts.put("contractName", contractDTO.getContractName());
+            facts.put("contractType", contractDTO.getContractType());
+            facts.put("contractAmount", contractDTO.getContractAmount());
+            facts.put("totalAmountWithTax", contractDTO.getTotalAmountWithTax());
+            facts.put("contractStatus", contractDTO.getContractStatus());
+            facts.put("approvalStatus", contractDTO.getApprovalStatus());
+            
+            if (contractDTO.getExtendedFields() != null) {
+                facts.putAll(contractDTO.getExtendedFields());
+            }
 
             String contractIdStr = contract.getContractId().value().toString();
             problemRepository.deleteByContractIdAndTenantId(contractIdStr, job.getTenantId());
@@ -98,7 +110,7 @@ public class EvaluationConsumer {
                             RuleExecutionResult result = getExecutor(rule.getLogicType()).execute(rule, facts);
                             if (result.isMatched()) {
                                 log.info("Rule matched: {} for contract {}", rule.getName(), contractIdStr);
-                                return createProblem(job, rule, contract, result);
+                                return createProblem(job, rule, contract, result, facts);
                             }
                         } catch (Exception e) {
                             log.error("Error executing rule {} for contract {}", rule.getId(), contractIdStr, e);
@@ -135,13 +147,19 @@ public class EvaluationConsumer {
                 .orElseThrow(() -> new RuntimeException("No executor found for logic type: " + type));
     }
 
-    private Problem createProblem(ProblemEvaluationJob job, Rule rule, Contract contract, RuleExecutionResult result) {
+    private Problem createProblem(ProblemEvaluationJob job, Rule rule, Contract contract, RuleExecutionResult result, Map<String, Object> facts) {
         Problem problem = new Problem();
         problem.setEvaluationJobId(job.getId());
         problem.setRuleId(rule.getId());
         problem.setContractId(contract.getContractId().value().toString());
         problem.setTenantId(job.getTenantId());
-        problem.setGeneratedMessage("Rule hit: " + rule.getName());
+        
+        String message = "Rule hit: " + rule.getName();
+        if (rule.getDescription() != null && !rule.getDescription().isEmpty()) {
+            message += ". " + rule.getDescription();
+        }
+        problem.setGeneratedMessage(message);
+        
         problem.setStatus(ProblemStatus.NEW);
         problem.setSeverity(rule.getSeverity());
         if (result.getLocation() != null) {

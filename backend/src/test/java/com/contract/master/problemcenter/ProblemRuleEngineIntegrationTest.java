@@ -68,7 +68,7 @@ public class ProblemRuleEngineIntegrationTest {
         evaluationService.startEvaluation(contractId.value());
 
         await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-            List<Problem> problems = problemRepository.findByContractIdAndTenantId(contractId.value(), tenantId);
+            List<Problem> problems = problemRepository.findByContractIdAndTenantId(contractId.value().toString(), tenantId);
             assertThat(problems).isNotEmpty();
             assertThat(problems.get(0).getGeneratedMessage()).contains("Rule hit: High Risk Rule");
             assertThat(problems.get(0).getStatus()).isEqualTo(ProblemStatus.NEW);

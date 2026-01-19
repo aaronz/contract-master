@@ -6,6 +6,13 @@ set FRONTEND_DIR=%ROOT_DIR%\frontend
 
 echo Starting Contract Master Development Environment...
 
+call "%SCRIPT_DIR%check_env.bat"
+if %ERRORLEVEL% NEQ 0 (
+    echo Environment check failed. Aborting.
+    pause
+    exit /b %ERRORLEVEL%
+)
+
 echo Resetting Docker environment...
 cd /d "%ROOT_DIR%"
 docker-compose down -v --remove-orphans
