@@ -53,4 +53,8 @@ public class AuditService {
     public List<AuditLog> getAuditLogsByContract(String contractId) {
         return auditLogRepository.findByContractIdOrderByCreateTimeDesc(contractId);
     }
+
+    public List<AuditLog> getAllAuditLogs() {
+        return auditLogRepository.findAllByOrderByCreateTimeDesc();
+    }
 }

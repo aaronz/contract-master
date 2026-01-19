@@ -19,23 +19,28 @@
     </div>
 
     <div class="glass-card table-wrapper">
-      <el-table :data="auditLogs" style="width: 100%" @row-click="showDiff">
-        <el-table-column prop="timestamp" label="Time" width="180" />
-        <el-table-column prop="user" label="User" width="180">
+      <el-table v-loading="loading" :data="auditLogs" style="width: 100%" @row-click="showDiff">
+        <el-table-column prop="createTime" label="Time" width="180" />
+        <el-table-column prop="modifyUser" label="User" width="180">
            <template #default="{ row }">
              <div class="flex items-center gap-2">
-               <el-avatar size="small" :src="row.avatar">{{ row.user.charAt(0) }}</el-avatar>
-               <span>{{ row.user }}</span>
+               <el-avatar size="small">{{ row.modifyUser.charAt(0) }}</el-avatar>
+               <span>{{ row.modifyUser }}</span>
              </div>
            </template>
         </el-table-column>
-        <el-table-column prop="action" label="Action" width="150">
+        <el-table-column prop="modifyType" label="Action" width="150">
            <template #default="{ row }">
-             <el-tag :type="getActionType(row.action)">{{ row.action }}</el-tag>
+             <el-tag :type="getActionType(row.modifyType)">{{ row.modifyType }}</el-tag>
            </template>
         </el-table-column>
-        <el-table-column prop="resource" label="Resource" />
-        <el-table-column prop="summary" label="Summary" />
+        <el-table-column prop="contractId" label="Resource" />
+        <el-table-column prop="fieldName" label="Field" width="150" />
+        <el-table-column prop="summary" label="Summary">
+          <template #default="{ row }">
+            {{ row.fieldName }}: {{ row.modifyType }}
+          </template>
+        </el-table-column>
         <el-table-column width="80" align="center">
            <template #default>
              <el-icon class="text-gray-400"><ArrowRight /></el-icon>
@@ -43,7 +48,12 @@
         </el-table-column>
       </el-table>
       <div class="pagination-bar">
-        <el-pagination background layout="prev, pager, next" :total="100" />
+        <el-pagination 
+          background 
+          layout="prev, pager, next" 
+          :total="total" 
+          v-model:current-page="currentPage"
+        />
       </div>
     </div>
 
@@ -54,27 +64,27 @@
           <div class="diff-meta">
             <div class="meta-item">
               <label>User</label>
-              <span>{{ selectedLog.user }}</span>
+              <span>{{ selectedLog.modifyUser }}</span>
             </div>
             <div class="meta-item">
               <label>Time</label>
-              <span>{{ selectedLog.timestamp }}</span>
+              <span>{{ selectedLog.createTime }}</span>
             </div>
             <div class="meta-item">
               <label>Action</label>
-              <span>{{ selectedLog.action }}</span>
+              <span>{{ selectedLog.modifyType }}</span>
             </div>
           </div>
         </div>
 
         <div class="diff-viewer">
           <div class="diff-pane old">
-            <div class="pane-label bg-red-50 text-red-600">Old Value</div>
-            <pre>{{ formatJSON(selectedLog.oldValue) }}</pre>
+            <div class="pane-label bg-red-50 text-red-600">Old Value ({{ selectedLog.fieldName }})</div>
+            <pre>{{ formatValue(selectedLog.oldValue) }}</pre>
           </div>
           <div class="diff-pane new">
-            <div class="pane-label bg-green-50 text-green-600">New Value</div>
-            <pre>{{ formatJSON(selectedLog.newValue) }}</pre>
+            <div class="pane-label bg-green-50 text-green-600">New Value ({{ selectedLog.fieldName }})</div>
+            <pre>{{ formatValue(selectedLog.newValue) }}</pre>
           </div>
         </div>
       </div>
@@ -83,67 +93,44 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { ArrowRight, Download } from '@element-plus/icons-vue'
+import request from '@/utils/request'
 
 const dateRange = ref([])
 const drawerVisible = ref(false)
 const selectedLog = ref(null)
+const loading = ref(false)
+const auditLogs = ref([])
+const total = ref(0)
+const currentPage = ref(1)
 
-const auditLogs = ref([
-  { 
-    id: 1, 
-    timestamp: '2024-01-15 14:30:22', 
-    user: 'Alice Admin', 
-    avatar: '', 
-    action: 'UPDATE', 
-    resource: 'Contract #2024-001', 
-    summary: 'Modified payment terms',
-    oldValue: {
-      "payment_terms": "Net 30",
-      "amount": 50000,
-      "status": "DRAFT"
-    },
-    newValue: {
-      "payment_terms": "Net 60",
-      "amount": 50000,
-      "status": "REVIEW"
-    }
-  },
-  { 
-    id: 2, 
-    timestamp: '2024-01-15 12:15:00', 
-    user: 'Bob Legal', 
-    avatar: '', 
-    action: 'DELETE', 
-    resource: 'Risk Rule #88', 
-    summary: 'Deleted obsolete risk rule',
-    oldValue: {
-      "rule_id": "88",
-      "name": "Old Vendor Check",
-      "active": true
-    },
-    newValue: null
-  },
-  { 
-    id: 3, 
-    timestamp: '2024-01-14 09:00:11', 
-    user: 'System', 
-    avatar: '', 
-    action: 'SYNC', 
-    resource: 'Salesforce Connector', 
-    summary: 'Auto-sync completed',
-    oldValue: null,
-    newValue: { "synced_count": 450, "status": "SUCCESS" }
+const fetchLogs = async () => {
+  loading.value = true
+  try {
+    const res = await request.get('/audit/logs')
+    auditLogs.value = res.data.data
+    total.value = res.data.data.length
+  } catch (error) {
+    console.error('Failed to fetch audit logs:', error)
+  } finally {
+    loading.value = false
   }
-])
+}
+
+onMounted(() => {
+  fetchLogs()
+})
 
 const getActionType = (action) => {
   const map = {
     'UPDATE': 'warning',
     'CREATE': 'success',
+    'CREATED': 'success',
     'DELETE': 'danger',
-    'SYNC': 'info'
+    'SYNC': 'info',
+    'MANUAL': 'info',
+    'RE_EVALUATION_TRIGGERED': 'warning'
   }
   return map[action] || 'info'
 }
@@ -153,9 +140,14 @@ const showDiff = (row) => {
   drawerVisible.value = true
 }
 
-const formatJSON = (obj) => {
-  if (!obj) return 'null'
-  return JSON.stringify(obj, null, 2)
+const formatValue = (val) => {
+  if (val === null || val === undefined) return 'null'
+  try {
+    const parsed = JSON.parse(val)
+    return JSON.stringify(parsed, null, 2)
+  } catch (e) {
+    return val
+  }
 }
 </script>
 
