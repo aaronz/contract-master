@@ -99,6 +99,10 @@ const sections = {
   integrations: {
     icon: Connection,
     steps: ['step1', 'step2', 'step3']
+  },
+  ai: {
+    icon: MagicStick,
+    steps: ['step1', 'step2', 'step3']
   }
 }
 

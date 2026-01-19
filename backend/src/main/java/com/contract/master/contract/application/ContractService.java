@@ -205,7 +205,13 @@ public class ContractService {
 
     @Transactional
     public ContractDTO createContract(ContractDTO dto) {
-        ContractId contractId = ContractId.generate();
+        ContractId contractId;
+        if (dto.getContractId() != null && !dto.getContractId().isEmpty()) {
+            contractId = ContractId.of(dto.getContractId());
+        } else {
+            contractId = ContractId.generate();
+        }
+        
         TenantId tenantId = TenantId.of(TenantContext.getCurrentTenant());
         ContractNo contractNo = new ContractNo(dto.getContractNo());
         

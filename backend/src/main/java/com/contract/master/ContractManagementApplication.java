@@ -18,6 +18,8 @@ import com.contract.master.identity.domain.model.User;
 import com.contract.master.identity.domain.model.Role;
 import com.contract.master.identity.domain.repository.UserRepository;
 import com.contract.master.identity.domain.repository.RoleRepository;
+import com.contract.master.ai.domain.model.AISetting;
+import com.contract.master.ai.domain.repository.AISettingRepository;
 import com.contract.master.shared.domain.model.TenantId;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -36,6 +38,7 @@ import java.util.UUID;
 @SpringBootApplication
 @EnableJpaAuditing
 @EntityScan(basePackages = {
+    "com.contract.master.ai.domain.model",
     "com.contract.master.audit.domain.model",
     "com.contract.master.contract.domain.model",
     "com.contract.master.contract.metadata.domain.model",
@@ -60,10 +63,31 @@ public class ContractManagementApplication {
     
 
     @Bean
-    public CommandLineRunner initData(UserRepository userRepository, RoleRepository roleRepository, ContractRepository contractRepository, RuleConfigRepository ruleConfigRepository, RuleRepository ruleRepository, PasswordEncoder passwordEncoder) {
+    public CommandLineRunner initData(UserRepository userRepository, RoleRepository roleRepository, ContractRepository contractRepository, RuleConfigRepository ruleConfigRepository, RuleRepository ruleRepository, AISettingRepository aiSettingRepository, PasswordEncoder passwordEncoder) {
         return args -> {
-            System.out.println(">>> CHECKING ROLES...");
+            System.out.println(">>> CHECKING AI SETTINGS...");
             TenantId t1 = TenantId.of("tenant-1");
+            if (aiSettingRepository.findByTenantId(t1).isEmpty()) {
+                AISetting setting = new AISetting();
+                setting.setProvider("SILICONFLOW");
+                setting.setModelName("Qwen/Qwen2.5-7B-Instruct");
+                setting.setEndpointUrl("https://api.siliconflow.cn/v1/chat/completions");
+                setting.setExtractionPrompt("You are an expert legal document analyzer. Your task is to extract specific information from the contract text provided (which could be in English or Chinese). \n\n" +
+                    "Return ONLY a valid JSON object with the following keys: \n" +
+                    "- contractNo: The contract reference number or ID.\n" +
+                    "- contractName: The official title of the contract.\n" +
+                    "- partyAName: The legal name of the first party (Party A/甲方).\n" +
+                    "- partyBName: The legal name of the second party (Party B/乙方).\n" +
+                    "- contractAmount: The total contract value as a number.\n" +
+                    "- contractType: The classification of the contract.\n\n" +
+                    "Guidelines:\n" +
+                    "1. If a value is missing, return null for that key.\n" +
+                    "2. Return only the JSON object without any additional text or formatting explanation.");
+                setting.setTenantId(t1);
+                aiSettingRepository.save(setting);
+            }
+
+            System.out.println(">>> CHECKING ROLES...");
             if (roleRepository.findByTenantId(t1).isEmpty()) {
                 System.out.println(">>> CREATING DEFAULT ROLES...");
                 String[][] defaultRoles = {

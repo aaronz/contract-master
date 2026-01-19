@@ -90,6 +90,11 @@ const routes = [
         component: () => import('@/views/settings/users.vue'),
       },
       {
+        path: 'settings/ai',
+        name: 'AIConfiguration',
+        component: () => import('@/views/settings/ai-config.vue'),
+      },
+      {
         path: 'settings/fields',
         name: 'FieldConfig',
         component: () => import('@/views/settings/fields.vue'),

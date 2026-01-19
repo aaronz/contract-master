@@ -10,7 +10,7 @@
         <el-button @click="showFilterDrawer = true">
           <el-icon><Filter /></el-icon> {{ $t('common.filter') }}
         </el-button>
-        <el-button type="primary" icon="Plus" @click="showNewContractDialog = true">{{ $t('contract.create') }}</el-button>
+        <el-button type="primary" icon="Plus" @click="handleAddNewContract">{{ $t('contract.create') }}</el-button>
       </div>
     </div>
 
@@ -21,24 +21,67 @@
           
           <!-- General Info Tab -->
           <el-tab-pane :label="$t('contract.generalInfo')" name="general">
+            <div class="ai-extraction-area glass-panel-sm p-4 mb-6">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h4 class="m-0 text-blue-600 flex items-center gap-2">
+                    <el-icon><MagicStick /></el-icon> AI Auto-Extraction
+                  </h4>
+                  <p class="text-xs text-gray-500 m-0 mt-1">Upload a contract document to automatically fill out the form using AI.</p>
+                </div>
+                <div class="flex gap-2">
+                  <el-upload
+                    action="#"
+                    :auto-upload="false"
+                    :show-file-list="false"
+                    :on-change="handleAiFileChange"
+                  >
+                    <el-button type="primary" plain size="small" icon="Upload">Choose File</el-button>
+                  </el-upload>
+                  <el-button 
+                    type="primary" 
+                    size="small" 
+                    :loading="extracting" 
+                    :disabled="!selectedAiFile"
+                    @click="runAiExtraction"
+                  >
+                    Start Analysis
+                  </el-button>
+                </div>
+              </div>
+              <div v-if="selectedAiFile" class="mt-2 text-xs text-blue-500">
+                Selected: {{ selectedAiFile.name }}
+              </div>
+            </div>
+
             <div class="form-section">
               <h3 class="section-header">Core Details</h3>
               <div class="form-grid">
                 <div class="field-group" v-if="fieldStore.isFieldVisible('contract_no')">
                   <label>{{ fieldStore.getFieldByCode('contract_no')?.fieldName || $t('contract.no') }}</label>
                   <el-form-item prop="contractNo">
-                    <el-input v-model="newContractForm.contractNo" placeholder="e.g. CON-2026-001" />
+                    <el-input 
+                      v-model="newContractForm.contractNo" 
+                      placeholder="e.g. CON-2026-001" 
+                      :class="{ 'ai-highlight': isAiUpdated('contractNo') }"
+                    />
                   </el-form-item>
                 </div>
                 <div class="field-group" v-if="fieldStore.isFieldVisible('contract_name')">
                   <label>{{ fieldStore.getFieldByCode('contract_name')?.fieldName || $t('contract.name') }}</label>
                   <el-form-item prop="contractName">
-                    <el-input v-model="newContractForm.contractName" />
+                    <el-input 
+                      v-model="newContractForm.contractName" 
+                      :class="{ 'ai-highlight': isAiUpdated('contractName') }"
+                    />
                   </el-form-item>
                 </div>
                 <div class="field-group" v-if="fieldStore.isFieldVisible('contract_type')">
                   <label>{{ fieldStore.getFieldByCode('contract_type')?.fieldName || $t('contract.type') }}</label>
-                  <el-input v-model="newContractForm.contractType" />
+                  <el-input 
+                    v-model="newContractForm.contractType" 
+                    :class="{ 'ai-highlight': isAiUpdated('contractType') }"
+                  />
                 </div>
                 <div class="field-group" v-if="fieldStore.isFieldVisible('contract_status')">
                   <label>{{ fieldStore.getFieldByCode('contract_status')?.fieldName || $t('contract.status') }}</label>
@@ -57,7 +100,7 @@
                 <div class="field-group" v-if="fieldStore.isFieldVisible('party_a_name')">
                   <label>{{ fieldStore.getFieldByCode('party_a_name')?.fieldName || 'Entity Name' }}</label>
                   <el-form-item prop="partyAName">
-                    <el-input v-model="newContractForm.partyAName" />
+                    <el-input v-model="newContractForm.partyAName" :class="{ 'ai-highlight': isAiUpdated('partyAName') }" />
                   </el-form-item>
                 </div>
                 <div class="form-grid">
@@ -81,7 +124,7 @@
                 <div class="field-group" v-if="fieldStore.isFieldVisible('party_b_name')">
                   <label>{{ fieldStore.getFieldByCode('party_b_name')?.fieldName || 'Entity Name' }}</label>
                   <el-form-item prop="partyBName">
-                    <el-input v-model="newContractForm.partyBName" />
+                    <el-input v-model="newContractForm.partyBName" :class="{ 'ai-highlight': isAiUpdated('partyBName') }" />
                   </el-form-item>
                 </div>
                 <div class="form-grid">
@@ -145,7 +188,12 @@
                 </div>
                 <div class="field-group" v-if="fieldStore.isFieldVisible('contract_amount')">
                   <label>{{ fieldStore.getFieldByCode('contract_amount')?.fieldName || $t('contract.amount') }}</label>
-                  <el-input-number v-model="newContractForm.contractAmount" :precision="2" style="width: 100%" />
+                  <el-input-number 
+                    v-model="newContractForm.contractAmount" 
+                    :precision="2" 
+                    style="width: 100%" 
+                    :class="{ 'ai-highlight': isAiUpdated('contractAmount') }"
+                  />
                 </div>
                 <div class="field-group" v-if="fieldStore.isFieldVisible('tax_rate')">
                   <label>{{ fieldStore.getFieldByCode('tax_rate')?.fieldName || 'Tax Rate (%)' }}</label>
@@ -473,11 +521,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, reactive } from 'vue'
 import { useRouter } from 'vue-router'
-import { Filter, Search, Files, ArrowDown, ArrowRight, Download, User, Delete, Close, Plus } from '@element-plus/icons-vue'
+import { Filter, Search, Files, ArrowDown, ArrowRight, Download, User, Delete, Close, Plus, MagicStick, Upload } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useFieldStore } from '@/stores/fieldStore'
+import request from '@/utils/request'
 
 const fieldStore = useFieldStore()
 const router = useRouter()
@@ -488,6 +537,60 @@ const selectedRows = ref([])
 const tableRef = ref(null)
 const contracts = ref([])
 const isSticky = ref(false)
+
+// AI Extraction State
+const extracting = ref(false)
+const selectedAiFile = ref(null)
+
+const handleAddNewContract = () => {
+  // Generate a temporary UUID for new contract to link attachments before creation
+  newContractForm.value.contractId = self.crypto.randomUUID()
+  aiUpdatedFields.value.clear()
+  selectedAiFile.value = null
+  showNewContractDialog.value = true
+}
+
+const handleAiFileChange = (file) => {
+  selectedAiFile.value = file.raw
+}
+
+const runAiExtraction = async () => {
+  if (!selectedAiFile.value) return
+  extracting.value = true
+  
+  const formData = new FormData()
+  formData.append('file', selectedAiFile.value)
+  if (newContractForm.value.contractId) {
+    formData.append('contractId', newContractForm.value.contractId)
+  }
+  
+  try {
+    const response = await request.post('/contracts/extract', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+    if (response.data && response.data.data) {
+      const extracted = response.data.data
+      // Track updated fields
+      Object.keys(extracted).forEach(key => {
+        if (key in newContractForm.value) {
+          newContractForm.value[key] = extracted[key]
+          aiUpdatedFields.value.add(key)
+        }
+      })
+      ElMessage.success('Contract fields extracted successfully!')
+    }
+  } catch (error) {
+    console.error('AI Extraction failed', error)
+    ElMessage.error('AI Extraction failed. Please fill manually.')
+  } finally {
+    extracting.value = false
+  }
+}
+
+// Track AI-updated fields for highlighting
+const aiUpdatedFields = ref(new Set())
+const isAiUpdated = (field) => aiUpdatedFields.value.has(field)
+
 const filterForm = ref({
   dateRange: [],
   type: '',
@@ -621,15 +724,12 @@ const handleCreateContract = async () => {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
             'X-Tenant-ID': localStorage.getItem('tenantId')
           },
-          body: JSON.stringify({
-            ...newContractForm.value,
-            contractStatus: 'DRAFT'
-          })
+          body: JSON.stringify(newContractForm.value)
         })
         if (response.ok) {
           ElMessage.success('Contract created successfully')
           showNewContractDialog.value = false
-          currentPage.value = 1 // Reset to first page to see the new record
+          aiUpdatedFields.value.clear()
           fetchContracts()
         } else {
           ElMessage.error('Failed to create contract')
@@ -871,6 +971,16 @@ const getStatusType = (status) => {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+:deep(.ai-highlight .el-input__wrapper) {
+  box-shadow: 0 0 0 1px #3B82F6 inset !important;
+  background-color: rgba(59, 130, 246, 0.05) !important;
+}
+
+:deep(.ai-highlight.el-input-number .el-input__wrapper) {
+  box-shadow: 0 0 0 1px #3B82F6 inset !important;
+  background-color: rgba(59, 130, 246, 0.05) !important;
 }
 
 /* Detailed Form Styles */

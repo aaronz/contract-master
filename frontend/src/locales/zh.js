@@ -78,6 +78,7 @@ export default {
     ruleEngine: '规则引擎',
     evaluationRules: '合规规则库',
     roleManagement: '角色管理',
+    aiConfiguration: 'AI模型配置',
     systemSettings: '系统设置',
     permissionMatrix: '权限矩阵',
     fieldConfig: '字段配置',
@@ -204,6 +205,13 @@ export default {
         step1: { title: 'Webhooks', content: '配置端点，在合同验证或发现问题时接收实时通知。' },
         step2: { title: '字段映射', content: '将内部字段映射到外部 CRM 字段，实现无缝同步。' },
         step3: { title: '推送服务', content: '自动将已验证的合同数据分发到 SAP、Salesforce 或自定义 ERP。' }
+      },
+      ai: {
+        title: 'AI 智能化',
+        description: '利用大语言模型（LLM）实现合同自动化处理。',
+        step1: { title: '模型配置', content: '在设置中配置硅基流动、DeepSeek 或 OpenAI 等服务商。' },
+        step2: { title: '自动提取', content: '上传 PDF/Docx 文件，AI 将自动识别并填充合同表单。' },
+        step3: { title: '可视化校对', content: '保存前核对以蓝色高亮显示的 AI 提取字段。' }
       }
     }
   },
@@ -211,6 +219,23 @@ export default {
     title: '发布日志',
     subtitle: '跟踪合同大师的最新功能更新与改进。',
     items: [
+      {
+        version: 'v1.2.0',
+        date: '2026-01-19',
+        title: 'AI 智能提取与附件管理上线',
+        features: [
+          '新增基于 LLM 的 PDF/Docx 合同字段自动提取功能。',
+          '集成硅基流动 (SiliconFlow) 作为首选 AI 供应商，支持 Qwen/DeepSeek 模型。',
+          '实现 AI 填充字段的视觉高亮提醒，增强人工审核体验。',
+          '上线真实的附件管理系统，支持多版本上传、在线预览与下载。',
+          '支持管理员自定义 AI 提示词（Prompt）和模型参数。'
+        ],
+        fixes: [
+          '修复了合同附件接口的路由冲突问题。',
+          '解决了新创建合同在加载附件时触发的 500 错误。',
+          '通过 PDFBox 提升了 PDF 文本提取的准确性。'
+        ]
+      },
       {
         version: 'v1.1.0',
         date: '2026-01-19',

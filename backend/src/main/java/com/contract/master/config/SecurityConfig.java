@@ -43,6 +43,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/publish/**").permitAll()
+                .requestMatchers("/api/attachments/**").permitAll()
                 .requestMatchers("/api/contracts").permitAll() // Temporarily permit all for GET /api/contracts to unblock frontend
                 .requestMatchers("/api/evaluations/**").permitAll()
                 .requestMatchers("/api/evaluations").permitAll() // Permit all for new evaluation endpoints

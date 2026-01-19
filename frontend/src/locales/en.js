@@ -78,6 +78,7 @@ export default {
     ruleEngine: 'Rule Engine',
     evaluationRules: 'Evaluation Rules',
     roleManagement: 'Role Management',
+    aiConfiguration: 'AI Configuration',
     systemSettings: 'System Settings',
     permissionMatrix: 'Permission Matrix',
     fieldConfig: 'Field Config',
@@ -204,6 +205,13 @@ export default {
         step1: { title: 'Webhooks', content: 'Configure endpoints to receive notifications when contracts are verified or issues are found.' },
         step2: { title: 'Field Mapping', content: 'Map internal fields to external CRM fields for seamless synchronization.' },
         step3: { title: 'Push Service', content: 'Automatically distribute verified contract data to SAP, Salesforce, or custom ERPs.' }
+      },
+      ai: {
+        title: 'AI Intelligence',
+        description: 'Leverage LLMs for automated contract processing.',
+        step1: { title: 'LLM Configuration', content: 'Set up providers like SiliconFlow, DeepSeek, or OpenAI in Settings.' },
+        step2: { title: 'Auto-Extraction', content: 'Upload PDF/Docx files to automatically fill out contract forms.' },
+        step3: { title: 'Visual Review', content: 'Verify AI-extracted fields highlighted in blue before saving.' }
       }
     }
   },
@@ -211,6 +219,23 @@ export default {
     title: 'Release Notes',
     subtitle: 'Track latest updates and improvements to Contract Master.',
     items: [
+      {
+        version: 'v1.2.0',
+        date: '2026-01-19',
+        title: 'AI Intelligence & Document Management',
+        features: [
+          'Added AI Auto-Extraction for PDF/Docx documents with LLM support.',
+          'Integrated SiliconFlow as a primary AI provider (DeepSeek/Qwen models).',
+          'Implemented visual field highlighting for AI-suggested values.',
+          'Added real Attachment Management system (upload, preview, download).',
+          'Configurable LLM prompts and model settings for administrators.'
+        ],
+        fixes: [
+          'Fixed API routing collision for contract attachment endpoints.',
+          'Resolved 500 error when fetching attachments for newly created contracts.',
+          'Improved PDF text extraction reliability via PDFBox.'
+        ]
+      },
       {
         version: 'v1.1.0',
         date: '2026-01-19',

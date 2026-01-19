@@ -4,16 +4,17 @@ import com.contract.master.audit.domain.model.AuditLog;
 import com.contract.master.contract.dto.ContractDTO;
 import com.contract.master.contract.application.ContractService;
 import com.contract.master.contract.application.ContractApplicationService;
+import com.contract.master.audit.application.AuditService;
 import com.contract.master.api.GlobalExceptionHandler;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Map;
-import com.contract.master.audit.application.AuditService;
+import java.io.IOException;
+import com.contract.master.shared.domain.model.TenantId;
 
 @RestController
 @RequestMapping("/api/contracts")
@@ -23,15 +24,57 @@ public class ContractController {
     private final ContractApplicationService applicationService;
     private final AuditService auditService;
     private final com.contract.master.integration.application.IntegrationPushService pushService;
+    private final com.contract.master.ai.application.AIExtractionService aiExtractionService;
+    private final com.contract.master.contract.domain.repository.ContractAttachmentRepository attachmentRepository;
 
     public ContractController(ContractService contractService, 
                               ContractApplicationService applicationService,
                               AuditService auditService,
-                              com.contract.master.integration.application.IntegrationPushService pushService) {
+                              com.contract.master.integration.application.IntegrationPushService pushService,
+                              com.contract.master.ai.application.AIExtractionService aiExtractionService,
+                              com.contract.master.contract.domain.repository.ContractAttachmentRepository attachmentRepository) {
         this.contractService = contractService;
         this.applicationService = applicationService;
         this.auditService = auditService;
         this.pushService = pushService;
+        this.aiExtractionService = aiExtractionService;
+        this.attachmentRepository = attachmentRepository;
+    }
+
+    @PostMapping("/extract")
+    public GlobalExceptionHandler.ApiResponse<Map<String, Object>> extract(
+            @RequestParam("file") org.springframework.web.multipart.MultipartFile file,
+            @RequestParam(value = "contractId", required = false) String contractId) {
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, aiExtractionService.extract(file, contractId));
+    }
+
+    @PostMapping("/{id}/attachments")
+    public GlobalExceptionHandler.ApiResponse<Void> uploadAttachment(
+            @PathVariable String id,
+            @RequestParam("file") org.springframework.web.multipart.MultipartFile file) throws IOException {
+        if ("attachments".equals(id)) {
+            return GlobalExceptionHandler.ApiResponse.error(400, "Invalid contract ID");
+        }
+        TenantId tenantId = TenantId.of(com.contract.master.security.TenantContext.getCurrentTenant());
+        com.contract.master.contract.domain.model.ContractAttachment attachment = new com.contract.master.contract.domain.model.ContractAttachment();
+        attachment.setAttachmentId(java.util.UUID.randomUUID().toString());
+        attachment.setContractId(id);
+        attachment.setAttachmentName(file.getOriginalFilename());
+        attachment.setFileSize(file.getSize());
+        attachment.setFileFormat(file.getContentType());
+        attachment.setStoragePath("uploads/" + attachment.getAttachmentId());
+        attachment.setTenantId(tenantId);
+        attachment.setUploadUser(com.contract.master.security.TenantContext.getCurrentTenant());
+        attachmentRepository.save(attachment);
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, null);
+    }
+
+    @GetMapping("/{id}/attachments")
+    public GlobalExceptionHandler.ApiResponse<List<com.contract.master.contract.domain.model.ContractAttachment>> getAttachments(@PathVariable String id) {
+        if ("attachments".equals(id)) {
+            return GlobalExceptionHandler.ApiResponse.error(400, "Invalid contract ID");
+        }
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, attachmentRepository.findByContractId(id));
     }
 
     @PostMapping("/{id}/publish")

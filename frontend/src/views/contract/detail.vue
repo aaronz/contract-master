@@ -44,6 +44,37 @@
       <div class="main-form-area" :class="{ 'with-panel': showSidePanel }">
         <el-tabs v-model="activeTab" class="custom-tabs glass-card">
           <el-tab-pane :label="$t('contract.generalInfo')" name="general">
+            <!-- AI Re-Extraction Area -->
+            <div v-if="isEditMode" class="ai-extraction-area glass-panel-sm p-4 mb-6 border-blue-100 bg-blue-50/30">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h4 class="m-0 text-blue-600 flex items-center gap-2">
+                    <el-icon><MagicStick /></el-icon> AI Sync from Document
+                  </h4>
+                  <p class="text-xs text-gray-500 m-0 mt-1">Upload a new version of the contract to update fields using AI.</p>
+                </div>
+                <div class="flex gap-2">
+                  <el-upload
+                    action="#"
+                    :auto-upload="false"
+                    :show-file-list="false"
+                    :on-change="handleAiFileChange"
+                  >
+                    <el-button type="primary" plain size="small" icon="Upload">New Version</el-button>
+                  </el-upload>
+                  <el-button 
+                    type="primary" 
+                    size="small" 
+                    :loading="extracting" 
+                    :disabled="!selectedAiFile"
+                    @click="runAiExtraction"
+                  >
+                    Re-extract
+                  </el-button>
+                </div>
+              </div>
+            </div>
+
             <div class="section-grid">
               <!-- Basic Info -->
               <div class="form-section">
@@ -51,17 +82,17 @@
                 <div class="form-grid">
                   <div class="field-group" v-if="isFieldVisible('contract_no')">
                     <label>{{ getFieldName('contract_no') }}</label>
-                    <el-input v-if="isEditMode" v-model="form.contractNo" />
+                    <el-input v-if="isEditMode" v-model="form.contractNo" :class="{ 'ai-highlight': aiUpdatedFields.has('contractNo') }" />
                     <div v-else class="display-val font-mono" :style="getFieldStyle('contract_no')">{{ form.contractNo }}</div>
                   </div>
                   <div class="field-group" v-if="isFieldVisible('contract_name')">
                     <label>{{ getFieldName('contract_name') }}</label>
-                    <el-input v-if="isEditMode" v-model="form.contractName" />
+                    <el-input v-if="isEditMode" v-model="form.contractName" :class="{ 'ai-highlight': aiUpdatedFields.has('contractName') }" />
                     <div v-else class="display-val" :style="getFieldStyle('contract_name')">{{ form.contractName }}</div>
                   </div>
                   <div class="field-group" v-if="isFieldVisible('contract_type')">
                     <label>{{ getFieldName('contract_type') }}</label>
-                    <el-input v-if="isEditMode" v-model="form.contractType" />
+                    <el-input v-if="isEditMode" v-model="form.contractType" :class="{ 'ai-highlight': aiUpdatedFields.has('contractType') }" />
                     <div v-else class="display-val" :style="getFieldStyle('contract_type')">{{ form.contractType }}</div>
                   </div>
                   <div class="field-group" v-if="isFieldVisible('contract_status')">
@@ -84,7 +115,7 @@
                    <div class="form-stack">
                      <div class="field-group" v-if="isFieldVisible('party_a_name')">
                        <label>{{ getFieldName('party_a_name') }}</label>
-                       <el-input v-if="isEditMode" v-model="form.partyAName" />
+                       <el-input v-if="isEditMode" v-model="form.partyAName" :class="{ 'ai-highlight': aiUpdatedFields.has('partyAName') }" />
                        <div v-else class="display-val strong" :style="getFieldStyle('party_a_name')">{{ form.partyAName }}</div>
                      </div>
                      <div class="grid-2">
@@ -112,7 +143,7 @@
                    <div class="form-stack">
                      <div class="field-group" v-if="isFieldVisible('party_b_name')">
                        <label>{{ getFieldName('party_b_name') }}</label>
-                       <el-input v-if="isEditMode" v-model="form.partyBName" />
+                       <el-input v-if="isEditMode" v-model="form.partyBName" :class="{ 'ai-highlight': aiUpdatedFields.has('partyBName') }" />
                        <div v-else class="display-val strong" :style="getFieldStyle('party_b_name')">{{ form.partyBName }}</div>
                      </div>
                      <div class="grid-2">
@@ -186,7 +217,7 @@
                 </div>
                 <div class="field-group" v-if="isFieldVisible('contract_amount')">
                   <label>{{ getFieldName('contract_amount') }}</label>
-                  <el-input-number v-if="isEditMode" v-model="form.contractAmount" :precision="2" style="width: 100%" />
+                  <el-input-number v-if="isEditMode" v-model="form.contractAmount" :precision="2" style="width: 100%" :class="{ 'ai-highlight': aiUpdatedFields.has('contractAmount') }" />
                   <div v-else class="display-val highlight" :style="getFieldStyle('contract_amount')">{{ formatCurrency(form.contractAmount, form.currencyType) }}</div>
                 </div>
                 <div class="field-group" v-if="isFieldVisible('tax_rate')">
@@ -345,7 +376,8 @@
               class="upload-demo"
               drag
               action="#"
-              multiple
+              :auto-upload="false"
+              :on-change="handleNewAttachment"
             >
               <el-icon class="el-icon--upload"><UploadFilled /></el-icon>
               <div class="el-upload__text">
@@ -353,17 +385,20 @@
               </div>
             </el-upload>
             
-            <div class="attachment-list">
-               <div class="attachment-item glass-panel-sm" v-for="i in 3" :key="i">
+            <div class="attachment-list mt-6">
+               <div class="attachment-item glass-panel-sm" v-for="item in attachments" :key="item.attachmentId">
                  <el-icon class="file-icon"><Document /></el-icon>
                  <div class="file-info">
-                   <div class="file-name">Contract_Final_v{{i}}.pdf</div>
-                   <div class="file-meta">2.4MB • Uploaded by Admin • 2024-01-1{{i}}</div>
+                   <div class="file-name">{{ item.attachmentName }}</div>
+                   <div class="file-meta">{{ (item.fileSize / 1024 / 1024).toFixed(2) }}MB • {{ item.fileFormat }} • {{ item.createTime }}</div>
                  </div>
                  <div class="file-actions">
-                   <el-button link type="primary">Preview</el-button>
-                   <el-button link type="primary">Download</el-button>
+                   <el-button link type="primary" @click="previewAttachment(item)">Preview</el-button>
+                   <el-button link type="primary" @click="downloadAttachment(item)">Download</el-button>
                  </div>
+               </div>
+               <div v-if="attachments.length === 0" class="text-center p-10 text-gray-400">
+                 No attachments found.
                </div>
             </div>
           </el-tab-pane>
@@ -442,6 +477,64 @@ const isEditMode = ref(false)
 const showRuleSelectorModal = ref(false)
 const loading = ref(false)
 
+// AI Extraction State
+const extracting = ref(false)
+const selectedAiFile = ref(null)
+const aiUpdatedFields = ref(new Set())
+
+const handleAiFileChange = (file) => {
+  selectedAiFile.value = file.raw
+}
+
+const runAiExtraction = async () => {
+  if (!selectedAiFile.value) return
+  extracting.value = true
+  
+  const formData = new FormData()
+  formData.append('file', selectedAiFile.value)
+  formData.append('contractId', form.contractId || router.currentRoute.value.params.id)
+  
+  try {
+    const response = await request.post('/contracts/extract', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+    if (response.data && response.data.data) {
+      const extracted = response.data.data
+      // Apply extracted fields to form
+      Object.keys(extracted).forEach(key => {
+        if (key in form) {
+          form[key] = extracted[key]
+          aiUpdatedFields.value.add(key)
+        }
+      })
+      ElMessage.success('Fields updated via AI extraction')
+      // Important: if we didn't have a contractId before, refresh everything
+      if (!form.contractId) {
+        fetchContractDetail()
+      } else {
+        fetchAttachments()
+      }
+    }
+  } catch (error) {
+    console.error('AI Extraction failed', error)
+    ElMessage.error('AI Extraction failed')
+  } finally {
+    extracting.value = false
+  }
+}
+
+const handleNewAttachment = async (file) => {
+  const formData = new FormData()
+  formData.append('file', file.raw)
+  try {
+    await request.post(`/contracts/${form.contractId}/attachments`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+    ElMessage.success('Attachment uploaded')
+    fetchAttachments()
+  } catch (e) {}
+}
+
 const getFieldStyle = (fieldCode) => {
   const field = fieldStore.fields.find(f => f.fieldCode === fieldCode)
   if (!field) return {}
@@ -471,6 +564,8 @@ const fetchContractDetail = async () => {
       Object.assign(form, result.data)
       if (result.data.contractId) {
         form.contractId = result.data.contractId
+        // Fetch attachments only after we have a valid contractId
+        fetchAttachments()
       }
     } else {
       ElMessage.error('Invalid response format from server')
@@ -542,6 +637,19 @@ const comments = ref([
   { id: 2, user: 'Finance', time: '1 hour ago', text: 'Please confirm tax rate.' }
 ])
 
+const attachments = ref([])
+const fetchAttachments = async () => {
+  if (!form.contractId) return
+  try {
+    const res = await request.get(`/contracts/${form.contractId}/attachments`)
+    if (res.data && res.data.data) {
+      attachments.value = res.data.data
+    }
+  } catch (e) {
+    console.error('Failed to fetch attachments', e)
+  }
+}
+
 const auditLogs = ref([
   { content: 'Contract created by Admin', time: '2023-12-10 09:00', type: 'primary' },
   { content: 'Legal review completed', time: '2023-12-12 14:30', type: 'success' },
@@ -556,6 +664,7 @@ const saveContract = async () => {
   try {
     await contractApi.updateContract(form.contractId, form)
     isEditMode.value = false
+    aiUpdatedFields.value.clear()
     ElMessage.success('Contract updated successfully')
     fetchContractDetail()
   } catch (error) {
@@ -637,6 +746,22 @@ const addComment = () => {
     text: newComment.value
   })
   newComment.value = ''
+}
+
+const previewAttachment = (item) => {
+  ElMessage.info(`Opening preview for ${item.attachmentName}...`)
+  const url = `${window.location.origin}/api/attachments/view/${item.attachmentId}`
+  window.open(url, '_blank')
+}
+
+const downloadAttachment = (item) => {
+  ElMessage.info(`Starting download for ${item.attachmentName}...`)
+  const link = document.createElement('a')
+  link.href = `/api/attachments/download/${item.attachmentId}`
+  link.download = item.attachmentName
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
 }
 </script>
 
@@ -782,6 +907,16 @@ const addComment = () => {
 
 .display-val.strong { font-weight: 600; }
 .display-val.highlight { color: #3B82F6; font-weight: 700; font-size: 16px; }
+
+:deep(.ai-highlight .el-input__wrapper) {
+  box-shadow: 0 0 0 1px #3B82F6 inset !important;
+  background-color: rgba(59, 130, 246, 0.05) !important;
+}
+
+:deep(.ai-highlight.el-input-number .el-input__wrapper) {
+  box-shadow: 0 0 0 1px #3B82F6 inset !important;
+  background-color: rgba(59, 130, 246, 0.05) !important;
+}
 
 .comments-list {
   flex: 1;
