@@ -21,7 +21,7 @@ public class Problem extends BaseTenantEntity {
     private Long ruleId;
 
     @Column(name = "contract_id", nullable = false)
-    private UUID contractId;
+    private String contractId;
 
     @Column(name = "location_in_contract")
     @JdbcTypeCode(SqlTypes.JSON)
@@ -53,8 +53,8 @@ public class Problem extends BaseTenantEntity {
     public void setEvaluationJobId(Long evaluationJobId) { this.evaluationJobId = evaluationJobId; }
     public Long getRuleId() { return ruleId; }
     public void setRuleId(Long ruleId) { this.ruleId = ruleId; }
-    public UUID getContractId() { return contractId; }
-    public void setContractId(UUID contractId) { this.contractId = contractId; }
+    public String getContractId() { return contractId; }
+    public void setContractId(String contractId) { this.contractId = contractId; }
     public String getLocationInContract() { return locationInContract; }
     public void setLocationInContract(String locationInContract) { this.locationInContract = locationInContract; }
     public String getHighlightedText() { return highlightedText; }

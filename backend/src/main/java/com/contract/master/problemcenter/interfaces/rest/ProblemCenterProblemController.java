@@ -27,7 +27,7 @@ public class ProblemCenterProblemController {
 
     @GetMapping
     public GlobalExceptionHandler.ApiResponse<List<Problem>> list(
-            @RequestParam(required = false) UUID contractId,
+            @RequestParam(required = false) String contractId,
             @RequestParam(required = false) ProblemStatus status) {
         TenantId tenantId = TenantId.of(TenantContext.getCurrentTenant());
         List<Problem> problems;

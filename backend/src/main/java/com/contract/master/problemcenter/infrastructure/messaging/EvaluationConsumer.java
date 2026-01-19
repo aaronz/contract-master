@@ -73,6 +73,7 @@ public class EvaluationConsumer {
 
     private void executeJob(ProblemEvaluationJob job) {
         try {
+            log.info("Starting evaluation job {} for contract {}", job.getId(), job.getContractId());
             job.start();
             jobRepository.save(job);
 
@@ -81,33 +82,43 @@ public class EvaluationConsumer {
 
             ContractDTO contractDTO = contractService.convertToDTO(contract);
             List<Rule> rules = ruleRepository.findByTenantIdAndStatus(job.getTenantId(), RuleStatus.ACTIVE);
+            log.info("Found {} active rules for tenant {}", rules.size(), job.getTenantId().getId());
 
             Map<String, Object> facts = new HashMap<>();
             facts.put("contract", contractDTO);
             facts.put("content", contract.getContractName());
 
-            problemRepository.deleteByContractIdAndTenantId(contract.getContractId().value(), job.getTenantId());
+            String contractIdStr = contract.getContractId().value().toString();
+            problemRepository.deleteByContractIdAndTenantId(contractIdStr, job.getTenantId());
 
             List<Problem> problems = rules.stream()
                     .map(rule -> {
                         try {
+                            log.debug("Executing rule: {} ({})", rule.getName(), rule.getLogicType());
                             RuleExecutionResult result = getExecutor(rule.getLogicType()).execute(rule, facts);
                             if (result.isMatched()) {
+                                log.info("Rule matched: {} for contract {}", rule.getName(), contractIdStr);
                                 return createProblem(job, rule, contract, result);
                             }
                         } catch (Exception e) {
-                            log.error("Error executing rule {} for contract {}", rule.getId(), contract.getContractId(), e);
+                            log.error("Error executing rule {} for contract {}", rule.getId(), contractIdStr, e);
                         }
                         return null;
                     })
                     .filter(java.util.Objects::nonNull)
                     .collect(Collectors.toList());
 
-            problemRepository.saveAll(problems);
+            if (!problems.isEmpty()) {
+                log.info("Saving {} problems for contract {}", problems.size(), contractIdStr);
+                problemRepository.saveAll(problems);
+            } else {
+                log.info("No compliance issues detected for contract {}", contractIdStr);
+            }
+            
             job.complete();
             jobRepository.save(job);
 
-            log.info("Evaluation job {} completed with {} problems found.", job.getId(), problems.size());
+            log.info("Evaluation job {} completed.", job.getId());
 
         } catch (Exception e) {
             log.error("Failed to execute evaluation job: {}", job.getId(), e);
@@ -128,7 +139,7 @@ public class EvaluationConsumer {
         Problem problem = new Problem();
         problem.setEvaluationJobId(job.getId());
         problem.setRuleId(rule.getId());
-        problem.setContractId(contract.getContractId().value());
+        problem.setContractId(contract.getContractId().value().toString());
         problem.setTenantId(job.getTenantId());
         problem.setGeneratedMessage("Rule hit: " + rule.getName());
         problem.setStatus(ProblemStatus.NEW);
