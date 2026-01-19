@@ -9,7 +9,7 @@
       <div class="brand-side">
         <div class="logo">
           <div class="logo-icon"></div>
-          <h1>Contract Master</h1>
+          <h1>{{ $t('common.appTitle') }}</h1>
         </div>
         <p class="brand-slogan">Enterprise Contract Lifecycle Management</p>
         <div class="brand-features">

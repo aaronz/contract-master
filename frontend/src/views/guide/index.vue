@@ -65,18 +65,20 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { 
   Monitor, Document, DocumentChecked, PieChart, 
   Setting, Star, Connection, Search 
 } from '@element-plus/icons-vue'
 
+const { t } = useI18n()
 const activeSection = ref(0)
 
 const sections = [
   {
     title: 'System Overview',
     icon: Monitor,
-    description: 'Contract Master is an AI-powered compliance platform designed to automate contract extraction, risk evaluation, and lifecycle management.',
+    description: `Contract Master (${t('common.appTitle')}) is an AI-powered compliance platform designed to automate contract extraction, risk evaluation, and lifecycle management.`,
     tips: [
       'Use the Dashboard for a high-level view of your contract portfolio.',
       'Global search (Ctrl+K) helps you find any contract or rule instantly.'
@@ -118,7 +120,7 @@ const sections = [
   {
     title: 'Integrations',
     icon: Connection,
-    description: 'Connect Contract Master to your existing enterprise stack.',
+    description: `Connect ${t('common.appTitle')} to your existing enterprise stack.`,
     steps: [
       { title: 'Webhooks', content: 'Configure endpoints to receive notifications when contracts are verified or issues are found.' },
       { title: 'Field Mapping', content: 'Map internal fields to external CRM fields for seamless synchronization.' }

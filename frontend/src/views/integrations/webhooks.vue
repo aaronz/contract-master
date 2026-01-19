@@ -67,9 +67,10 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import request from '@/utils/request'
 
 const webhooks = ref([
   { id: 1, name: 'Main ERP Sync', url: 'https://erp.internal/api/contracts', events: ['CONTRACT_PUBLISHED'], enabled: true, authType: 'HMAC' }
@@ -84,25 +85,50 @@ const form = ref({
   enabled: true
 })
 
+const fetchWebhooks = async () => {
+  try {
+    const res = await request.get('/webhook/configs')
+    if (res.data && res.data.data) {
+      webhooks.value = res.data.data.map(w => ({
+        ...w,
+        events: typeof w.events === 'string' ? w.events.split(',') : (w.events || [])
+      }))
+    }
+  } catch (e) {}
+}
+
+onMounted(() => {
+  fetchWebhooks()
+})
+
 const handleAdd = () => {
   form.value = { name: '', url: '', events: ['CONTRACT_PUBLISHED'], authType: 'HMAC', enabled: true }
   dialogVisible.value = true
 }
 
 const handleEdit = (row) => {
-  form.value = { ...row }
+  form.value = { 
+    ...row,
+    events: Array.isArray(row.events) ? row.events : (row.events ? row.events.split(',') : [])
+  }
   dialogVisible.value = true
 }
 
-const handleSave = () => {
-  if (form.value.id) {
-    const idx = webhooks.value.findIndex(w => w.id === form.value.id)
-    webhooks.value[idx] = { ...form.value }
-  } else {
-    webhooks.value.push({ ...form.value, id: Date.now() })
+const handleSave = async () => {
+  try {
+    const payload = {
+      ...form.value,
+      events: Array.isArray(form.value.events) ? form.value.events.join(',') : form.value.events
+    }
+    const res = await request.post('/webhook/configs', payload)
+    if (res.data.status === 200 || res.status === 200) {
+      ElMessage.success('WebHook configuration saved')
+      dialogVisible.value = false
+      fetchWebhooks()
+    }
+  } catch (error) {
+    console.error('Save failed', error)
   }
-  ElMessage.success('WebHook configuration saved')
-  dialogVisible.value = false
 }
 
 const testWebHook = (row) => {
@@ -110,8 +136,12 @@ const testWebHook = (row) => {
 }
 
 const handleDelete = (row) => {
-  ElMessageBox.confirm('This will stop all data sync to this endpoint. Continue?', 'Warning').then(() => {
-    ElMessage.success('WebHook deleted')
+  ElMessageBox.confirm('This will stop all data sync to this endpoint. Continue?', 'Warning').then(async () => {
+    try {
+      await request.delete(`/webhook/configs/${row.id}`)
+      ElMessage.success('WebHook deleted')
+      fetchWebhooks()
+    } catch (e) {}
   })
 }
 </script>

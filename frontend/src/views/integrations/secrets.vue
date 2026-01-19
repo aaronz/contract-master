@@ -78,6 +78,7 @@
 import { ref } from 'vue'
 import { Key } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import request from '@/utils/request'
 
 const keys = ref([
   { id: 1, label: 'Default ERP Key', accessKey: 'AK_9A2B3C4D5E', secretKey: 'sk_test_123456789', lastUsed: '2026-01-14 10:30', hidden: true }

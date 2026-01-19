@@ -1,6 +1,7 @@
 export default {
   common: {
     dashboard: '仪表盘',
+    appTitle: '合同大师',
     contracts: '合同管理',
     compliance: '合规风控',
     integrations: '系统集成',

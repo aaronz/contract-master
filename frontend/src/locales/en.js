@@ -1,6 +1,7 @@
 export default {
   common: {
     dashboard: 'Dashboard',
+    appTitle: 'Contract Master',
     contracts: 'Contracts',
     compliance: 'Compliance',
     integrations: 'Integrations',

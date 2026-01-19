@@ -135,6 +135,16 @@ public class ContractService {
                 .orElse(null);
     }
 
+    public Contract getRawContract(String id) {
+        return contractRepository.findById(ContractId.of(id))
+                .orElseThrow(() -> new RuntimeException("Contract not found: " + id));
+    }
+
+    @Transactional
+    public void saveContract(Contract contract) {
+        contractRepository.save(contract);
+    }
+
     @Transactional
     public void updateContract(String id, Contract updated) {
         contractRepository.findById(ContractId.of(id)).ifPresent(existing -> {

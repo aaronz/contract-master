@@ -26,7 +26,7 @@ public class ApplicationConfig {
                 .map(user -> org.springframework.security.core.userdetails.User.builder()
                         .username(user.getUsername())
                         .password(user.getPassword())
-                        .authorities("USER") // Simple role for now
+                        .authorities("admin".equals(username) ? "ROLE_ADMIN" : "ROLE_USER")
                         .build())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }

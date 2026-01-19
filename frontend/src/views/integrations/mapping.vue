@@ -70,6 +70,7 @@
 import { ref, onMounted } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import request from '@/utils/request'
 
 const mappings = ref([
   { id: 1, internalField: 'amount', externalField: 'contract_value', transformation: 'NONE', enabled: true },
@@ -88,26 +89,31 @@ const contractFields = ref([])
 
 const fetchMetadata = async () => {
   try {
-    const response = await fetch('/api/metadata/contract-fields', {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        'X-Tenant-ID': localStorage.getItem('tenantId')
-      }
-    })
-    if (response.ok) {
-      const result = await response.json()
-      contractFields.value = result.data
+    const response = await request.get('/metadata/contract-fields')
+    if (response.data && response.data.status === 200) {
+      contractFields.value = response.data.data
     } else {
       ElMessage.error('Failed to load contract fields')
     }
   } catch (error) {
     console.error('Failed to fetch metadata', error)
-    ElMessage.error('Network error loading mapping fields')
+  }
+}
+
+const fetchMappings = async () => {
+  try {
+    const res = await request.get('/v1/settings/mapping')
+    if (res.data && res.data.data) {
+      mappings.value = res.data.data
+    }
+  } catch (error) {
+    console.error('Failed to fetch mappings', error)
   }
 }
 
 onMounted(() => {
   fetchMetadata()
+  fetchMappings()
 })
 
 const handleAdd = () => {
@@ -120,20 +126,28 @@ const handleEdit = (row) => {
   dialogVisible.value = true
 }
 
-const handleSave = () => {
-  if (form.value.id) {
-    const idx = mappings.value.findIndex(m => m.id === form.value.id)
-    mappings.value[idx] = { ...form.value }
-  } else {
-    mappings.value.push({ ...form.value, id: Date.now() })
+const handleSave = async () => {
+  try {
+    const url = '/v1/settings/mapping'
+    const res = await request.post(url, form.value)
+    
+    if (res.data.status === 200 || res.status === 200) {
+      ElMessage.success('Mapping configuration saved')
+      dialogVisible.value = false
+      fetchMappings()
+    }
+  } catch (error) {
+    console.error('Save failed', error)
   }
-  ElMessage.success('Mapping configuration saved')
-  dialogVisible.value = false
 }
 
 const handleDelete = (row) => {
-  ElMessageBox.confirm('Are you sure you want to delete this mapping?', 'Warning').then(() => {
-    ElMessage.success('Mapping deleted')
+  ElMessageBox.confirm('Are you sure you want to delete this mapping?', 'Warning').then(async () => {
+    try {
+      await request.delete(`/v1/settings/mapping/${row.id}`)
+      ElMessage.success('Mapping deleted')
+      fetchMappings()
+    } catch (e) {}
   })
 }
 </script>

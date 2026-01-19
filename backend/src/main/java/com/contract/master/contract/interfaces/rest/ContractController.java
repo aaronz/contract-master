@@ -22,13 +22,25 @@ public class ContractController {
     private final ContractService contractService;
     private final ContractApplicationService applicationService;
     private final AuditService auditService;
+    private final com.contract.master.integration.application.IntegrationPushService pushService;
 
     public ContractController(ContractService contractService, 
                               ContractApplicationService applicationService,
-                              AuditService auditService) {
+                              AuditService auditService,
+                              com.contract.master.integration.application.IntegrationPushService pushService) {
         this.contractService = contractService;
         this.applicationService = applicationService;
         this.auditService = auditService;
+        this.pushService = pushService;
+    }
+
+    @PostMapping("/{id}/publish")
+    public GlobalExceptionHandler.ApiResponse<Void> publish(@PathVariable String id) {
+        com.contract.master.contract.domain.model.Contract contract = contractService.getRawContract(id);
+        pushService.pushToDownstreamSystems(contract);
+        contract.setStatus("PUBLISHED");
+        contractService.saveContract(contract);
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, null);
     }
 
     @GetMapping

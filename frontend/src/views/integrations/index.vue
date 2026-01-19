@@ -3,13 +3,13 @@
     <div class="page-header">
       <div>
         <h1 class="page-title">{{ $t('menu.integrationsHub') }}</h1>
-        <p class="page-subtitle">Manage your CRM connections and data synchronization pipelines.</p>
+        <p class="page-subtitle">{{ $t('dashboard.subtitle') }}</p>
       </div>
       <el-button type="primary" size="large" icon="Plus" @click="handleAddConnector">{{ $t('common.create') }}</el-button>
     </div>
 
     <!-- Connector Dialog -->
-    <el-dialog v-model="showConnectorDialog" :title="isEdit ? 'Configure Connector' : $t('common.create')" width="500px">
+    <el-dialog v-model="showConnectorDialog" :title="isEdit ? $t('common.edit') : $t('common.create')" width="500px">
       <el-form :model="connectorForm" label-position="top">
         <el-form-item :label="$t('common.systemName')">
           <el-input v-model="connectorForm.systemName" placeholder="e.g. Salesforce Production" />
@@ -42,7 +42,7 @@
         </div>
         <div class="stat-content">
           <div class="stat-value">12</div>
-          <div class="stat-label">Active Connectors</div>
+          <div class="stat-label">{{ $t('menu.connectors') }}</div>
         </div>
       </div>
       <div class="stat-card glass-card">
@@ -69,13 +69,13 @@
         </div>
         <div class="stat-content">
           <div class="stat-value">3</div>
-          <div class="stat-label">Pending Issues</div>
+          <div class="stat-label">{{ $t('compliance.problems') }}</div>
         </div>
       </div>
     </div>
 
     <!-- Connectors Grid -->
-    <div class="section-title">Active Connectors</div>
+    <div class="section-title">{{ $t('menu.connectors') }}</div>
     <div class="connectors-grid">
       <div v-for="connector in connectors" :key="connector.id" class="connector-card glass-card hover-scale">
         <div class="connector-header">
@@ -89,14 +89,14 @@
         </div>
         <div class="connector-body">
           <h3>{{ connector.name }}</h3>
-          <p>{{ connector.description }}</p>
+          <p>{{ connector.endpointUrl }}</p>
           <div class="sync-info">
             <span class="label">Last Sync:</span>
             <span class="value">{{ connector.lastSync }}</span>
           </div>
         </div>
         <div class="connector-footer">
-          <el-button link type="primary" @click="handleEditConnector(connector)">Configure</el-button>
+          <el-button link type="primary" @click="handleEditConnector(connector)">{{ $t('common.edit') }}</el-button>
           <el-switch v-model="connector.active" size="small" />
         </div>
       </div>
@@ -113,7 +113,7 @@
     </div>
 
     <!-- Recent Activity Table -->
-    <div class="section-title mt-8">Recent Synchronization Activity</div>
+    <div class="section-title mt-8">{{ $t('dashboard.recentActivity') }}</div>
     <div class="glass-card table-wrapper">
       <el-table :data="activities" style="width: 100%">
         <el-table-column prop="source" :label="$t('common.resource')" width="180">
@@ -155,6 +155,7 @@
 import { ref, onMounted } from 'vue'
 import { Connection, Check, DataAnalysis, Warning, Plus, Refresh } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+import request from '@/utils/request'
 
 const connectors = ref([
   { 
@@ -245,34 +246,58 @@ const handleSaveConnector = async () => {
   saving.value = true
   try {
     const url = isEdit.value 
-      ? `/api/v1/settings/downstream/${connectorForm.value.systemId}`
-      : '/api/v1/settings/downstream'
-    const method = isEdit.value ? 'PUT' : 'POST'
+      ? `/v1/settings/downstream/${connectorForm.value.systemId}`
+      : '/v1/settings/downstream'
     
-    const response = await fetch(url, {
-      method,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        'X-Tenant-ID': localStorage.getItem('tenantId')
-      },
-      body: JSON.stringify(connectorForm.value)
-    })
+    let response;
+    if (isEdit.value) {
+      response = await request.put(url, connectorForm.value)
+    } else {
+      response = await request.post(url, connectorForm.value)
+    }
     
-    if (response.ok) {
+    if (response.status === 200 || response.data.status === 200) {
       ElMessage.success(isEdit.value ? 'Connector updated' : 'Connector created')
       showConnectorDialog.value = false
-      // fetchConnectors() // Would implement this to refresh list
+      fetchConnectors()
     } else {
       ElMessage.error('Failed to save connector')
     }
   } catch (error) {
     console.error('Failed to save connector', error)
-    ElMessage.error('Network error saving connector')
   } finally {
     saving.value = false
   }
 }
+
+const fetchConnectors = async () => {
+  try {
+    const res = await request.get('/v1/settings/downstream')
+    if (res.data && res.data.data) {
+      const backendConnectors = res.data.data.map(sys => ({
+        id: sys.systemId,
+        systemId: sys.systemId,
+        name: sys.systemName,
+        description: sys.endpointUrl,
+        status: sys.isEnabled ? 'online' : 'offline',
+        lastSync: 'N/A',
+        active: sys.isEnabled,
+        color: '#3B82F6',
+        authType: sys.authType,
+        accessKey: sys.accessKey,
+        endpointUrl: sys.endpointUrl
+      }))
+      // Merge or replace
+      connectors.value = backendConnectors
+    }
+  } catch (error) {
+    console.error('Failed to fetch connectors', error)
+  }
+}
+
+onMounted(() => {
+  fetchConnectors()
+})
 
 const handleRetry = (row) => {
   ElMessage.success('Retry initiated for ' + row.source)

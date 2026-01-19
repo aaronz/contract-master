@@ -1,13 +1,13 @@
 <template>
   <el-container class="layout-container">
     <el-aside width="280px" class="sidebar glass">
-      <div class="logo">
-        <div class="logo-icon">
+        <div class="logo">
+          <div class="logo-icon">
           <div class="logo-square"></div>
           <div class="logo-circle"></div>
         </div>
-        <span class="logo-text">Contract Master</span>
-      </div>
+          <span class="logo-text">{{ $t('common.appTitle') }}</span>
+        </div>
       
       <div class="menu-wrapper">
         <el-menu
