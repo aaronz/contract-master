@@ -45,6 +45,9 @@ public class ContractService {
     @Autowired
     private AuditService auditService;
 
+    @Autowired(required = false)
+    private com.contract.master.problemcenter.application.EvaluationService evaluationService;
+
     private final Map<String, List<FieldConfig>> fieldConfigCache = new java.util.concurrent.ConcurrentHashMap<>();
     private static final String FIELD_CONFIG_TYPE_CONTRACT = "CONTRACT";
 
@@ -181,6 +184,13 @@ public class ContractService {
             if (dto.getExtendedFields() != null) {
                 saveExtendedData(id, dto.getExtendedFields());
             }
+
+            if (evaluationService != null) {
+                try {
+                    evaluationService.startEvaluation(UUID.fromString(id));
+                } catch (Exception e) {
+                }
+            }
         });
     }
 
@@ -228,10 +238,18 @@ public class ContractService {
         }
         
         auditService.logChange(saved.getContractId().value().toString(), "contract", null, "CREATED", "MANUAL", "admin");
+        
+        if (evaluationService != null) {
+            try {
+                evaluationService.startEvaluation(saved.getContractId().value());
+            } catch (Exception e) {
+            }
+        }
+        
         return convertToDTO(saved);
     }
 
-    private ContractDTO convertToDTO(Contract base) {
+    public ContractDTO convertToDTO(Contract base) {
         ContractDTO dto = new ContractDTO();
         dto.setContractId(base.getContractId().value().toString());
         dto.setContractNo(base.getContractNo().value());

@@ -177,6 +177,16 @@ public class ContractManagementApplication {
                 rule3.setTenantId(TenantId.of("tenant-1"));
                 ruleRepository.save(rule3);
 
+                Rule rule4 = new Rule();
+                rule4.setName("Contract Present Check");
+                rule4.setDescription("Always hit if contract number exists");
+                rule4.setLogicType(RuleLogicType.LOGIC);
+                rule4.setLogicContent("{\"type\":\"group\",\"operator\":\"AND\",\"children\":[{\"type\":\"rule\",\"field\":\"contractNo\",\"operator\":\"neq\",\"value\":\"\"}]}");
+                rule4.setSeverity(Severity.INFO);
+                rule4.setStatus(RuleStatus.ACTIVE);
+                rule4.setTenantId(TenantId.of("tenant-1"));
+                ruleRepository.save(rule4);
+
                 System.out.println(">>> DEFAULT RULES CREATED SUCCESSFULLY.");
             }
         };

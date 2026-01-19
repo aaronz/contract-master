@@ -13,4 +13,5 @@ import java.util.UUID;
 public interface ProblemRepository extends JpaRepository<Problem, Long> {
     List<Problem> findByContractIdAndTenantId(UUID contractId, TenantId tenantId);
     List<Problem> findByContractIdAndStatusAndTenantId(UUID contractId, ProblemStatus status, TenantId tenantId);
+    void deleteByContractIdAndTenantId(UUID contractId, TenantId tenantId);
 }

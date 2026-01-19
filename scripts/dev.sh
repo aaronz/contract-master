@@ -1,7 +1,8 @@
 #!/bin/bash
 set -e
 
-ROOT_DIR="$(pwd)"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 BACKEND_DIR="$ROOT_DIR/backend"
 FRONTEND_DIR="$ROOT_DIR/frontend"
 
@@ -27,6 +28,7 @@ fi
 log_info "Starting Contract Master Development Environment..."
 
 log_info "Resetting Docker environment..."
+cd "$ROOT_DIR"
 docker-compose down -v --remove-orphans
 docker-compose up -d
 

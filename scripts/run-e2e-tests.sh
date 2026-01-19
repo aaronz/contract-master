@@ -1,7 +1,10 @@
 #!/bin/bash
 
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+
 export PLAYWRIGHT_HEADLESS=true
-cd backend
+cd "$ROOT_DIR/backend"
 mvn test -Dtest=com.contract.master.e2e.** surefire-report:report-only
 
 echo ""

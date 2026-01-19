@@ -2,6 +2,8 @@ package com.contract.master.problemcenter.infrastructure.messaging;
 
 import com.contract.master.contract.domain.model.Contract;
 import com.contract.master.contract.domain.repository.ContractRepository;
+import com.contract.master.contract.dto.ContractDTO;
+import com.contract.master.contract.application.ContractService;
 import com.contract.master.problemcenter.domain.model.ProblemEvaluationJob;
 import com.contract.master.problemcenter.domain.model.ProblemEvaluationJobStatus;
 import com.contract.master.problemcenter.domain.model.Problem;
@@ -34,32 +36,39 @@ public class EvaluationConsumer {
     private final RuleRepository ruleRepository;
     private final ProblemRepository problemRepository;
     private final ContractRepository contractRepository;
+    private final ContractService contractService;
     private final List<RuleExecutor> ruleExecutors;
 
     public EvaluationConsumer(ProblemEvaluationJobRepository jobRepository,
                               RuleRepository ruleRepository,
                               ProblemRepository problemRepository,
                               ContractRepository contractRepository,
+                              ContractService contractService,
                               List<RuleExecutor> ruleExecutors) {
         this.jobRepository = jobRepository;
         this.ruleRepository = ruleRepository;
         this.problemRepository = problemRepository;
         this.contractRepository = contractRepository;
+        this.contractService = contractService;
         this.ruleExecutors = ruleExecutors;
     }
 
     @KafkaListener(topics = "contract-evaluation", groupId = "contract-master-group")
     @Transactional
     public void consume(String jobIdStr) {
-        Long jobId = Long.valueOf(jobIdStr);
-        jobRepository.findById(jobId).ifPresent(job -> {
-            try {
-                com.contract.master.security.TenantContext.setCurrentTenant(job.getTenantId().getId());
-                executeJob(job);
-            } finally {
-                com.contract.master.security.TenantContext.clear();
-            }
-        });
+        try {
+            Long jobId = Long.valueOf(jobIdStr);
+            jobRepository.findById(jobId).ifPresent(job -> {
+                try {
+                    com.contract.master.security.TenantContext.setCurrentTenant(job.getTenantId().getId());
+                    executeJob(job);
+                } finally {
+                    com.contract.master.security.TenantContext.clear();
+                }
+            });
+        } catch (Exception e) {
+            log.error("Failed to consume evaluation job message: {}", jobIdStr, e);
+        }
     }
 
     private void executeJob(ProblemEvaluationJob job) {
@@ -70,17 +79,24 @@ public class EvaluationConsumer {
             Contract contract = contractRepository.findById(new com.contract.master.contract.domain.model.ContractId(job.getContractId()))
                     .orElseThrow(() -> new RuntimeException("Contract not found: " + job.getContractId()));
 
+            ContractDTO contractDTO = contractService.convertToDTO(contract);
             List<Rule> rules = ruleRepository.findByTenantIdAndStatus(job.getTenantId(), RuleStatus.ACTIVE);
 
             Map<String, Object> facts = new HashMap<>();
-            facts.put("contract", contract);
+            facts.put("contract", contractDTO);
             facts.put("content", contract.getContractName());
+
+            problemRepository.deleteByContractIdAndTenantId(contract.getContractId().value(), job.getTenantId());
 
             List<Problem> problems = rules.stream()
                     .map(rule -> {
-                        RuleExecutionResult result = getExecutor(rule.getLogicType()).execute(rule, facts);
-                        if (result.isMatched()) {
-                            return createProblem(job, rule, contract, result);
+                        try {
+                            RuleExecutionResult result = getExecutor(rule.getLogicType()).execute(rule, facts);
+                            if (result.isMatched()) {
+                                return createProblem(job, rule, contract, result);
+                            }
+                        } catch (Exception e) {
+                            log.error("Error executing rule {} for contract {}", rule.getId(), contract.getContractId(), e);
                         }
                         return null;
                     })
@@ -91,6 +107,8 @@ public class EvaluationConsumer {
             job.complete();
             jobRepository.save(job);
 
+            log.info("Evaluation job {} completed with {} problems found.", job.getId(), problems.size());
+
         } catch (Exception e) {
             log.error("Failed to execute evaluation job: {}", job.getId(), e);
             job.fail(e.getMessage());
@@ -99,9 +117,9 @@ public class EvaluationConsumer {
     }
 
     private RuleExecutor getExecutor(RuleLogicType type) {
-        String prefix = type.name().toLowerCase();
+        String typeName = type.name().toLowerCase().replace("_", "");
         return ruleExecutors.stream()
-                .filter(e -> e.getClass().getSimpleName().toLowerCase().startsWith(prefix))
+                .filter(e -> e.getClass().getSimpleName().toLowerCase().contains(typeName))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("No executor found for logic type: " + type));
     }
@@ -114,6 +132,7 @@ public class EvaluationConsumer {
         problem.setTenantId(job.getTenantId());
         problem.setGeneratedMessage("Rule hit: " + rule.getName());
         problem.setStatus(ProblemStatus.NEW);
+        problem.setSeverity(rule.getSeverity());
         if (result.getLocation() != null) {
             problem.setLocationInContract(result.getLocation().toJson());
         }
