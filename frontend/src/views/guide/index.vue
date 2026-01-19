@@ -68,7 +68,8 @@ import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { 
   Monitor, Document, DocumentChecked, PieChart, 
-  Setting, Star, Connection, Search, UserFilled 
+  Setting, Star, Connection, Search, UserFilled,
+  MagicStick 
 } from '@element-plus/icons-vue'
 
 const { t } = useI18n()
