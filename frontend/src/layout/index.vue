@@ -130,6 +130,10 @@
               <el-icon><QuestionFilled /></el-icon>
             </el-button>
 
+            <el-button circle text class="icon-btn" @click="$router.push('/releases')">
+              <el-icon><Timer /></el-icon>
+            </el-button>
+
             <el-dropdown trigger="click" popper-class="notification-popper">
               <el-badge :value="unreadCount" :hidden="unreadCount === 0" class="notification-badge" type="danger">
                 <el-button circle text class="icon-btn">

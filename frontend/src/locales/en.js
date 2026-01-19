@@ -37,6 +37,7 @@ export default {
     field: 'Field',
     summary: 'Summary',
     details: 'Details',
+    releaseNotes: 'Release Notes',
     internalField: 'Internal Field',
     downstreamField: 'Downstream Field',
     transformation: 'Transformation',
@@ -158,5 +159,85 @@ export default {
     changeDetail: 'Change Detail',
     oldValue: 'Old Value',
     newValue: 'New Value'
+  },
+  guide: {
+    subtitle: 'Master the Contract Compliance & Management System',
+    sections: {
+      overview: {
+        title: 'System Overview',
+        description: 'Contract Master is an AI-powered compliance platform designed to automate contract extraction, risk evaluation, and lifecycle management.',
+        tip1: 'Use the Dashboard for a high-level view of your contract portfolio.',
+        tip2: 'Global search (Ctrl+K) helps you find any contract or rule instantly.'
+      },
+      contract: {
+        title: 'Contract Management',
+        description: 'Manage your contracts from ingestion to archive.',
+        step1: { title: 'Ingestion', content: 'Upload PDF/Docx files or sync from downstream CRM systems.' },
+        step2: { title: 'AI Extraction', content: 'The system automatically extracts key fields (Parties, Dates, Amounts) using OCR and LLMs.' },
+        step3: { title: 'Verification', content: 'Review AI-suggested values in the Detail page and confirm them to change status to VERIFIED.' }
+      },
+      rbac: {
+        title: 'IAM & RBAC',
+        description: 'Advanced Identity and Access Management with multi-tenant isolation.',
+        step1: { title: 'Role Definition', content: 'Define business roles like Legal, Finance, or Sales in Role Management.' },
+        step2: { title: 'User Assignment', content: 'Assign one or more roles to users within your specific tenant.' },
+        step3: { title: 'Data Scoping', content: 'Configure the Permission Matrix to restrict data visibility to Global, Department, or Self-only.' }
+      },
+      compliance: {
+        title: 'Compliance & Rules',
+        description: 'Automated risk detection using dynamic rule engines.',
+        step1: { title: 'Rule Definition', content: 'Create rules using Groovy scripts or Regex in the Rule Management section.' },
+        step2: { title: 'Triggering', content: 'Rules run automatically on save, or can be triggered manually via "Re-evaluate".' },
+        step3: { title: 'Resolution', content: 'Found issues appear in the Problem Cockpit. Acknowledge or resolve them to clear the alert.' },
+        tip1: 'Groovy rules allow complex logic like "If amount > 1M, Party B must have a verified VAT ID".',
+        tip2: 'You can select specific rules to run if you only want to check a particular compliance aspect.'
+      },
+      dashboard: {
+        title: 'Dashboard & Analytics',
+        description: 'Real-time statistics and visual insights.',
+        tip1: 'The Volume Trend shows your activity over time.',
+        tip2: 'Risk Radar categorizes threats into Legal, Financial, and Operational dimensions.'
+      },
+      integrations: {
+        title: 'Integrations',
+        description: 'Connect Contract Master to your existing enterprise stack.',
+        step1: { title: 'Webhooks', content: 'Configure endpoints to receive notifications when contracts are verified or issues are found.' },
+        step2: { title: 'Field Mapping', content: 'Map internal fields to external CRM fields for seamless synchronization.' },
+        step3: { title: 'Push Service', content: 'Automatically distribute verified contract data to SAP, Salesforce, or custom ERPs.' }
+      }
+    }
+  },
+  releases: {
+    title: 'Release Notes',
+    subtitle: 'Track latest updates and improvements to Contract Master.',
+    items: [
+      {
+        version: 'v1.1.0',
+        date: '2026-01-19',
+        title: 'Stabilization & IAM Overhaul',
+        features: [
+          'Implemented full RBAC with dynamic role definition and user assignment.',
+          'Added Data Scoping engine (Global/Dept/Self) at the database level.',
+          'Completed Integration Hub with real-time push and field mapping.',
+          'Full internationalization (i18n) support for English and Chinese.',
+          'Live system notifications for compliance alerts.'
+        ],
+        fixes: [
+          'Fixed data disappearing bug in Compliance Cockpit on page refresh.',
+          'Resolved multi-tenancy isolation gaps in Notification center.',
+          'Corrected UI layout issues in Permission Matrix table.'
+        ]
+      },
+      {
+        version: 'v1.0.5',
+        date: '2026-01-15',
+        title: 'Core Engine Enhancements',
+        features: [
+          'Enhanced Groovy rule executor with standard field flattening.',
+          'Added environment dependency check scripts (JDK 17+, Node 18+).',
+          'Improved AI extraction reliability for multi-page documents.'
+        ]
+      }
+    ]
   }
 }

@@ -3,7 +3,7 @@
     <div class="guide-header glass-blur">
       <div class="header-content">
         <h1>{{ $t('common.userGuide') }}</h1>
-        <p>Master the Contract Compliance & Management System</p>
+        <p>{{ $t('guide.subtitle') }}</p>
       </div>
     </div>
 
@@ -12,14 +12,14 @@
         <el-col :span="6">
           <div class="guide-nav glass-card">
             <div 
-              v-for="(item, index) in sections" 
-              :key="index"
+              v-for="(item, key) in sections" 
+              :key="key"
               class="nav-item"
-              :class="{ active: activeSection === index }"
-              @click="scrollTo(index)"
+              :class="{ active: activeSection === key }"
+              @click="scrollTo(key)"
             >
               <el-icon><component :is="item.icon" /></el-icon>
-              <span>{{ item.title }}</span>
+              <span>{{ $t('guide.sections.' + key + '.title') }}</span>
             </div>
           </div>
         </el-col>
@@ -27,24 +27,24 @@
         <el-col :span="18">
           <div class="guide-content">
             <div 
-              v-for="(item, index) in sections" 
-              :key="index" 
-              :id="'section-' + index"
+              v-for="(item, key) in sections" 
+              :key="key" 
+              :id="'section-' + key"
               class="content-section glass-card"
             >
               <div class="section-header">
                 <el-icon class="title-icon"><component :is="item.icon" /></el-icon>
-                <h2>{{ item.title }}</h2>
+                <h2>{{ $t('guide.sections.' + key + '.title') }}</h2>
               </div>
-              <p class="section-desc">{{ item.description }}</p>
+              <p class="section-desc">{{ $t('guide.sections.' + key + '.description') }}</p>
               
               <div v-if="item.steps" class="steps-box">
                 <el-steps direction="vertical" :active="99">
                   <el-step 
-                    v-for="(step, sIdx) in item.steps" 
-                    :key="sIdx"
-                    :title="step.title"
-                    :description="step.content"
+                    v-for="sKey in item.steps" 
+                    :key="sKey"
+                    :title="$t('guide.sections.' + key + '.' + sKey + '.title')"
+                    :description="$t('guide.sections.' + key + '.' + sKey + '.content')"
                   />
                 </el-steps>
               </div>
@@ -52,7 +52,7 @@
               <div v-if="item.tips" class="tips-box">
                 <h4><el-icon><Star /></el-icon> Pro Tips</h4>
                 <ul>
-                  <li v-for="(tip, tIdx) in item.tips" :key="tIdx">{{ tip }}</li>
+                  <li v-for="tKey in item.tips" :key="tKey">{{ $t('guide.sections.' + key + '.' + tKey) }}</li>
                 </ul>
               </div>
             </div>
@@ -68,69 +68,43 @@ import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { 
   Monitor, Document, DocumentChecked, PieChart, 
-  Setting, Star, Connection, Search 
+  Setting, Star, Connection, Search, UserFilled 
 } from '@element-plus/icons-vue'
 
 const { t } = useI18n()
-const activeSection = ref(0)
+const activeSection = ref('overview')
 
-const sections = [
-  {
-    title: 'System Overview',
+const sections = {
+  overview: {
     icon: Monitor,
-    description: `Contract Master (${t('common.appTitle')}) is an AI-powered compliance platform designed to automate contract extraction, risk evaluation, and lifecycle management.`,
-    tips: [
-      'Use the Dashboard for a high-level view of your contract portfolio.',
-      'Global search (Ctrl+K) helps you find any contract or rule instantly.'
-    ]
+    tips: ['tip1', 'tip2']
   },
-  {
-    title: 'Contract Management',
+  contract: {
     icon: Document,
-    description: 'Manage your contracts from ingestion to archive.',
-    steps: [
-      { title: 'Ingestion', content: 'Upload PDF/Docx files or sync from downstream CRM systems.' },
-      { title: 'AI Extraction', content: 'The system automatically extracts key fields (Parties, Dates, Amounts) using OCR and LLMs.' },
-      { title: 'Verification', content: 'Review AI-suggested values in the Detail page and confirm them to change status to VERIFIED.' }
-    ]
+    steps: ['step1', 'step2', 'step3']
   },
-  {
-    title: 'Compliance & Rules',
+  rbac: {
+    icon: UserFilled,
+    steps: ['step1', 'step2', 'step3']
+  },
+  compliance: {
     icon: DocumentChecked,
-    description: 'Automated risk detection using dynamic rule engines.',
-    steps: [
-      { title: 'Rule Definition', content: 'Create rules using Groovy scripts or Regex in the Rule Management section.' },
-      { title: 'Triggering', content: 'Rules run automatically on save, or can be triggered manually via "Re-evaluate".' },
-      { title: 'Resolution', content: 'Found issues appear in the Problem Cockpit. Acknowledge or resolve them to clear the alert.' }
-    ],
-    tips: [
-      'Groovy rules allow complex logic like "If amount > 1M, Party B must have a verified VAT ID".',
-      'You can select specific rules to run if you only want to check a particular compliance aspect.'
-    ]
+    steps: ['step1', 'step2', 'step3'],
+    tips: ['tip1', 'tip2']
   },
-  {
-    title: 'Dashboard & Analytics',
+  dashboard: {
     icon: PieChart,
-    description: 'Real-time statistics and visual insights.',
-    tips: [
-      'The Volume Trend shows your activity over time.',
-      'Risk Radar categorizes threats into Legal, Financial, and Operational dimensions.'
-    ]
+    tips: ['tip1', 'tip2']
   },
-  {
-    title: 'Integrations',
+  integrations: {
     icon: Connection,
-    description: `Connect ${t('common.appTitle')} to your existing enterprise stack.`,
-    steps: [
-      { title: 'Webhooks', content: 'Configure endpoints to receive notifications when contracts are verified or issues are found.' },
-      { title: 'Field Mapping', content: 'Map internal fields to external CRM fields for seamless synchronization.' }
-    ]
+    steps: ['step1', 'step2', 'step3']
   }
-]
+}
 
-const scrollTo = (index) => {
-  activeSection.value = index
-  const element = document.getElementById('section-' + index)
+const scrollTo = (key) => {
+  activeSection.value = key
+  const element = document.getElementById('section-' + key)
   if (element) {
     element.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }

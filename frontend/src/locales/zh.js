@@ -37,6 +37,7 @@ export default {
     field: '字段',
     summary: '摘要',
     details: '详情',
+    releaseNotes: '发布日志',
     internalField: '内部字段',
     downstreamField: '下游字段',
     transformation: '转换规则',
@@ -158,5 +159,85 @@ export default {
     changeDetail: '变更详情',
     oldValue: '原始值',
     newValue: '新值'
+  },
+  guide: {
+    subtitle: '全面掌握 AI 驱动的合同合规与管理系统',
+    sections: {
+      overview: {
+        title: '系统概览',
+        description: '合同大师（Contract Master）是一个基于 AI 的合规平台，旨在自动完成合同提取、风险评估和全生命周期管理。',
+        tip1: '使用仪表盘从高维度查看您的合同组合。',
+        tip2: '全局搜索 (Ctrl+K) 帮助您立即找到任何合同或规则。'
+      },
+      contract: {
+        title: '合同管理',
+        description: '管理您的合同，从录入到归档。',
+        step1: { title: '录入', content: '上传 PDF/Docx 文件或从下游 CRM 系统同步。' },
+        step2: { title: 'AI 提取', content: '系统自动使用 OCR 和大模型提取关键字段（各方、日期、金额）。' },
+        step3: { title: '验证', content: '在详情页查看 AI 建议值并确认，将状态更改为“已验证”。' }
+      },
+      rbac: {
+        title: '身份与权限管理',
+        description: '具备多租户隔离的高级身份与访问控制（RBAC）。',
+        step1: { title: '角色定义', content: '在角色管理中定义法务、财务或销售等业务角色。' },
+        step2: { title: '用户分配', content: '在您的特定租户下为用户分配一个或多个角色。' },
+        step3: { title: '数据范围', content: '配置权限矩阵，限制数据可见性为全局、部门或仅限个人。' }
+      },
+      compliance: {
+        title: '合规与规则',
+        description: '使用动态规则引擎进行自动风险检测。',
+        step1: { title: '规则定义', content: '在规则管理部分使用 Groovy 脚本或正则创建规则。' },
+        step2: { title: '触发机制', content: '规则在保存时自动运行，也可通过“重新评估”手动触发。' },
+        step3: { title: '问题解决', content: '检出的问题出现在合规驾驶舱。确认或解决它们以清除告警。' },
+        tip1: 'Groovy 规则允许复杂逻辑，如“如果金额 > 100万，乙方必须提供已验证的税号”。',
+        tip2: '如果您只想检查特定的合规项，可以选择运行特定规则。'
+      },
+      dashboard: {
+        title: '数据看板与分析',
+        description: '实时统计与可视化洞察。',
+        tip1: '合同量趋势显示您的业务活跃度随时间的变化。',
+        tip2: '风险雷达将威胁归类为法律、财务和操作维度。'
+      },
+      integrations: {
+        title: '系统集成',
+        description: '将合同大师连接到您现有的企业技术栈。',
+        step1: { title: 'Webhooks', content: '配置端点，在合同验证或发现问题时接收实时通知。' },
+        step2: { title: '字段映射', content: '将内部字段映射到外部 CRM 字段，实现无缝同步。' },
+        step3: { title: '推送服务', content: '自动将已验证的合同数据分发到 SAP、Salesforce 或自定义 ERP。' }
+      }
+    }
+  },
+  releases: {
+    title: '发布日志',
+    subtitle: '跟踪合同大师的最新功能更新与改进。',
+    items: [
+      {
+        version: 'v1.1.0',
+        date: '2026-01-19',
+        title: '稳定性提升与权限体系重构',
+        features: [
+          '实现了完整的 RBAC 体系，支持动态角色定义和用户分配。',
+          '增加了数据库层面的数据范围引擎（全局/部门/个人）。',
+          '完成了集成中心建设，支持实时推送和字段转换映射。',
+          '全系统支持中英文双语切换（i18n）。',
+          '实现了合规风险的系统级实时通知。'
+        ],
+        fixes: [
+          '修复了合规驾驶舱在页面刷新时数据消失的 Bug。',
+          '解决了通知中心在多租户环境下的隔离缺陷。',
+          '修正了权限矩阵表格在某些分辨率下的布局问题。'
+        ]
+      },
+      {
+        version: 'v1.0.5',
+        date: '2026-01-15',
+        title: '核心引擎增强',
+        features: [
+          '增强了 Groovy 规则执行器，支持标准字段自动打平。',
+          '增加了环境依赖检查脚本 (JDK 17+, Node 18+)。',
+          '提升了 AI 在多页长文档提取中的稳定性。'
+        ]
+      }
+    ]
   }
 }

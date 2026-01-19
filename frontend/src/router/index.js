@@ -104,6 +104,11 @@ const routes = [
         name: 'UserGuide',
         component: () => import('@/views/guide/index.vue'),
       },
+      {
+        path: 'releases',
+        name: 'ReleaseNotes',
+        component: () => import('@/views/guide/release-notes.vue'),
+      },
     ],
   },
 ]
