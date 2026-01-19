@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -84,17 +85,28 @@ public class AIExtractionService {
     }
 
     private void saveAsAttachment(MultipartFile file, String contractId, TenantId tenantId) throws IOException {
+        String attachmentId = java.util.UUID.randomUUID().toString();
+        String uploadDir = System.getProperty("user.dir") + File.separator + "uploads";
+        java.nio.file.Path uploadPath = java.nio.file.Paths.get(uploadDir);
+        if (!java.nio.file.Files.exists(uploadPath)) {
+            java.nio.file.Files.createDirectories(uploadPath);
+        }
+
+        String fileName = attachmentId + "_" + file.getOriginalFilename();
+        java.nio.file.Path filePath = uploadPath.resolve(fileName);
+        java.nio.file.Files.write(filePath, file.getBytes());
+
         com.contract.master.contract.domain.model.ContractAttachment attachment = new com.contract.master.contract.domain.model.ContractAttachment();
-        attachment.setAttachmentId(java.util.UUID.randomUUID().toString());
+        attachment.setAttachmentId(attachmentId);
         attachment.setContractId(contractId);
         attachment.setAttachmentName(file.getOriginalFilename());
         attachment.setFileSize(file.getSize());
         attachment.setFileFormat(file.getContentType());
-        attachment.setStoragePath("uploads/" + attachment.getAttachmentId());
+        attachment.setStoragePath(filePath.toString());
         attachment.setTenantId(tenantId);
         attachment.setUploadUser(TenantContext.getCurrentTenant());
         attachmentRepository.save(attachment);
-        log.info("Saved contract attachment {} for contract {}", attachment.getAttachmentName(), contractId);
+        log.info("Saved contract attachment {} to {} for contract {}", attachment.getAttachmentName(), filePath, contractId);
     }
 
     private String extractTextFromFile(MultipartFile file) throws IOException {

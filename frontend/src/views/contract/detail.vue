@@ -508,6 +508,7 @@ const runAiExtraction = async () => {
         }
       })
       ElMessage.success(t('common.success'))
+      selectedAiFile.value = null // Clear selection after success
       // Important: if we didn't have a contractId before, refresh everything
       if (!form.contractId) {
         fetchContractDetail()

@@ -56,13 +56,25 @@ public class ContractController {
             return GlobalExceptionHandler.ApiResponse.error(400, "Invalid contract ID");
         }
         TenantId tenantId = TenantId.of(com.contract.master.security.TenantContext.getCurrentTenant());
+        
+        String attachmentId = java.util.UUID.randomUUID().toString();
+        String uploadDir = System.getProperty("user.dir") + java.io.File.separator + "uploads";
+        java.nio.file.Path uploadPath = java.nio.file.Paths.get(uploadDir);
+        if (!java.nio.file.Files.exists(uploadPath)) {
+            java.nio.file.Files.createDirectories(uploadPath);
+        }
+
+        String fileName = attachmentId + "_" + file.getOriginalFilename();
+        java.nio.file.Path filePath = uploadPath.resolve(fileName);
+        java.nio.file.Files.write(filePath, file.getBytes());
+
         com.contract.master.contract.domain.model.ContractAttachment attachment = new com.contract.master.contract.domain.model.ContractAttachment();
-        attachment.setAttachmentId(java.util.UUID.randomUUID().toString());
+        attachment.setAttachmentId(attachmentId);
         attachment.setContractId(id);
         attachment.setAttachmentName(file.getOriginalFilename());
         attachment.setFileSize(file.getSize());
         attachment.setFileFormat(file.getContentType());
-        attachment.setStoragePath("uploads/" + attachment.getAttachmentId());
+        attachment.setStoragePath(filePath.toString());
         attachment.setTenantId(tenantId);
         attachment.setUploadUser(com.contract.master.security.TenantContext.getCurrentTenant());
         attachmentRepository.save(attachment);

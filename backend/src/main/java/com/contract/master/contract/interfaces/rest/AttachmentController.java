@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,8 @@ import java.nio.file.Paths;
 @RestController
 @RequestMapping("/api/attachments")
 public class AttachmentController {
+
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AttachmentController.class);
 
     @Autowired
     private ContractAttachmentRepository attachmentRepository;
@@ -32,13 +35,15 @@ public class AttachmentController {
     }
 
     private ResponseEntity<Resource> getFileResponse(String attachmentId, boolean isDownload) {
-        return attachmentRepository.findAll().stream()
-                .filter(a -> a.getAttachmentId().equals(attachmentId))
-                .findFirst()
+        return attachmentRepository.findByAttachmentId(attachmentId)
                 .map(attachment -> {
                     File file = new File(attachment.getStoragePath());
+                    if (!file.exists()) {
+                        log.error("File not found on disk: {}", attachment.getStoragePath());
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND).<Resource>build();
+                    }
+
                     Resource resource = new FileSystemResource(file);
-                    
                     String contentType = attachment.getFileFormat();
                     if (contentType == null) contentType = "application/octet-stream";
 
