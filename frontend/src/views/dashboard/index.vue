@@ -13,7 +13,7 @@
     </div>
 
     <!-- Stats Cards -->
-    <div class="stats-grid">
+    <div class="stats-grid" v-loading="loading">
       <div class="stat-card glass-card hover-scale">
         <div class="stat-icon bg-blue-100 text-blue-600">
           <el-icon><Document /></el-icon>
@@ -146,6 +146,7 @@ import { useRouter } from 'vue-router'
 import { Document, Timer, Money, Warning, Top, Download, ArrowDown } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import * as echarts from 'echarts'
+import request from '@/utils/request'
 
 const router = useRouter()
 const chartPeriod = ref('Month')
@@ -157,8 +158,8 @@ let radarChart = null
 let gaugeChart = null
 
 const recentActivities = ref([])
-
 const myTasks = ref([])
+const loading = ref(false)
 
 const initCharts = () => {
   // Trend Chart
@@ -290,21 +291,17 @@ const stats = ref({
 })
 
 const fetchDashboardStats = async () => {
+  loading.value = true
   try {
-    const response = await fetch('/api/dashboard/stats', {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        'X-Tenant-ID': localStorage.getItem('tenantId')
-      }
-    })
-    if (response.ok) {
-      const result = await response.json()
-      stats.value = result.data
-      updateVisuals(result.data)
-    }
+    const res = await request.get('/dashboard/stats')
+    const result = res.data
+    stats.value = result.data
+    updateVisuals(result.data)
   } catch (error) {
     console.error('Failed to fetch dashboard stats', error)
     ElMessage.error('Failed to load dashboard statistics')
+  } finally {
+    loading.value = false
   }
 }
 

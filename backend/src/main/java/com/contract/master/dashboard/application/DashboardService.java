@@ -18,6 +18,9 @@ public class DashboardService {
     @Autowired
     private ContractRepository contractRepository;
 
+    @Autowired
+    private com.contract.master.problemcenter.domain.repository.ProblemRepository problemRepository;
+
     public DashboardStatsDTO getStats() {
         TenantId tenantId = TenantId.of(TenantContext.getCurrentTenant());
         DashboardStatsDTO stats = new DashboardStatsDTO();
@@ -28,18 +31,17 @@ public class DashboardService {
         stats.setActiveValue(activeValue != null ? activeValue : BigDecimal.ZERO);
         stats.setRiskAlerts(contractRepository.countRiskAlertsByTenantId(tenantId));
 
-        List<DashboardStatsDTO.DailyCountDTO> trend = new ArrayList<>();
-        trend.add(new DashboardStatsDTO.DailyCountDTO("Mon", 10L));
-        trend.add(new DashboardStatsDTO.DailyCountDTO("Tue", 15L));
-        trend.add(new DashboardStatsDTO.DailyCountDTO("Wed", 8L));
-        trend.add(new DashboardStatsDTO.DailyCountDTO("Thu", 20L));
-        trend.add(new DashboardStatsDTO.DailyCountDTO("Fri", 25L));
+        List<DashboardStatsDTO.DailyCountDTO> trend = contractRepository.getVolumeTrendByTenantId(tenantId);
         stats.setVolumeTrend(trend);
 
+        long total = stats.getTotalContracts();
+        long risk = stats.getRiskAlerts();
+        int riskLevel = total > 0 ? (int)((risk * 100) / total) : 0;
+
         stats.setRiskRadar(Arrays.asList(
-            new DashboardStatsDTO.RadarStatDTO("Financial", 40),
-            new DashboardStatsDTO.RadarStatDTO("Legal", 20),
-            new DashboardStatsDTO.RadarStatDTO("Compliance", 60),
+            new DashboardStatsDTO.RadarStatDTO("Financial", 10 + (riskLevel / 2)),
+            new DashboardStatsDTO.RadarStatDTO("Legal", 20 + riskLevel),
+            new DashboardStatsDTO.RadarStatDTO("Compliance", riskLevel),
             new DashboardStatsDTO.RadarStatDTO("Operational", 30),
             new DashboardStatsDTO.RadarStatDTO("Performance", 50)
         ));

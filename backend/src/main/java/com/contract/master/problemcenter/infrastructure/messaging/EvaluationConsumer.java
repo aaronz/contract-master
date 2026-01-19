@@ -38,19 +38,22 @@ public class EvaluationConsumer {
     private final ContractRepository contractRepository;
     private final ContractService contractService;
     private final List<RuleExecutor> ruleExecutors;
+    private final com.contract.master.notification.application.NotificationService notificationService;
 
     public EvaluationConsumer(ProblemEvaluationJobRepository jobRepository,
                               RuleRepository ruleRepository,
                               ProblemRepository problemRepository,
                               ContractRepository contractRepository,
                               ContractService contractService,
-                              List<RuleExecutor> ruleExecutors) {
+                              List<RuleExecutor> ruleExecutors,
+                              com.contract.master.notification.application.NotificationService notificationService) {
         this.jobRepository = jobRepository;
         this.ruleRepository = ruleRepository;
         this.problemRepository = problemRepository;
         this.contractRepository = contractRepository;
         this.contractService = contractService;
         this.ruleExecutors = ruleExecutors;
+        this.notificationService = notificationService;
     }
 
     @KafkaListener(topics = "contract-evaluation", groupId = "contract-master-group")
@@ -82,7 +85,18 @@ public class EvaluationConsumer {
 
             ContractDTO contractDTO = contractService.convertToDTO(contract);
             List<Rule> rules = ruleRepository.findByTenantIdAndStatus(job.getTenantId(), RuleStatus.ACTIVE);
-            log.info("Found {} active rules for tenant {}", rules.size(), job.getTenantId().getId());
+            
+            if (job.getRuleIdsJson() != null && !job.getRuleIdsJson().isEmpty()) {
+                try {
+                    com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                    List<String> ruleIds = mapper.readValue(job.getRuleIdsJson(), new com.fasterxml.jackson.core.type.TypeReference<List<String>>(){});
+                    rules = rules.stream().filter(r -> ruleIds.contains(r.getId().toString())).collect(Collectors.toList());
+                } catch (Exception e) {
+                    log.error("Failed to parse rule IDs for job {}", job.getId(), e);
+                }
+            }
+            
+            log.info("Found {} rules to execute for tenant {}", rules.size(), job.getTenantId().getId());
 
             Map<String, Object> facts = new HashMap<>();
             facts.put("contract", contractDTO);
@@ -123,6 +137,14 @@ public class EvaluationConsumer {
             if (!problems.isEmpty()) {
                 log.info("Saving {} problems for contract {}", problems.size(), contractIdStr);
                 problemRepository.saveAll(problems);
+                
+                notificationService.sendNotification(
+                    "admin", 
+                    "Compliance Issues Detected", 
+                    String.format("System found %d issues in contract %s during automated evaluation.", 
+                        problems.size(), contract.getContractName()),
+                    "COMPLIANCE_ALERT"
+                );
             } else {
                 log.info("No compliance issues detected for contract {}", contractIdStr);
             }

@@ -20,14 +20,17 @@ public class ProblemEvaluationController {
 
     @PostMapping
     public GlobalExceptionHandler.ApiResponse<Long> triggerEvaluation(@RequestBody EvaluationTriggerRequest request) {
-        Long jobId = evaluationService.startEvaluation(request.getContractId());
+        Long jobId = evaluationService.startEvaluation(request.getContractId(), request.getRuleIds());
         return GlobalExceptionHandler.ApiResponse.success(HttpStatus.ACCEPTED, jobId);
     }
 
     public static class EvaluationTriggerRequest {
         private UUID contractId;
+        private java.util.List<String> ruleIds;
 
         public UUID getContractId() { return contractId; }
         public void setContractId(UUID contractId) { this.contractId = contractId; }
+        public java.util.List<String> getRuleIds() { return ruleIds; }
+        public void setRuleIds(java.util.List<String> ruleIds) { this.ruleIds = ruleIds; }
     }
 }

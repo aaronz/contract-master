@@ -26,12 +26,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import ProblemTable from './ProblemTable.vue'
 import contractApi from '@/services/contractApi'
 import problemApi from '@/services/problemApi'
 
+const route = useRoute()
+const router = useRouter()
 const selectedContractId = ref(null)
 const selectedContractNo = ref('')
 const contracts = ref([])
@@ -41,10 +44,13 @@ const problemTableRef = ref(null)
 const handleContractChange = async (val) => {
   if (!val) {
     selectedContractNo.value = ''
+    router.replace({ query: { ...route.query, contractId: undefined } })
     return
   }
   const contract = contracts.value.find(c => c.value === val)
   selectedContractNo.value = contract?.label || ''
+  
+  router.replace({ query: { ...route.query, contractId: val } })
   
   if (problemTableRef.value) {
     problemTableRef.value.loadProblems()
@@ -69,11 +75,26 @@ const loadContracts = async () => {
       value: c.contractId,
       label: c.contractNo + ' - ' + c.contractName
     }));
+
+    // After loading contracts, sync with query param
+    if (route.query.contractId) {
+      selectedContractId.value = route.query.contractId
+      const contract = contracts.value.find(c => c.value === selectedContractId.value)
+      selectedContractNo.value = contract?.label || ''
+    }
   } catch (error) {
     console.error('Failed to load contracts', error)
     ElMessage.error('Failed to load contracts for selection')
   }
 }
+
+watch(() => route.query.contractId, (newVal) => {
+  if (newVal && newVal !== selectedContractId.value) {
+    selectedContractId.value = newVal
+    const contract = contracts.value.find(c => c.value === newVal)
+    selectedContractNo.value = contract?.label || ''
+  }
+})
 
 const triggerEvaluation = async () => {
   if (!selectedContractId.value) return

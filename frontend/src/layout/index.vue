@@ -113,23 +113,32 @@
             <el-divider direction="vertical" />
             
             <el-dropdown trigger="click" popper-class="notification-popper">
-              <el-badge :value="3" class="notification-badge" type="danger">
+              <el-badge :value="unreadCount" :hidden="unreadCount === 0" class="notification-badge" type="danger">
                 <el-button circle text class="icon-btn">
                   <el-icon><Bell /></el-icon>
                 </el-button>
               </el-badge>
               <template #dropdown>
                 <div class="notification-dropdown glass-card">
-                  <!-- Notification content (same as before) -->
                   <div class="dropdown-header">
-                    <span>Notifications</span>
+                    <span>Notifications ({{ unreadCount }})</span>
+                    <el-button link type="primary" size="small" @click="handleMarkAllRead" v-if="unreadCount > 0">Mark all read</el-button>
                   </div>
-                  <div class="notify-list">
-                    <div v-for="i in 3" :key="i" class="notify-item">
-                       <div class="notify-icon"><el-icon><InfoFilled /></el-icon></div>
+                  <div class="notify-list" v-loading="notifLoading">
+                    <div v-if="notifications.length === 0" class="empty-notif">
+                      No notifications
+                    </div>
+                    <div v-for="item in notifications" :key="item.id" class="notify-item" :class="{ unread: !item.isRead }" @click="handleReadNotif(item)">
+                       <div class="notify-icon" :class="item.type">
+                         <el-icon v-if="item.type === 'COMPLIANCE_ALERT'"><Warning /></el-icon>
+                         <el-icon v-else><InfoFilled /></el-icon>
+                       </div>
                        <div class="notify-content">
-                         <b>Contract Update</b>
-                         <p>Status changed...</p>
+                         <div class="notif-title-row">
+                           <b>{{ item.title }}</b>
+                           <span class="notif-time">{{ formatTime(item.createTime) }}</span>
+                         </div>
+                         <p>{{ item.content }}</p>
                        </div>
                     </div>
                   </div>
@@ -156,9 +165,58 @@ import {
   DataLine, Document, Setting, Bell, InfoFilled, 
   Warning, Connection, Hide, DocumentChecked, Operation, Tools 
 } from '@element-plus/icons-vue'
-import { ref } from 'vue'
+import { ref, onMounted, computed, onUnmounted } from 'vue'
+import request from '@/utils/request'
 
 const tenantId = ref('default-tenant')
+const notifications = ref([])
+const notifLoading = ref(false)
+const unreadCount = computed(() => notifications.value.filter(n => !n.isRead).length)
+let notifTimer = null
+
+const fetchNotifications = async () => {
+  try {
+    const res = await request.get('/notifications/my')
+    notifications.value = res.data.data || []
+  } catch (error) {
+    console.error('Failed to fetch notifications', error)
+  }
+}
+
+const handleReadNotif = async (item) => {
+  if (item.isRead) return
+  try {
+    await request.post(`/notifications/${item.id}/read`)
+    item.isRead = true
+  } catch (error) {
+    console.error('Failed to mark notification as read', error)
+  }
+}
+
+const handleMarkAllRead = async () => {
+  // Simple implementation: sequential calls or backend enhancement needed
+  // For now, mark local and attempt sequentially
+  for (const n of notifications.value) {
+    if (!n.isRead) await handleReadNotif(n)
+  }
+}
+
+const formatTime = (timeStr) => {
+  if (!timeStr) return ''
+  const date = new Date(timeStr)
+  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+}
+
+onMounted(() => {
+  tenantId.value = localStorage.getItem('tenantId') || 'default-tenant'
+  fetchNotifications()
+  // Poll every 30s
+  notifTimer = setInterval(fetchNotifications, 30000)
+})
+
+onUnmounted(() => {
+  if (notifTimer) clearInterval(notifTimer)
+})
 </script>
 
 <style scoped>
@@ -376,10 +434,49 @@ const tenantId = ref('default-tenant')
   cursor: pointer;
   transition: background 0.2s;
   border-bottom: 1px solid rgba(0,0,0,0.02);
+  position: relative;
+}
+
+.notify-item.unread {
+  background: rgba(59, 130, 246, 0.03);
+}
+
+.notify-item.unread::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--accent-color);
 }
 
 .notify-item:hover {
   background: rgba(59, 130, 246, 0.05);
+}
+
+.notify-icon.COMPLIANCE_ALERT {
+  background: #FEF2F2;
+  color: #EF4444;
+}
+
+.notif-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.notif-time {
+  font-size: 10px;
+  color: #94A3B8;
+}
+
+.empty-notif {
+  padding: 32px;
+  text-align: center;
+  color: #94A3B8;
+  font-size: 13px;
 }
 
 .notify-icon {

@@ -31,6 +31,9 @@ public class ProblemEvaluationJob extends BaseTenantEntity implements AggregateR
     @Column(name = "finished_at")
     private LocalDateTime finishedAt;
 
+    @Column(name = "rule_ids_json", columnDefinition = "TEXT")
+    private String ruleIdsJson;
+
     public ProblemEvaluationJob() {}
 
     public UUID getContractId() { return contractId; }
@@ -45,6 +48,8 @@ public class ProblemEvaluationJob extends BaseTenantEntity implements AggregateR
     public void setStartedAt(LocalDateTime startedAt) { this.startedAt = startedAt; }
     public LocalDateTime getFinishedAt() { return finishedAt; }
     public void setFinishedAt(LocalDateTime finishedAt) { this.finishedAt = finishedAt; }
+    public String getRuleIdsJson() { return ruleIdsJson; }
+    public void setRuleIdsJson(String ruleIdsJson) { this.ruleIdsJson = ruleIdsJson; }
 
     public void start() {
         this.status = ProblemEvaluationJobStatus.RUNNING;

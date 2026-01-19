@@ -13,8 +13,8 @@ export default {
     return request.put(`/problems/${id}`, data)
   },
 
-  triggerEvaluation(contractId) {
-    return request.post('/problem-center/evaluations', { contractId })
+  triggerEvaluation(contractId, ruleIds = null) {
+    return request.post('/problem-center/evaluations', { contractId, ruleIds })
   },
 
   getRules() {

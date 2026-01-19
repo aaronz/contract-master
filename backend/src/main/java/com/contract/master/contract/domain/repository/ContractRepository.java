@@ -27,4 +27,10 @@ public interface ContractRepository {
     long count();
 
     Page<Contract> findByTenantIdAndQuery(TenantId tenantId, String query, Pageable pageable);
+
+    @org.springframework.data.jpa.repository.Query("SELECT new com.contract.master.dashboard.dto.DashboardStatsDTO$DailyCountDTO(FUNCTION('DATE_FORMAT', c.createTime, '%Y-%m-%d'), COUNT(c)) " +
+           "FROM Contract c WHERE c.tenantId.id = :#{#tenantId.id} " +
+           "GROUP BY FUNCTION('DATE_FORMAT', c.createTime, '%Y-%m-%d') " +
+           "ORDER BY FUNCTION('DATE_FORMAT', c.createTime, '%Y-%m-%d') ASC")
+    List<com.contract.master.dashboard.dto.DashboardStatsDTO.DailyCountDTO> getVolumeTrendByTenantId(TenantId tenantId);
 }

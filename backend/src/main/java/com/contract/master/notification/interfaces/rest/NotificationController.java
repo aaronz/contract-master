@@ -2,7 +2,9 @@ package com.contract.master.notification.interfaces.rest;
 
 import com.contract.master.notification.domain.model.Notification;
 import com.contract.master.notification.application.NotificationService;
+import com.contract.master.api.GlobalExceptionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,13 +16,14 @@ public class NotificationController {
     @Autowired
     private NotificationService notificationService;
 
-    @GetMapping
-    public List<Notification> list() {
-        return notificationService.getUserNotifications("admin");
+    @GetMapping("/my")
+    public GlobalExceptionHandler.ApiResponse<List<Notification>> list() {
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, notificationService.getUserNotifications("admin"));
     }
 
     @PostMapping("/{id}/read")
-    public void read(@PathVariable Long id) {
+    public GlobalExceptionHandler.ApiResponse<Void> read(@PathVariable Long id) {
         notificationService.markAsRead(id);
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, null);
     }
 }

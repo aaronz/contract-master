@@ -435,7 +435,7 @@ import { ArrowLeft, Check, ChatDotRound, UploadFilled, Document, Close, Refresh 
 import { ElMessage } from 'element-plus'
 
 import { useFieldStore } from '@/stores/fieldStore'
-import evaluationApi from '@/services/evaluationApi' 
+import problemApi from '@/services/problemApi' 
 import RuleSelectorModal from '@/components/RuleSelectorModal.vue' 
 
 const fieldStore = useFieldStore()
@@ -635,15 +635,12 @@ const handleReEvaluation = async (ruleIds) => {
   }
 
   try {
-    // Assuming evaluationApi.triggerEvaluation expects contractId first, then ruleIds
-    const response = await evaluationApi.triggerEvaluation(form.contractId, ruleIds);
-    // Handle nested ApiResponse structure
+    const response = await problemApi.triggerEvaluation(form.contractId, ruleIds);
     const responseData = response.data.data || response.data;
-    if (responseData && responseData.jobId) {
-      ElMessage.success(`Re-evaluation started successfully! Job ID: ${responseData.jobId}`);
-      // Optionally, refresh contract details or update a status
+    if (responseData) {
+      ElMessage.success(`Re-evaluation started successfully!`);
     } else {
-      ElMessage.error('Failed to start re-evaluation. No job ID returned.');
+      ElMessage.error('Failed to start re-evaluation.');
     }
   } catch (error) {
     console.error('Re-evaluation failed:', error);

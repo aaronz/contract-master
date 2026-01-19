@@ -54,4 +54,10 @@ public interface JpaContractRepository extends JpaRepository<Contract, Long>, Co
     @Override
     @Query("SELECT c FROM Contract c WHERE c.tenantId.id = :#{#tenantId.id} AND (c.contractName LIKE %:query% OR c.contractNo.value LIKE %:query%)")
     Page<Contract> findByTenantIdAndQuery(TenantId tenantId, String query, Pageable pageable);
+
+    @Override
+    @Query("SELECT new com.contract.master.dashboard.dto.DashboardStatsDTO$DailyCountDTO(CAST(c.createTime as string), COUNT(c)) " +
+           "FROM Contract c WHERE c.tenantId.id = :#{#tenantId.id} " +
+           "GROUP BY CAST(c.createTime as string)")
+    List<com.contract.master.dashboard.dto.DashboardStatsDTO.DailyCountDTO> getVolumeTrendByTenantId(TenantId tenantId);
 }
