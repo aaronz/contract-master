@@ -2,35 +2,35 @@
   <div class="integrations-hub">
     <div class="page-header">
       <div>
-        <h1 class="page-title">Integrations Hub</h1>
+        <h1 class="page-title">{{ $t('menu.integrationsHub') }}</h1>
         <p class="page-subtitle">Manage your CRM connections and data synchronization pipelines.</p>
       </div>
-      <el-button type="primary" size="large" icon="Plus" @click="handleAddConnector">New Connection</el-button>
+      <el-button type="primary" size="large" icon="Plus" @click="handleAddConnector">{{ $t('common.create') }}</el-button>
     </div>
 
     <!-- Connector Dialog -->
-    <el-dialog v-model="showConnectorDialog" :title="isEdit ? 'Configure Connector' : 'New Connection'" width="500px">
+    <el-dialog v-model="showConnectorDialog" :title="isEdit ? 'Configure Connector' : $t('common.create')" width="500px">
       <el-form :model="connectorForm" label-position="top">
-        <el-form-item label="System Name">
+        <el-form-item :label="$t('common.systemName')">
           <el-input v-model="connectorForm.systemName" placeholder="e.g. Salesforce Production" />
         </el-form-item>
-        <el-form-item label="Endpoint URL">
+        <el-form-item :label="$t('common.endpointUrl')">
           <el-input v-model="connectorForm.endpointUrl" placeholder="https://api.salesforce.com/..." />
         </el-form-item>
-        <el-form-item label="Auth Type">
+        <el-form-item :label="$t('common.authType')">
           <el-select v-model="connectorForm.authType" style="width: 100%">
             <el-option label="OAuth2" value="OAUTH2" />
             <el-option label="API Key" value="API_KEY" />
             <el-option label="Basic Auth" value="BASIC" />
           </el-select>
         </el-form-item>
-        <el-form-item label="Access Key">
+        <el-form-item :label="$t('common.accessKeyId')">
           <el-input v-model="connectorForm.accessKey" placeholder="Enter access key or client ID" />
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="showConnectorDialog = false">Cancel</el-button>
-        <el-button type="primary" @click="handleSaveConnector" :loading="saving">Save</el-button>
+        <el-button @click="showConnectorDialog = false">{{ $t('common.cancel') }}</el-button>
+        <el-button type="primary" @click="handleSaveConnector" :loading="saving">{{ $t('common.save') }}</el-button>
       </template>
     </el-dialog>
 
@@ -107,7 +107,7 @@
           <el-button circle size="large" class="add-btn">
             <el-icon><Plus /></el-icon>
           </el-button>
-          <p class="mt-4 text-secondary font-medium">Add Connector</p>
+          <p class="mt-4 text-secondary font-medium">{{ $t('common.create') }}</p>
         </div>
       </div>
     </div>
@@ -116,7 +116,7 @@
     <div class="section-title mt-8">Recent Synchronization Activity</div>
     <div class="glass-card table-wrapper">
       <el-table :data="activities" style="width: 100%">
-        <el-table-column prop="source" label="Source" width="180">
+        <el-table-column prop="source" :label="$t('common.resource')" width="180">
           <template #default="{ row }">
             <div class="flex items-center gap-2">
               <div class="mini-dot" :style="{ background: row.color }"></div>
@@ -124,7 +124,7 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="type" label="Event Type" width="180">
+        <el-table-column prop="type" :label="$t('common.action')" width="180">
           <template #default="{ row }">
             <el-tag size="small" :type="row.type === 'Full Sync' ? 'primary' : 'success'" effect="plain" round>
               {{ row.type }}
@@ -133,7 +133,7 @@
         </el-table-column>
         <el-table-column prop="records" label="Records" />
         <el-table-column prop="duration" label="Duration" />
-        <el-table-column prop="status" label="Status">
+        <el-table-column prop="status" :label="$t('common.status')">
            <template #default="{ row }">
             <div class="flex items-center gap-2">
               <span :class="['status-text', row.status === 'Success' ? 'text-green' : 'text-red']">
@@ -145,7 +145,7 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="time" label="Time" align="right" />
+        <el-table-column prop="time" :label="$t('common.time')" align="right" />
       </el-table>
     </div>
   </div>

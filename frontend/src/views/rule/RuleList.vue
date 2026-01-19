@@ -2,14 +2,14 @@
   <div class="rules-config-page">
     <div class="page-header">
       <div>
-        <h1 class="page-title">Rule Engine</h1>
+        <h1 class="page-title">{{ $t('menu.ruleEngine') }}</h1>
         <p class="page-subtitle">Configure automated validation rules and risk alerts.</p>
       </div>
       <div class="header-actions">
         <el-button v-if="selectedRules.length > 0" type="success" icon="Edit" @click="openBatchEdit">
           Batch Edit ({{ selectedRules.length }})
         </el-button>
-        <el-button type="primary" icon="Plus" @click="addRule">Add New Rule</el-button>
+        <el-button type="primary" icon="Plus" @click="addRule">{{ $t('common.create') }}</el-button>
       </div>
     </div>
 
@@ -62,8 +62,8 @@
         </div>
 
         <div class="rule-footer">
-           <el-button link type="primary" @click="editRule(rule)">Edit</el-button>
-           <el-button link type="danger">Delete</el-button>
+           <el-button link type="primary" @click="editRule(rule)">{{ $t('common.edit') }}</el-button>
+           <el-button link type="danger">{{ $t('common.delete') }}</el-button>
         </div>
       </el-card>
     </div>

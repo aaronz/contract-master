@@ -3,45 +3,45 @@
     <!-- Header & Actions -->
     <div class="page-header">
       <div>
-        <h1 class="page-title">Contracts</h1>
-        <p class="page-subtitle">Manage all your contracts, approvals, and archives.</p>
+        <h1 class="page-title">{{ $t('common.contracts') }}</h1>
+        <p class="page-subtitle">{{ $t('contract.subtitle') }}</p>
       </div>
       <div class="header-actions">
         <el-button @click="showFilterDrawer = true">
-          <el-icon><Filter /></el-icon> Filters
+          <el-icon><Filter /></el-icon> {{ $t('common.filter') }}
         </el-button>
-        <el-button type="primary" icon="Plus" @click="showNewContractDialog = true">New Contract</el-button>
+        <el-button type="primary" icon="Plus" @click="showNewContractDialog = true">{{ $t('contract.create') }}</el-button>
       </div>
     </div>
 
     <!-- New Contract Dialog -->
-    <el-dialog v-model="showNewContractDialog" title="Create New Contract" width="900px" top="5vh">
+    <el-dialog v-model="showNewContractDialog" :title="$t('contract.create')" width="900px" top="5vh">
       <el-form :model="newContractForm" :rules="rules" ref="newContractFormRef" label-position="top">
         <el-tabs v-model="activeNewContractTab" class="custom-tabs-dialog">
           
           <!-- General Info Tab -->
-          <el-tab-pane label="General Info" name="general">
+          <el-tab-pane :label="$t('contract.generalInfo')" name="general">
             <div class="form-section">
               <h3 class="section-header">Core Details</h3>
               <div class="form-grid">
                 <div class="field-group" v-if="fieldStore.isFieldVisible('contract_no')">
-                  <label>{{ fieldStore.getFieldByCode('contract_no')?.fieldName || 'Contract Number' }}</label>
+                  <label>{{ fieldStore.getFieldByCode('contract_no')?.fieldName || $t('contract.no') }}</label>
                   <el-form-item prop="contractNo">
                     <el-input v-model="newContractForm.contractNo" placeholder="e.g. CON-2026-001" />
                   </el-form-item>
                 </div>
                 <div class="field-group" v-if="fieldStore.isFieldVisible('contract_name')">
-                  <label>{{ fieldStore.getFieldByCode('contract_name')?.fieldName || 'Contract Name' }}</label>
+                  <label>{{ fieldStore.getFieldByCode('contract_name')?.fieldName || $t('contract.name') }}</label>
                   <el-form-item prop="contractName">
                     <el-input v-model="newContractForm.contractName" />
                   </el-form-item>
                 </div>
                 <div class="field-group" v-if="fieldStore.isFieldVisible('contract_type')">
-                  <label>{{ fieldStore.getFieldByCode('contract_type')?.fieldName || 'Contract Type' }}</label>
+                  <label>{{ fieldStore.getFieldByCode('contract_type')?.fieldName || $t('contract.type') }}</label>
                   <el-input v-model="newContractForm.contractType" />
                 </div>
                 <div class="field-group" v-if="fieldStore.isFieldVisible('contract_status')">
-                  <label>{{ fieldStore.getFieldByCode('contract_status')?.fieldName || 'Status' }}</label>
+                  <label>{{ fieldStore.getFieldByCode('contract_status')?.fieldName || $t('contract.status') }}</label>
                   <el-select v-model="newContractForm.contractStatus" style="width: 100%">
                     <el-option label="Draft" value="Draft" />
                     <el-option label="Active" value="Active" />
@@ -53,7 +53,7 @@
 
             <div class="form-grid-2">
               <div class="form-section" v-if="fieldStore.isFieldVisible('party_a_name') || fieldStore.isFieldVisible('party_a_contact') || fieldStore.isFieldVisible('party_a_phone') || fieldStore.isFieldVisible('party_a_address')">
-                <h3 class="section-header text-blue">Party A (Us)</h3>
+                <h3 class="section-header text-blue">{{ $t('contract.partyA') }}</h3>
                 <div class="field-group" v-if="fieldStore.isFieldVisible('party_a_name')">
                   <label>{{ fieldStore.getFieldByCode('party_a_name')?.fieldName || 'Entity Name' }}</label>
                   <el-form-item prop="partyAName">
@@ -77,7 +77,7 @@
               </div>
 
               <div class="form-section" v-if="fieldStore.isFieldVisible('party_b_name') || fieldStore.isFieldVisible('party_b_contact') || fieldStore.isFieldVisible('party_b_phone') || fieldStore.isFieldVisible('party_b_address')">
-                <h3 class="section-header text-purple">Party B (Counterparty)</h3>
+                <h3 class="section-header text-purple">{{ $t('contract.partyB') }}</h3>
                 <div class="field-group" v-if="fieldStore.isFieldVisible('party_b_name')">
                   <label>{{ fieldStore.getFieldByCode('party_b_name')?.fieldName || 'Entity Name' }}</label>
                   <el-form-item prop="partyBName">
@@ -131,7 +131,7 @@
             </div>
           </el-tab-pane>
 
-          <el-tab-pane label="Financials" name="financials">
+          <el-tab-pane :label="$t('contract.financials')" name="financials">
             <div class="form-section" v-if="fieldStore.isFieldVisible('currency_type') || fieldStore.isFieldVisible('contract_amount') || fieldStore.isFieldVisible('tax_rate') || fieldStore.isFieldVisible('tax_amount') || fieldStore.isFieldVisible('total_amount_with_tax') || fieldStore.isFieldVisible('payment_method') || fieldStore.isFieldVisible('payment_term')">
               <h3 class="section-header">Financial Details</h3>
               <div class="form-grid-3">
@@ -144,7 +144,7 @@
                   </el-select>
                 </div>
                 <div class="field-group" v-if="fieldStore.isFieldVisible('contract_amount')">
-                  <label>{{ fieldStore.getFieldByCode('contract_amount')?.fieldName || 'Contract Amount' }}</label>
+                  <label>{{ fieldStore.getFieldByCode('contract_amount')?.fieldName || $t('contract.amount') }}</label>
                   <el-input-number v-model="newContractForm.contractAmount" :precision="2" style="width: 100%" />
                 </div>
                 <div class="field-group" v-if="fieldStore.isFieldVisible('tax_rate')">
@@ -193,7 +193,7 @@
             </div>
           </el-tab-pane>
 
-          <el-tab-pane label="Performance" name="performance">
+          <el-tab-pane :label="$t('contract.performance')" name="performance">
             <div class="form-section" v-if="fieldStore.isFieldVisible('subject_type') || fieldStore.isFieldVisible('subject_quantity') || fieldStore.isFieldVisible('unit_price') || fieldStore.isFieldVisible('subject_desc')">
               <h3 class="section-header">Subject Matter</h3>
               <div class="form-grid-3">
@@ -247,7 +247,7 @@
           </el-tab-pane>
 
           <!-- Legal & Dates Tab -->
-          <el-tab-pane label="Legal & Dates" name="legal">
+          <el-tab-pane :label="$t('contract.legalDates')" name="legal">
             <div class="form-section" v-if="fieldStore.isFieldVisible('sign_date') || fieldStore.isFieldVisible('effective_date') || fieldStore.isFieldVisible('expire_date')">
               <h3 class="section-header">Important Dates</h3>
               <div class="form-grid-3">
@@ -291,8 +291,8 @@
         </el-tabs>
       </el-form>
       <template #footer>
-        <el-button @click="showNewContractDialog = false">Cancel</el-button>
-        <el-button type="primary" @click="handleCreateContract" :loading="creating">Create</el-button>
+        <el-button @click="showNewContractDialog = false">{{ $t('common.cancel') }}</el-button>
+        <el-button type="primary" @click="handleCreateContract" :loading="creating">{{ $t('common.create') }}</el-button>
       </template>
     </el-dialog>
 
@@ -300,9 +300,9 @@
     <div class="toolbar-container" :class="{ 'is-sticky': isSticky }">
       <div class="toolbar-left">
         <el-radio-group v-model="activeTab" size="large">
-          <el-radio-button value="all">All Contracts</el-radio-button>
-          <el-radio-button value="my">My Pending</el-radio-button>
-          <el-radio-button value="shared">Shared with me</el-radio-button>
+          <el-radio-button value="all">{{ $t('contract.allContracts') }}</el-radio-button>
+          <el-radio-button value="my">{{ $t('contract.myPending') }}</el-radio-button>
+          <el-radio-button value="shared">{{ $t('contract.sharedWithMe') }}</el-radio-button>
         </el-radio-group>
       </div>
       <div class="toolbar-right">
@@ -310,7 +310,7 @@
           <el-icon><Search /></el-icon>
           <input 
             v-model="searchQuery" 
-            placeholder="Search contracts..." 
+            :placeholder="$t('contract.searchPlaceholder')" 
             @keyup.enter="handleSearch"
           />
         </div>
@@ -334,12 +334,12 @@
     <transition name="slide-up">
       <div v-if="selectedRows.length > 0" class="batch-action-bar">
         <div class="selected-count">
-          <span>{{ selectedRows.length }}</span> items selected
+          <span>{{ selectedRows.length }}</span> {{ $t('contract.itemsSelected') }}
         </div>
         <div class="batch-actions">
-          <el-button text bg><el-icon><Download /></el-icon> Export</el-button>
-          <el-button text bg><el-icon><User /></el-icon> Assign</el-button>
-          <el-button text bg type="danger" @click="handleBatchArchive"><el-icon><Delete /></el-icon> Archive</el-button>
+          <el-button text bg><el-icon><Download /></el-icon> {{ $t('common.export') }}</el-button>
+          <el-button text bg><el-icon><User /></el-icon> {{ $t('contract.assign') }}</el-button>
+          <el-button text bg type="danger" @click="handleBatchArchive"><el-icon><Delete /></el-icon> {{ $t('contract.archive') }}</el-button>
           <div class="divider"></div>
           <el-button circle text @click="clearSelection"><el-icon><Close /></el-icon></el-button>
         </div>
@@ -356,12 +356,12 @@
         :header-cell-style="{ background: '#F8FAFC', color: '#64748B' }"
       >
         <el-table-column type="selection" width="55" />
-        <el-table-column v-if="fieldStore.isFieldVisible('contract_no')" label="Contract No." prop="contractNo" width="160">
+        <el-table-column v-if="fieldStore.isFieldVisible('contract_no')" :label="$t('contract.no')" prop="contractNo" width="160">
           <template #default="{ row }">
             <span class="font-mono font-medium" :style="getFieldStyle('contract_no')">{{ row.contractNo }}</span>
           </template>
         </el-table-column>
-        <el-table-column v-if="fieldStore.isFieldVisible('contract_name')" label="Contract Name" min-width="250">
+        <el-table-column v-if="fieldStore.isFieldVisible('contract_name')" :label="$t('contract.name')" min-width="250">
           <template #default="{ row }">
             <div class="contract-name-cell">
               <div class="name-text" :style="getFieldStyle('contract_name')">{{ row.contractName }}</div>
@@ -369,19 +369,19 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column v-if="fieldStore.isFieldVisible('amount')" label="Amount" prop="contractAmount" width="150" sortable>
+        <el-table-column v-if="fieldStore.isFieldVisible('amount')" :label="$t('contract.amount')" prop="contractAmount" width="150" sortable>
           <template #default="{ row }">
             <span class="amount-text" :style="getFieldStyle('amount')">{{ formatCurrency(row.contractAmount || row.amount) }}</span>
           </template>
         </el-table-column>
-        <el-table-column v-if="fieldStore.isFieldVisible('status')" label="Status" prop="status" width="120">
+        <el-table-column v-if="fieldStore.isFieldVisible('status')" :label="$t('contract.status')" prop="status" width="120">
           <template #default="{ row }">
             <el-tag :type="getStatusType(row.status)" effect="light" round :style="getFieldStyle('status')">
               {{ row.status }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column v-if="fieldStore.isFieldVisible('create_time')" label="Date" prop="createTime" width="180" sortable>
+        <el-table-column v-if="fieldStore.isFieldVisible('create_time')" :label="$t('contract.date')" prop="createTime" width="180" sortable>
           <template #default="{ row }">
             <div class="date-cell" :style="getFieldStyle('create_time')">
               <span>{{ formatDate(row.createTime) }}</span>
@@ -405,7 +405,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column label="Actions" width="100" fixed="right">
+        <el-table-column :label="$t('common.actions')" width="100" fixed="right">
           <template #default="{ row }">
             <el-button circle text type="primary" @click="viewDetail(row.contractId)">
               <el-icon><ArrowRight /></el-icon>
@@ -427,9 +427,9 @@
     </el-card>
 
     <!-- Filter Drawer -->
-    <el-drawer v-model="showFilterDrawer" title="Advanced Filters" size="400px">
+    <el-drawer v-model="showFilterDrawer" :title="$t('contract.advancedFilters')" size="400px">
       <el-form label-position="top">
-        <el-form-item label="Date Range">
+        <el-form-item :label="$t('contract.dateRange')">
           <el-date-picker
             v-model="filterForm.dateRange"
             type="daterange"
@@ -439,7 +439,7 @@
             style="width: 100%"
           />
         </el-form-item>
-        <el-form-item label="Contract Type">
+        <el-form-item :label="$t('contract.type')">
           <el-select v-model="filterForm.type" placeholder="Select type" style="width: 100%">
             <el-option label="NDA" value="nda" />
             <el-option label="Service Agreement" value="service" />
@@ -448,12 +448,12 @@
         </el-form-item>
         <el-form-item label="Amount Range">
           <div class="amount-range">
-            <el-input v-model="filterForm.minAmount" placeholder="Min" />
+            <el-input v-model="filterForm.minAmount" :placeholder="$t('contract.min')" />
             <span class="separator">-</span>
-            <el-input v-model="filterForm.maxAmount" placeholder="Max" />
+            <el-input v-model="filterForm.maxAmount" :placeholder="$t('contract.max')" />
           </div>
         </el-form-item>
-        <el-form-item label="Status">
+        <el-form-item :label="$t('contract.status')">
           <el-checkbox-group v-model="filterForm.status">
             <el-checkbox value="Draft">Draft</el-checkbox>
             <el-checkbox value="Pending">Pending</el-checkbox>
@@ -464,8 +464,8 @@
       </el-form>
       <template #footer>
         <div style="flex: auto">
-          <el-button @click="showFilterDrawer = false">Cancel</el-button>
-          <el-button type="primary" @click="applyFilters">Apply Filters</el-button>
+          <el-button @click="showFilterDrawer = false">{{ $t('common.cancel') }}</el-button>
+          <el-button type="primary" @click="applyFilters">{{ $t('contract.applyFilters') }}</el-button>
         </div>
       </template>
     </el-drawer>

@@ -2,12 +2,12 @@
   <div class="role-matrix-page">
     <div class="page-header">
       <div>
-        <h1 class="page-title">Permission Matrix</h1>
+        <h1 class="page-title">{{ $t('menu.permissionMatrix') }}</h1>
         <p class="page-subtitle">Configure granular access controls and data scopes for each role.</p>
       </div>
       <div class="header-actions">
         <el-button icon="Refresh">Reset</el-button>
-        <el-button type="primary" :loading="saving" icon="Check" @click="savePermissions">Save Changes</el-button>
+        <el-button type="primary" :loading="saving" icon="Check" @click="savePermissions">{{ $t('common.save') }}</el-button>
       </div>
     </div>
 
@@ -20,16 +20,16 @@
         :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
         class="matrix-table"
       >
-        <el-table-column prop="name" label="Module & Action" width="300" fixed>
+        <el-table-column prop="name" :label="$t('common.moduleAction')" width="300" fixed>
            <template #default="{ row }">
              <div class="module-cell">
                <el-icon v-if="row.icon" class="mr-2"><component :is="row.icon" /></el-icon>
-               <span :class="{ 'font-bold': row.children, 'text-secondary': !row.children }">{{ row.name }}</span>
+               <span :class="{ 'font-bold': row.children, 'text-secondary': !row.children }">{{ $t(row.name) }}</span>
              </div>
            </template>
         </el-table-column>
 
-        <el-table-column v-for="role in roles" :key="role.id" :label="role.name" width="180" align="center">
+        <el-table-column v-for="role in roles" :key="role.id" :label="$t('common.roles.' + role.id)" width="180" align="center">
           <template #default="{ row }">
             <div v-if="!row.children" class="permission-cell">
               <!-- Access Checkbox -->
@@ -99,43 +99,43 @@ const roles = [
 const modules = [
   {
     id: 'contract',
-    name: 'Contract Management',
+    name: 'contract.parties',
     icon: 'Document',
     children: [
-      { id: 'contract_view', name: 'View Contracts' },
-      { id: 'contract_create', name: 'Create Contracts' },
-      { id: 'contract_edit', name: 'Edit Contracts' },
-      { id: 'contract_delete', name: 'Delete Contracts' },
-      { id: 'contract_export', name: 'Export Data' }
+      { id: 'contract_view', name: 'common.view' },
+      { id: 'contract_create', name: 'common.create' },
+      { id: 'contract_edit', name: 'common.edit' },
+      { id: 'contract_delete', name: 'common.delete' },
+      { id: 'contract_export', name: 'common.export' }
     ]
   },
   {
     id: 'integrations',
-    name: 'Integrations Hub',
+    name: 'common.integrations',
     icon: 'Connection',
     children: [
-      { id: 'integration_view', name: 'View Connectors' },
-      { id: 'integration_config', name: 'Configure Connectors' },
-      { id: 'webhook_mgmt', name: 'Manage Webhooks' }
+      { id: 'integration_view', name: 'menu.hubOverview' },
+      { id: 'integration_config', name: 'menu.connectors' },
+      { id: 'webhook_mgmt', name: 'menu.webhooks' }
     ]
   },
   {
     id: 'compliance',
-    name: 'Risk & Compliance',
+    name: 'common.compliance',
     icon: 'Warning',
     children: [
-      { id: 'risk_view', name: 'View Risks' },
-      { id: 'risk_approve', name: 'Approve High Risk' },
-      { id: 'audit_view', name: 'View Audit Logs' }
+      { id: 'risk_view', name: 'menu.problemCenter' },
+      { id: 'risk_approve', name: 'common.confirm' },
+      { id: 'audit_view', name: 'menu.auditLogs' }
     ]
   },
   {
     id: 'rules',
-    name: 'Rule Engine',
+    name: 'menu.ruleEngine',
     icon: 'Operation',
     children: [
-      { id: 'rule_view', name: 'View Rules' },
-      { id: 'rule_edit', name: 'Edit Rules' }
+      { id: 'rule_view', name: 'common.view' },
+      { id: 'rule_edit', name: 'common.edit' }
     ]
   }
 ]

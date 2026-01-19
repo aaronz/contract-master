@@ -2,12 +2,12 @@
   <div class="problem-table-container">
     <div class="table-header">
       <el-form :inline="true" :model="filters" size="small">
-        <el-form-item label="Status">
+        <el-form-item :label="$t('contract.status')">
           <el-select v-model="filters.status" placeholder="All" clearable @change="loadProblems" style="width: 120px">
-            <el-option label="New" value="NEW" />
-            <el-option label="Acknowledged" value="ACKNOWLEDGED" />
-            <el-option label="Resolved" value="RESOLVED" />
-            <el-option label="Ignored" value="IGNORED" />
+            <el-option :label="$t('compliance.status.new')" value="NEW" />
+            <el-option :label="$t('compliance.status.acknowledged')" value="ACKNOWLEDGED" />
+            <el-option :label="$t('compliance.status.resolved')" value="RESOLVED" />
+            <el-option :label="$t('compliance.status.ignored')" value="IGNORED" />
           </el-select>
         </el-form-item>
         <el-button icon="Refresh" circle @click="loadProblems" />
@@ -29,21 +29,21 @@
           <el-tag :type="getSeverityType(row.severity)" size="small" effect="dark">{{ row.severity?.substring(0,1) }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="ruleId" label="Rule ID" width="100" />
-      <el-table-column prop="generatedMessage" label="Issue Description" min-width="400" show-overflow-tooltip />
-      <el-table-column prop="status" label="Status" width="130">
+      <el-table-column prop="ruleId" :label="$t('compliance.ruleId')" width="100" />
+      <el-table-column prop="generatedMessage" :label="$t('compliance.issueDescription')" min-width="400" show-overflow-tooltip />
+      <el-table-column prop="status" :label="$t('common.status')" width="130">
         <template #default="{ row }">
-          <el-tag :type="getStatusType(row.status)" size="small">{{ row.status }}</el-tag>
+          <el-tag :type="getStatusType(row.status)" size="small">{{ $t('compliance.status.' + row.status.toLowerCase()) }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="createTime" label="Detected At" width="180">
+      <el-table-column prop="createTime" :label="$t('compliance.detectedAt')" width="180">
         <template #default="{ row }">
           {{ row.createTime ? new Date(row.createTime).toLocaleString() : '-' }}
         </template>
       </el-table-column>
-      <el-table-column label="Actions" width="120" fixed="right">
+      <el-table-column :label="$t('common.actions')" width="120" fixed="right">
         <template #default="{ row }">
-          <el-button link type="primary" size="small" icon="Edit" @click.stop="handleEdit(row)">Update Status</el-button>
+          <el-button link type="primary" size="small" icon="Edit" @click.stop="handleEdit(row)">{{ $t('common.edit') }}</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -59,26 +59,26 @@
       />
     </div>
 
-    <el-dialog v-model="editDialogVisible" title="Update Problem" width="400px" append-to-body>
+    <el-dialog v-model="editDialogVisible" :title="$t('compliance.updateStatus')" width="400px" append-to-body>
       <el-form :model="editForm" label-width="80px" size="small">
-        <el-form-item label="Status">
+        <el-form-item :label="$t('common.status')">
           <el-select v-model="editForm.status" class="w-full">
-            <el-option label="New" value="NEW" />
-            <el-option label="Acknowledged" value="ACKNOWLEDGED" />
-            <el-option label="Resolved" value="RESOLVED" />
-            <el-option label="Ignored" value="IGNORED" />
+            <el-option :label="$t('compliance.status.new')" value="NEW" />
+            <el-option :label="$t('compliance.status.acknowledged')" value="ACKNOWLEDGED" />
+            <el-option :label="$t('compliance.status.resolved')" value="RESOLVED" />
+            <el-option :label="$t('compliance.status.ignored')" value="IGNORED" />
           </el-select>
         </el-form-item>
-        <el-form-item label="Assignee">
+        <el-form-item :label="$t('compliance.assignee')">
           <el-input v-model="editForm.assigneeId" />
         </el-form-item>
-        <el-form-item label="Notes">
+        <el-form-item :label="$t('compliance.notes')">
           <el-input v-model="editForm.notes" type="textarea" :rows="3" />
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button size="small" @click="editDialogVisible = false">Cancel</el-button>
-        <el-button size="small" type="primary" :loading="saving" @click="saveProblem">Save</el-button>
+        <el-button size="small" @click="editDialogVisible = false">{{ $t('common.cancel') }}</el-button>
+        <el-button size="small" type="primary" :loading="saving" @click="saveProblem">{{ $t('common.save') }}</el-button>
       </template>
     </el-dialog>
   </div>

@@ -2,21 +2,21 @@
   <div class="permissions-page">
     <div class="page-header">
       <div>
-        <h1 class="page-title">Data Permissions</h1>
+        <h1 class="page-title">{{ $t('menu.permissionMatrix') }}</h1>
         <p class="page-subtitle">Manage data access scopes for different roles and departments.</p>
       </div>
-      <el-button type="primary" icon="Plus" @click="addPermission">Add Permission Rule</el-button>
+      <el-button type="primary" icon="Plus" @click="addPermission">{{ $t('common.create') }}</el-button>
     </div>
 
     <el-card shadow="never" class="permissions-card">
       <el-table :data="permissions" style="width: 100%">
-        <el-table-column prop="ruleName" label="Rule Name" width="200">
+        <el-table-column prop="ruleName" :label="$t('common.name')" width="200">
            <template #default="{ row }">
              <span class="font-medium">{{ row.ruleName }}</span>
            </template>
         </el-table-column>
         
-        <el-table-column prop="dataType" label="Data Type" width="150">
+        <el-table-column prop="dataType" :label="$t('contract.type')" width="150">
            <template #default="{ row }">
              <el-tag effect="plain">{{ row.dataType }}</el-tag>
            </template>
@@ -28,16 +28,16 @@
            </template>
         </el-table-column>
         
-        <el-table-column label="Status" width="100">
+        <el-table-column :label="$t('common.status')" width="100">
           <template #default="scope">
             <el-switch v-model="scope.row.isEnabled" active-color="#10B981" />
           </template>
         </el-table-column>
         
-        <el-table-column label="Actions" width="150">
+        <el-table-column :label="$t('common.actions')" width="150">
           <template #default="scope">
-            <el-button link type="primary">Edit</el-button>
-            <el-button link type="danger">Delete</el-button>
+            <el-button link type="primary">{{ $t('common.edit') }}</el-button>
+            <el-button link type="danger">{{ $t('common.delete') }}</el-button>
           </template>
         </el-table-column>
       </el-table>

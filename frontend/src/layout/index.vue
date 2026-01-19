@@ -20,67 +20,67 @@
           :collapse-transition="false"
         >
           <!-- Core -->
-          <div class="menu-group-title">Core Operations</div>
+          <div class="menu-group-title">{{ $t('menu.coreOperations') }}</div>
           <el-menu-item index="/dashboard">
             <el-icon><DataLine /></el-icon>
-            <span>Dashboard</span>
+            <span>{{ $t('common.dashboard') }}</span>
           </el-menu-item>
           <el-menu-item index="/contracts">
             <el-icon><Document /></el-icon>
-            <span>Contract Management</span>
+            <span>{{ $t('common.contracts') }}</span>
           </el-menu-item>
 
           <!-- Integrations -->
-          <div class="menu-group-title">Integrations Hub</div>
+          <div class="menu-group-title">{{ $t('menu.integrationsHub') }}</div>
           <el-sub-menu index="integrations">
             <template #title>
               <el-icon><Connection /></el-icon>
-              <span>Connectors</span>
+              <span>{{ $t('menu.connectors') }}</span>
             </template>
-            <el-menu-item index="/integrations">Hub Overview</el-menu-item>
-            <el-menu-item index="/integrations/mapping">Field Mapping</el-menu-item>
-            <el-menu-item index="/integrations/webhooks">Webhooks</el-menu-item>
-            <el-menu-item index="/integrations/secrets">Secrets & Keys</el-menu-item>
+            <el-menu-item index="/integrations">{{ $t('menu.hubOverview') }}</el-menu-item>
+            <el-menu-item index="/integrations/mapping">{{ $t('menu.fieldMapping') }}</el-menu-item>
+            <el-menu-item index="/integrations/webhooks">{{ $t('menu.webhooks') }}</el-menu-item>
+            <el-menu-item index="/integrations/secrets">{{ $t('menu.secretsKeys') }}</el-menu-item>
           </el-sub-menu>
 
           <!-- Risk & Compliance -->
-          <div class="menu-group-title">Risk & Compliance</div>
+          <div class="menu-group-title">{{ $t('menu.riskCompliance') }}</div>
           <el-menu-item index="/compliance/problems">
             <el-icon><Warning /></el-icon>
-            <span>Problem Center</span>
+            <span>{{ $t('menu.problemCenter') }}</span>
           </el-menu-item>
           <el-menu-item index="/compliance/masking">
             <el-icon><Hide /></el-icon>
-            <span>Data Masking</span>
+            <span>{{ $t('menu.dataMasking') }}</span>
           </el-menu-item>
           <el-menu-item index="/compliance/audit">
             <el-icon><DocumentChecked /></el-icon>
-            <span>Audit Logs</span>
+            <span>{{ $t('menu.auditLogs') }}</span>
           </el-menu-item>
 
           <!-- Configuration -->
-          <div class="menu-group-title">Configuration</div>
+          <div class="menu-group-title">{{ $t('menu.configuration') }}</div>
           <el-sub-menu index="rules">
             <template #title>
               <el-icon><Operation /></el-icon>
-              <span>Rule Engine</span>
+              <span>{{ $t('menu.ruleEngine') }}</span>
             </template>
-            <el-menu-item index="/rules/list">Evaluation Rules</el-menu-item>
+            <el-menu-item index="/rules/list">{{ $t('menu.evaluationRules') }}</el-menu-item>
           </el-sub-menu>
           <el-sub-menu index="settings">
             <template #title>
               <el-icon><Setting /></el-icon>
-              <span>System Settings</span>
+              <span>{{ $t('menu.systemSettings') }}</span>
             </template>
-            <el-menu-item index="/settings/permissions">Permission Matrix</el-menu-item>
-            <el-menu-item index="/settings/fields">Field Config</el-menu-item>
+            <el-menu-item index="/settings/permissions">{{ $t('menu.permissionMatrix') }}</el-menu-item>
+            <el-menu-item index="/settings/fields">{{ $t('menu.fieldConfig') }}</el-menu-item>
           </el-sub-menu>
           
           <!-- Developer Tools -->
-          <div class="menu-group-title">Developer</div>
+          <div class="menu-group-title">{{ $t('menu.developer') }}</div>
           <el-menu-item index="/developer/card-generator">
             <el-icon><Tools /></el-icon>
-            <span>Card Generator</span>
+            <span>{{ $t('menu.cardGenerator') }}</span>
           </el-menu-item>
 
         </el-menu>
@@ -110,6 +110,18 @@
           </div>
           
           <div class="header-actions">
+            <el-dropdown @command="handleLangChange" trigger="click">
+              <el-button circle text class="icon-btn">
+                <el-icon><Operation /></el-icon>
+              </el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command="en" :disabled="currentLang === 'en'">English</el-dropdown-item>
+                  <el-dropdown-item command="zh" :disabled="currentLang === 'zh'">中文</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+
             <el-divider direction="vertical" />
             
             <el-button circle text class="icon-btn" @click="$router.push('/guide')">
@@ -124,14 +136,14 @@
               </el-badge>
               <template #dropdown>
                 <div class="notification-dropdown glass-card">
-                  <div class="dropdown-header">
-                    <span>Notifications ({{ unreadCount }})</span>
-                    <el-button link type="primary" size="small" @click="handleMarkAllRead" v-if="unreadCount > 0">Mark all read</el-button>
-                  </div>
-                  <div class="notify-list" v-loading="notifLoading">
-                    <div v-if="notifications.length === 0" class="empty-notif">
-                      No notifications
+                    <div class="dropdown-header">
+                      <span>{{ $t('common.notifications') }} ({{ unreadCount }})</span>
+                      <el-button link type="primary" size="small" @click="handleMarkAllRead" v-if="unreadCount > 0">{{ $t('common.markAllRead') }}</el-button>
                     </div>
+                    <div class="notify-list" v-loading="notifLoading">
+                      <div v-if="notifications.length === 0" class="empty-notif">
+                        {{ $t('common.noNotifications') }}
+                      </div>
                     <div v-for="item in notifications" :key="item.id" class="notify-item" :class="{ unread: !item.isRead }" @click="handleReadNotif(item)">
                        <div class="notify-icon" :class="item.type">
                          <el-icon v-if="item.type === 'COMPLIANCE_ALERT'"><Warning /></el-icon>
@@ -171,7 +183,17 @@ import {
   QuestionFilled
 } from '@element-plus/icons-vue'
 import { ref, onMounted, computed, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import request from '@/utils/request'
+
+const { locale } = useI18n()
+const currentLang = computed(() => locale.value)
+
+const handleLangChange = (lang) => {
+  locale.value = lang
+  localStorage.setItem('lang', lang)
+  location.reload() // Reload to apply Element Plus locale if needed, or just let i18n handle it
+}
 
 const tenantId = ref('default-tenant')
 const notifications = ref([])

@@ -2,7 +2,7 @@
   <div class="guide-page">
     <div class="guide-header glass-blur">
       <div class="header-content">
-        <h1>User Guide</h1>
+        <h1>{{ $t('common.userGuide') }}</h1>
         <p>Master the Contract Compliance & Management System</p>
       </div>
     </div>

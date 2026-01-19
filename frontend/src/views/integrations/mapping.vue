@@ -3,33 +3,33 @@
     <div class="glass-card p-6">
       <div class="flex justify-between items-center mb-6">
         <div>
-          <h1 class="text-2xl font-bold">Field Mapping</h1>
+          <h1 class="text-2xl font-bold">{{ $t('menu.fieldMapping') }}</h1>
           <p class="text-gray-400">Map internal contract elements to downstream system fields</p>
         </div>
-        <el-button type="primary" icon="Plus" @click="handleAdd">Add Mapping</el-button>
+        <el-button type="primary" icon="Plus" @click="handleAdd">{{ $t('common.create') }}</el-button>
       </div>
 
       <el-table :data="mappings" border style="width: 100%">
-        <el-table-column prop="internalField" label="Internal Field" />
-        <el-table-column prop="externalField" label="Downstream Field" />
-        <el-table-column prop="transformation" label="Transformation" />
-        <el-table-column label="Status" width="120">
+        <el-table-column prop="internalField" :label="$t('common.internalField')" />
+        <el-table-column prop="externalField" :label="$t('common.downstreamField')" />
+        <el-table-column prop="transformation" :label="$t('common.transformation')" />
+        <el-table-column :label="$t('common.status')" width="120">
           <template #default="{ row }">
             <el-tag :type="row.enabled ? 'success' : 'info'">{{ row.enabled ? 'Active' : 'Disabled' }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="Actions" width="150">
+        <el-table-column :label="$t('common.actions')" width="150">
           <template #default="{ row }">
-            <el-button link type="primary" @click="handleEdit(row)">Edit</el-button>
-            <el-button link type="danger" @click="handleDelete(row)">Delete</el-button>
+            <el-button link type="primary" @click="handleEdit(row)">{{ $t('common.edit') }}</el-button>
+            <el-button link type="danger" @click="handleDelete(row)">{{ $t('common.delete') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
     </div>
 
-    <el-dialog v-model="dialogVisible" title="Field Mapping Configuration" width="500px">
+    <el-dialog v-model="dialogVisible" :title="$t('menu.fieldMapping')" width="500px">
       <el-form :model="form" label-position="top">
-        <el-form-item label="Internal Field (Contract Element)">
+        <el-form-item :label="$t('common.internalField')">
           <el-select v-model="form.internalField" style="width: 100%" placeholder="Select contract field">
             <el-option 
               v-for="field in contractFields" 
@@ -44,23 +44,23 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="Downstream Field Name">
+        <el-form-item :label="$t('common.downstreamField')">
           <el-input v-model="form.externalField" placeholder="e.g. amount_total" />
         </el-form-item>
-        <el-form-item label="Transformation Logic">
+        <el-form-item :label="$t('common.transformation')">
           <el-select v-model="form.transformation" style="width: 100%">
             <el-option label="Direct Copy" value="NONE" />
             <el-option label="To Uppercase" value="UPPERCASE" />
             <el-option label="Format Date (YYYY-MM-DD)" value="DATE_ISO" />
           </el-select>
         </el-form-item>
-        <el-form-item label="Enabled">
+        <el-form-item :label="$t('common.enabled')">
           <el-switch v-model="form.enabled" />
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="dialogVisible = false">Cancel</el-button>
-        <el-button type="primary" @click="handleSave">Save</el-button>
+        <el-button @click="dialogVisible = false">{{ $t('common.cancel') }}</el-button>
+        <el-button type="primary" @click="handleSave">{{ $t('common.save') }}</el-button>
       </template>
     </el-dialog>
   </div>

@@ -2,14 +2,14 @@
   <div class="problem-cockpit">
     <div class="cockpit-header glass-panel">
       <div class="header-left">
-        <h1 class="cockpit-title">Compliance Cockpit</h1>
-        <p class="cockpit-subtitle">Investigate risks in contract: {{ selectedContractNo || 'Select a contract' }}</p>
+        <h1 class="cockpit-title">{{ $t('compliance.problems') }}</h1>
+        <p class="cockpit-subtitle">{{ $t('common.search') }}: {{ selectedContractNo || '...' }}</p>
       </div>
       <div class="header-right">
-        <el-select v-model="selectedContractId" placeholder="Select Contract" clearable filterable @change="handleContractChange" style="width: 280px">
+        <el-select v-model="selectedContractId" :placeholder="$t('common.search')" clearable filterable @change="handleContractChange" style="width: 280px">
           <el-option v-for="contract in contracts" :key="contract.value" :label="contract.label" :value="contract.value" />
         </el-select>
-        <el-button type="primary" :disabled="!selectedContractId" :loading="evaluating" @click="triggerEvaluation" icon="VideoPlay">Run Rules</el-button>
+        <el-button type="primary" :disabled="!selectedContractId" :loading="evaluating" @click="triggerEvaluation" icon="VideoPlay">{{ $t('contract.reEvaluate') }}</el-button>
       </div>
     </div>
 

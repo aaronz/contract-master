@@ -2,27 +2,27 @@
   <div class="field-config-page">
     <div class="page-header">
       <div>
-        <h1 class="page-title">Field Configuration</h1>
+        <h1 class="page-title">{{ $t('menu.fieldConfig') }}</h1>
         <p class="page-subtitle">Customize how fields are displayed and returned by the API.</p>
       </div>
       <div class="header-actions">
-        <el-button @click="handleAddField" icon="Plus">Add Field</el-button>
+        <el-button @click="handleAddField" icon="Plus">{{ $t('common.create') }}</el-button>
         <el-button type="primary" @click="saveConfig">
-          <el-icon><Check /></el-icon> Save Changes
+          <el-icon><Check /></el-icon> {{ $t('common.save') }}
         </el-button>
       </div>
     </div>
 
     <!-- Add Field Dialog -->
-    <el-dialog v-model="showAddDialog" title="Add Extended Field" width="450px">
+    <el-dialog v-model="showAddDialog" :title="$t('menu.fieldConfig')" width="450px">
       <el-form :model="newField" label-position="top">
-        <el-form-item label="Field Code (Technical ID)" required>
+        <el-form-item :label="$t('common.field') + ' Code (Technical ID)'" required>
           <el-input v-model="newField.fieldCode" placeholder="e.g. project_manager" />
         </el-form-item>
-        <el-form-item label="Field Name (Display)" required>
+        <el-form-item :label="$t('common.field') + ' Name (Display)'" required>
           <el-input v-model="newField.fieldName" placeholder="e.g. Project Manager" />
         </el-form-item>
-        <el-form-item label="Field Type" required>
+        <el-form-item :label="$t('common.field') + ' Type'" required>
           <el-select v-model="newField.fieldType" style="width: 100%">
             <el-option label="Text" value="TEXT" />
             <el-option label="Number" value="NUMBER" />
@@ -31,8 +31,8 @@
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="showAddDialog = false">Cancel</el-button>
-        <el-button type="primary" @click="confirmAddField" :loading="adding">Add</el-button>
+        <el-button @click="showAddDialog = false">{{ $t('common.cancel') }}</el-button>
+        <el-button type="primary" @click="confirmAddField" :loading="adding">{{ $t('common.confirm') }}</el-button>
       </template>
     </el-dialog>
 
@@ -52,13 +52,13 @@
           </template>
         </el-table-column>
         
-        <el-table-column prop="fieldCode" label="Field Code" width="180">
+        <el-table-column prop="fieldCode" :label="$t('common.field') + ' Code'" width="180">
           <template #default="{ row }">
              <el-tag type="info">{{ row.fieldCode }}</el-tag>
           </template>
         </el-table-column>
         
-        <el-table-column label="Display Name" width="250">
+        <el-table-column :label="$t('common.name')" width="250">
           <template #default="{ row }">
             <el-input v-model="row.fieldAlias" placeholder="Enter custom name" />
           </template>
@@ -79,7 +79,7 @@
            </template>
         </el-table-column>
         
-        <el-table-column label="Visibility" width="200">
+        <el-table-column :label="$t('common.view')" width="200">
           <template #default="{ row }">
              <div class="visibility-toggles">
                <el-tooltip content="Show in Frontend">

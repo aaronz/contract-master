@@ -3,12 +3,12 @@
     <!-- Header Section -->
     <div class="dashboard-header">
       <div>
-        <h1 class="page-title">Dashboard Overview</h1>
-        <p class="page-subtitle">Welcome back, Admin. Here's what's happening today.</p>
+        <h1 class="page-title">{{ $t('dashboard.title') }}</h1>
+        <p class="page-subtitle">{{ $t('dashboard.subtitle') }}</p>
       </div>
       <div class="header-actions">
-        <el-button>Last 30 Days <el-icon class="el-icon--right"><ArrowDown /></el-icon></el-button>
-        <el-button type="primary" :icon="Download" @click="handleExport">Export Report</el-button>
+        <el-button>{{ $t('dashboard.last30Days') }} <el-icon class="el-icon--right"><ArrowDown /></el-icon></el-button>
+        <el-button type="primary" :icon="Download" @click="handleExport">{{ $t('dashboard.exportReport') }}</el-button>
       </div>
     </div>
 
@@ -19,7 +19,7 @@
           <el-icon><Document /></el-icon>
         </div>
         <div class="stat-content">
-          <span class="stat-label">Total Contracts</span>
+          <span class="stat-label">{{ $t('dashboard.totalContracts') }}</span>
           <div class="stat-value">{{ stats.totalContracts }}</div>
           <div class="stat-trend positive">
             <el-icon><Top /></el-icon> 12% from last month
@@ -32,7 +32,7 @@
           <el-icon><Timer /></el-icon>
         </div>
         <div class="stat-content">
-          <span class="stat-label">Pending Approval</span>
+          <span class="stat-label">{{ $t('dashboard.pendingApprovals') }}</span>
           <div class="stat-value">{{ stats.pendingApprovals }}</div>
           <div class="stat-trend negative">
             <el-icon><Top /></el-icon> 4 new today
@@ -45,7 +45,7 @@
           <el-icon><Money /></el-icon>
         </div>
         <div class="stat-content">
-          <span class="stat-label">Active Value</span>
+          <span class="stat-label">{{ $t('dashboard.activeValue') }}</span>
           <div class="stat-value">${{ stats.activeValue }}</div>
           <div class="stat-trend positive">
             <el-icon><Top /></el-icon> 8.5% YoY
@@ -58,7 +58,7 @@
           <el-icon><Warning /></el-icon>
         </div>
         <div class="stat-content">
-          <span class="stat-label">Risk Alerts</span>
+          <span class="stat-label">{{ $t('dashboard.riskAlerts') }}</span>
           <div class="stat-value">{{ stats.riskAlerts }}</div>
           <div class="stat-trend negative">
             <el-icon><Top /></el-icon> 2 critical
@@ -71,7 +71,7 @@
     <div class="charts-grid">
       <div class="chart-card glass-card main-chart">
         <div class="card-header">
-          <span>Contract Volume Trend</span>
+          <span>{{ $t('dashboard.volumeTrend') }}</span>
           <el-radio-group v-model="chartPeriod" size="small">
             <el-radio-button value="Week">Week</el-radio-button>
             <el-radio-button value="Month">Month</el-radio-button>
@@ -83,7 +83,7 @@
 
       <div class="chart-card glass-card">
         <div class="card-header">
-          <span>Risk Analysis Radar</span>
+          <span>{{ $t('dashboard.riskRadar') }}</span>
           <el-button link type="primary">View Details</el-button>
         </div>
         <div ref="radarChartRef" class="chart-container"></div>
@@ -91,8 +91,8 @@
 
       <div class="chart-card glass-card">
         <div class="card-header">
-          <span>Problem Processing</span>
-          <el-tag type="success" size="small">On Track</el-tag>
+          <span>{{ $t('dashboard.problemProcessing') }}</span>
+          <el-tag type="success" size="small">{{ $t('dashboard.onTrack') }}</el-tag>
         </div>
         <div ref="gaugeChartRef" class="chart-container"></div>
       </div>
@@ -102,7 +102,7 @@
     <div class="bottom-grid">
       <div class="list-card glass-card">
         <div class="card-header">
-          <span>Recent Activity</span>
+          <span>{{ $t('dashboard.recentActivity') }}</span>
         </div>
         <div class="activity-feed">
           <div v-for="(activity, index) in recentActivities" :key="index" class="activity-item">
@@ -124,7 +124,7 @@
 
       <div class="list-card glass-card">
         <div class="card-header">
-          <span>My Tasks</span>
+          <span>{{ $t('dashboard.myTasks') }}</span>
           <el-button type="primary" link>View All</el-button>
         </div>
         <div class="task-list">

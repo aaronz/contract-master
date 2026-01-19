@@ -2,26 +2,26 @@
   <div class="audit-page">
     <div class="page-header">
       <div>
-        <h1 class="page-title">Audit Logs</h1>
+        <h1 class="page-title">{{ $t('compliance.audit') }}</h1>
         <p class="page-subtitle">Complete history of system changes and user activities.</p>
       </div>
       <div class="header-actions">
         <el-date-picker 
           v-model="dateRange" 
           type="daterange" 
-          range-separator="To" 
+          :range-separator="$t('common.to')" 
           start-placeholder="Start date" 
           end-placeholder="End date" 
           size="default"
         />
-        <el-button icon="Download">Export CSV</el-button>
+        <el-button icon="Download">{{ $t('common.export') }} CSV</el-button>
       </div>
     </div>
 
     <div class="glass-card table-wrapper">
       <el-table v-loading="loading" :data="auditLogs" style="width: 100%" @row-click="showDiff">
-        <el-table-column prop="createTime" label="Time" width="180" />
-        <el-table-column prop="modifyUser" label="User" width="180">
+        <el-table-column prop="createTime" :label="$t('common.time')" width="180" />
+        <el-table-column prop="modifyUser" :label="$t('common.user')" width="180">
            <template #default="{ row }">
              <div class="flex items-center gap-2">
                <el-avatar size="small">{{ row.modifyUser.charAt(0) }}</el-avatar>
@@ -29,14 +29,14 @@
              </div>
            </template>
         </el-table-column>
-        <el-table-column prop="modifyType" label="Action" width="150">
+        <el-table-column prop="modifyType" :label="$t('common.action')" width="150">
            <template #default="{ row }">
              <el-tag :type="getActionType(row.modifyType)">{{ row.modifyType }}</el-tag>
            </template>
         </el-table-column>
-        <el-table-column prop="contractId" label="Resource" />
-        <el-table-column prop="fieldName" label="Field" width="150" />
-        <el-table-column prop="summary" label="Summary">
+        <el-table-column prop="contractId" :label="$t('common.resource')" />
+        <el-table-column prop="fieldName" :label="$t('common.field')" width="150" />
+        <el-table-column prop="summary" :label="$t('common.summary')">
           <template #default="{ row }">
             {{ row.fieldName }}: {{ row.modifyType }}
           </template>
@@ -58,20 +58,20 @@
     </div>
 
     <!-- Diff Drawer -->
-    <el-drawer v-model="drawerVisible" title="Change Detail" size="800px">
+    <el-drawer v-model="drawerVisible" :title="$t('compliance.changeDetail')" size="800px">
       <div v-if="selectedLog" class="diff-container">
         <div class="diff-header">
           <div class="diff-meta">
             <div class="meta-item">
-              <label>User</label>
+              <label>{{ $t('common.user') }}</label>
               <span>{{ selectedLog.modifyUser }}</span>
             </div>
             <div class="meta-item">
-              <label>Time</label>
+              <label>{{ $t('common.time') }}</label>
               <span>{{ selectedLog.createTime }}</span>
             </div>
             <div class="meta-item">
-              <label>Action</label>
+              <label>{{ $t('common.action') }}</label>
               <span>{{ selectedLog.modifyType }}</span>
             </div>
           </div>
@@ -79,11 +79,11 @@
 
         <div class="diff-viewer">
           <div class="diff-pane old">
-            <div class="pane-label bg-red-50 text-red-600">Old Value ({{ selectedLog.fieldName }})</div>
+            <div class="pane-label bg-red-50 text-red-600">{{ $t('compliance.oldValue') }} ({{ selectedLog.fieldName }})</div>
             <pre>{{ formatValue(selectedLog.oldValue) }}</pre>
           </div>
           <div class="diff-pane new">
-            <div class="pane-label bg-green-50 text-green-600">New Value ({{ selectedLog.fieldName }})</div>
+            <div class="pane-label bg-green-50 text-green-600">{{ $t('compliance.newValue') }} ({{ selectedLog.fieldName }})</div>
             <pre>{{ formatValue(selectedLog.newValue) }}</pre>
           </div>
         </div>

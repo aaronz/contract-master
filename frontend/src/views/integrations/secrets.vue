@@ -3,10 +3,10 @@
     <div class="glass-card p-6">
       <div class="flex justify-between items-center mb-6">
         <div>
-          <h1 class="text-2xl font-bold">Secrets & Keys</h1>
+          <h1 class="text-2xl font-bold">{{ $t('menu.secretsKeys') }}</h1>
           <p class="text-gray-400">Manage API keys and HMAC secrets for secure system integration</p>
         </div>
-        <el-button type="primary" icon="Key" @click="handleGenerate">Generate New Key</el-button>
+        <el-button type="primary" icon="Key" @click="handleGenerate">{{ $t('common.create') }}</el-button>
       </div>
 
       <el-alert
@@ -18,9 +18,9 @@
       />
 
       <el-table :data="keys" border style="width: 100%">
-        <el-table-column prop="label" label="Label" width="180" />
-        <el-table-column prop="accessKey" label="Access Key ID" />
-        <el-table-column label="Secret Key" width="300">
+        <el-table-column prop="label" :label="$t('common.label')" width="180" />
+        <el-table-column prop="accessKey" :label="$t('common.accessKeyId')" />
+        <el-table-column :label="$t('common.secretKey')" width="300">
           <template #default="{ row }">
             <div class="flex items-center">
               <span class="font-mono">{{ row.hidden ? '••••••••••••••••' : row.secretKey }}</span>
@@ -30,24 +30,24 @@
                 class="ml-2" 
                 @click="row.hidden = !row.hidden"
               >
-                {{ row.hidden ? 'Show' : 'Hide' }}
+                {{ row.hidden ? $t('common.view') : $t('common.hide') || 'Hide' }}
               </el-button>
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="lastUsed" label="Last Used" width="180" />
-        <el-table-column label="Actions" width="120">
+        <el-table-column prop="lastUsed" :label="$t('common.lastUsed')" width="180" />
+        <el-table-column :label="$t('common.actions')" width="120">
           <template #default="{ row }">
-            <el-button link type="danger" @click="handleRevoke(row)">Revoke</el-button>
+            <el-button link type="danger" @click="handleRevoke(row)">{{ $t('common.delete') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
     </div>
 
-    <el-dialog v-model="dialogVisible" title="New Security Key" width="500px">
+    <el-dialog v-model="dialogVisible" :title="$t('menu.secretsKeys')" width="500px">
       <div v-if="!newKeyGenerated">
         <el-form label-position="top">
-          <el-form-item label="Key Label (for identification)">
+          <el-form-item :label="$t('common.label')">
             <el-input v-model="keyLabel" placeholder="e.g. ERP-Production-Sync" />
           </el-form-item>
         </el-form>
