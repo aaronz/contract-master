@@ -32,6 +32,7 @@ public class NotificationService {
         });
     }
 
+    @Transactional
     public void sendNotification(String userId, String title, String content, String type) {
         Notification notification = new Notification();
         notification.setUserId(userId);
@@ -39,6 +40,12 @@ public class NotificationService {
         notification.setContent(content);
         notification.setType(type);
         notification.setIsRead(false);
+        
+        String currentTenant = com.contract.master.security.TenantContext.getCurrentTenant();
+        if (currentTenant != null) {
+            notification.setTenantId(com.contract.master.shared.domain.model.TenantId.of(currentTenant));
+        }
+        
         notificationRepository.save(notification);
         log.info("Notification saved for user {}: {}", userId, title);
     }

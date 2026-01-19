@@ -436,6 +436,7 @@ import { ElMessage } from 'element-plus'
 
 import { useFieldStore } from '@/stores/fieldStore'
 import problemApi from '@/services/problemApi' 
+import contractApi from '@/services/contractApi' 
 import RuleSelectorModal from '@/components/RuleSelectorModal.vue' 
 
 const fieldStore = useFieldStore()
@@ -466,22 +467,21 @@ const getFieldName = (code) => {
 
 const fetchContractDetail = async () => {
   const contractId = router.currentRoute.value.params.id
+  if (!contractId) return
+  
   try {
-    const response = await fetch(`/api/contracts/${contractId}`, {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        'X-Tenant-ID': localStorage.getItem('tenantId')
-      }
-    })
-    if (response.ok) {
-      const result = await response.json()
+    const response = await contractApi.getContractDetail(contractId)
+    const result = response.data
+    if (result && result.data) {
       Object.assign(form, result.data)
+      if (result.data.contractId) {
+        form.contractId = result.data.contractId
+      }
     } else {
-      ElMessage.error('Failed to fetch contract details')
+      ElMessage.error('Invalid response format from server')
     }
   } catch (error) {
-    console.error('Failed to fetch contract detail', error)
-    ElMessage.error('Network error loading contract')
+    console.error('Failed to fetch contract detail:', error)
   }
 }
 
@@ -557,25 +557,12 @@ const toggleSidePanel = () => {
 
 const saveContract = async () => {
   try {
-    const response = await fetch(`/api/contracts/${form.contractId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        'X-Tenant-ID': localStorage.getItem('tenantId')
-      },
-      body: JSON.stringify(form)
-    })
-    if (response.ok) {
-      isEditMode.value = false
-      ElMessage.success('Contract updated successfully')
-      fetchContractDetail()
-    } else {
-      ElMessage.error('Failed to save changes')
-    }
+    await contractApi.updateContract(form.contractId, form)
+    isEditMode.value = false
+    ElMessage.success('Contract updated successfully')
+    fetchContractDetail()
   } catch (error) {
     console.error('Update failed', error)
-    ElMessage.error('Network error saving changes')
   }
 }
 
