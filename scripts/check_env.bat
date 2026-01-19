@@ -8,7 +8,7 @@ echo ------------------------------------------
 set EXIT_CODE=0
 
 :: Check Java
-echo >>> Checking Java version...
+echo Checking Java version...
 java -version >nul 2>&1
 if %ERRORLEVEL% EQU 0 (
     for /f "tokens=3" %%g in ('java -version 2^>^&1 ^| findstr /i "version"') do (
@@ -28,7 +28,7 @@ if %ERRORLEVEL% EQU 0 (
 )
 
 :: Check Node
-echo >>> Checking Node.js version...
+echo Checking Node.js version...
 node -v >nul 2>&1
 if %ERRORLEVEL% EQU 0 (
     for /f "tokens=1 delims=v." %%v in ('node -v') do set NODE_MAJOR=%%v
@@ -44,7 +44,7 @@ if %ERRORLEVEL% EQU 0 (
 )
 
 :: Check Docker
-echo >>> Checking Docker...
+echo Checking Docker...
 docker --version >nul 2>&1
 if %ERRORLEVEL% EQU 0 (
     echo  [PASS] Docker installed.
