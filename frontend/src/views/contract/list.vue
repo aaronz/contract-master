@@ -551,7 +551,15 @@ const selectedAiFile = ref(null)
 
 const handleAddNewContract = () => {
   // Generate a temporary UUID for new contract to link attachments before creation
-  newContractForm.value.contractId = self.crypto.randomUUID()
+  // Fallback for non-secure contexts (HTTP via IP)
+  if (typeof self.crypto.randomUUID === 'function') {
+    newContractForm.value.contractId = self.crypto.randomUUID()
+  } else {
+    // Basic fallback for UUID generation
+    newContractForm.value.contractId = ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+      (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+    )
+  }
   aiUpdatedFields.value.clear()
   selectedAiFile.value = null
   showNewContractDialog.value = true
