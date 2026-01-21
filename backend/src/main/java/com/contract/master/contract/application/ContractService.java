@@ -354,7 +354,7 @@ public class ContractService {
         List<ContractExtendData> dataList = extendDataRepository.findByContractId(base.getContractId().value().toString());
         Map<String, Object> extendedFields = new HashMap<>();
         for (ContractExtendData data : dataList) {
-            extendFieldRepository.findById(data.getId()).ifPresent(field -> {
+            extendFieldRepository.findByFieldId(data.getFieldId()).ifPresent(field -> {
                 extendedFields.put(field.getFieldCode(), data.getFieldValue());
 
                 extendedFields.put(field.getFieldCode() + "_source", data.getFillType());

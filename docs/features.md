@@ -4,7 +4,8 @@
 |------------|--------------|-------------|--------|
 | 001 | Contract Master Core | Base system for contract management, lifecycle tracking, and status transitions. | Live |
 | 005 | Integration Hub | Hub for external system connectors (ERP/Finance) with HMAC signing and retry logic. | Live |
-| 006 | Core Enhancements | Unified metadata, hybrid rules (AI + Logic), and field extension management. | Active |
+| 006 | Core Enhancements | Unified metadata, hybrid rules (AI + Logic), and field extension management. | Live |
+| 018 | Metadata-Driven Verification | Comprehensive audit and enhancement of dynamic field extensions and validation. | Live |
 | 001-manual-rule-evaluation | Manual Rule Evaluation | Allows users to manually trigger rule evaluations against selected contracts. | Live |
 | 001-contract-reevaluation | Contract Re-evaluation | Trigger re-evaluation of specific contracts with selected rules from the detail page. | Live |
 | 007 | AI Extraction Engine | Automatically extracts key contract elements from PDF documents via AI. | Live |

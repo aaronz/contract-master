@@ -13,9 +13,9 @@
 
 | Table Name | Description | Key Fields |
 |------------|-------------|------------|
-| `contract_extend_field` | Dynamic field definitions | `field_id` (PK), `field_name`, `field_code`, `field_type`, `tenant_id` |
-| `contract_extend_data` | Values for dynamic fields | `id` (PK), `contract_id`, `field_id`, `field_value` |
-| `field_config` | UI visibility & display settings | `id` (PK), `field_code`, `is_visible`, `display_order`, `tenant_id` |
+| `contract_extend_field` | Dynamic field definitions | `db_id` (PK), `field_id`, `field_name`, `field_code`, `field_type`, `tenant_id` |
+| `contract_extend_data` | Values for dynamic fields | `db_id` (PK), `contract_id`, `field_id`, `field_value`, `fill_type`, `tenant_id` |
+| `field_config` | UI visibility & display settings | `db_id` (PK), `field_code`, `is_visible`, `display_order`, `tenant_id` |
 
 ## Rules & Evaluation (New Domain)
 

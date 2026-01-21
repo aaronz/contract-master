@@ -14,38 +14,44 @@ Web entries (HTTP Headers), Asynchronous Threads (TaskDecorator), and Message Qu
 The system ensures that the triggering actor's tenant identity is preserved throughout the entire
 request lifecycle without manual intervention.
 
-### III. AI-Manual Synergy & Traceability
+### III. Unified Metadata-Driven Design
+The system architecture is driven by a hybrid metadata model. Core fields (Standard) and dynamic
+custom fields (Extended) MUST be unified at the service layer. Data validation, UI rendering,
+CSV exports, and AI extraction prompts MUST be dynamically generated from this metadata. This ensures
+that per-tenant requirements are met through configuration rather than code changes.
+
+### IV. AI-Manual Synergy & Traceability
 AI-extracted data is treated as "suggested" until human verification or rule-based confirmation.
 Both AI and manual sources MUST be clearly identified in the data model. Every modification to
 contract elements MUST be traceable to an actor (User or AI model version).
 
-### IV. Rule-Driven Data Governance
+### V. Rule-Driven Data Governance
 All contract data MUST pass through the centralized rule engine before being published or considered
 "Complete". Risks and inconsistencies MUST be flagged with explicit severity levels (Info, Warning,
 Error) to ensure data quality and compliance.
 
-### V. Middleware Standardization
+### VI. Middleware Standardization
 Integration with external SaaS CRMs and internal downstream systems MUST use standardized API
 models and WebHooks. Decoupling through abstraction layers is mandatory to support diverse
 integrations without compromising core system stability.
 
-### VI. Absolute Auditability
+### VII. Absolute Auditability
 Every change to contract data, configuration, or permissions MUST be recorded in an immutable audit
 log. Logs MUST include the timestamp, actor ID, field changed, original value, and new value,
 supporting full history reconstruction. Automated capture via Entity Listeners and AOP is preferred.
 
-### VII. Continuous Design Document Optimization
+### VIII. Continuous Design Document Optimization
 Design artifacts (spec.md, plan.md, tasks.md) are "living documents". They MUST be updated whenever
 implementation diverges from the original plan or when new constraints are discovered. Outdated
 documentation is a technical debt that must be resolved within the same feature branch.
 
-### VIII. UX & Functional Completeness Reflection
+### IX. UX & Functional Completeness Reflection
 Developers MUST actively reflect on the user experience and functional completeness during
 development. If a planned feature is found to be confusing, incomplete, or technically redundant, it
 MUST be challenged and refined before completion. MVP doesn't mean "broken" or "confusing"; it means
 "minimal but high quality".
 
-### IX. Maintenance of Global Manifests
+### X. Maintenance of Global Manifests
 The project maintains four critical global manifests: `features.md` (Features), `bugs.md` (Known Bugs),
 `api.md` (API Registry), and `table.md` (Database Schema). These files MUST be refreshed with every
 relevant code change (feature add, bug fix, API change, schema change) to ensuring a real-time,
@@ -64,8 +70,8 @@ accurate view of the system state.
 - **Security**: Transparent logical isolation via Hibernate Filters and AOP. No manual `tenant_id` parameters in Repositories.
 - **Propagation**: Automatic context propagation across Web, Async Threads, and Kafka boundaries.
 - **Audit**: All entity modifications MUST be captured via `TenantEntityListener` or `AuditLogInterceptor`.
-- **Documentation**: All feature merges must trigger updates to global manifests (`features.md`, `bugs.md`, `api.md`, `table.md`) as per Principle IX.
-- **Review**: Every PR must verify adherence to all nine Core Principles and ensure design docs are in sync with code.
+- **Documentation**: All feature merges must trigger updates to global manifests (`features.md`, `bugs.md`, `api.md`, `table.md`) as per Principle X.
+- **Review**: Every PR must verify adherence to all ten Core Principles and ensure design docs are in sync with code.
 
 ## Governance
 
@@ -76,4 +82,4 @@ accurate view of the system state.
    "Constitution Check" section.
 4. Versioning follows Semantic Versioning (SemVer) rules.
 
-**Version**: 1.3.0 | **Ratified**: 2026-01-21 | **Last Amended**: 2026-01-21
+**Version**: 1.4.0 | **Ratified**: 2026-01-21 | **Last Amended**: 2026-01-21

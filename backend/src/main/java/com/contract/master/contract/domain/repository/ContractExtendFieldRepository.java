@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface ContractExtendFieldRepository extends JpaRepository<ContractExtendField, Long> {
     java.util.Optional<ContractExtendField> findByFieldCode(String fieldCode);
+    java.util.Optional<ContractExtendField> findByFieldId(String fieldId);
 }

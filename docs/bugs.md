@@ -17,7 +17,7 @@
 
 | ID | Description | Feature | Severity | Notes |
 |----|-------------|---------|----------|-------|
-| D001 | Stale Cache Risks in Field Config | Cache | Low | Cache requires manual clearing in tests; potential sync issues if multi-node. |
+| D001 | Distributed Cache Sync | Cache | Low | `FieldConfigChangedEvent` clears local cache; needs Redis Pub/Sub for multi-node sync. |
 | D002 | Hardcoded PII Masking Logic | Security | Medium | Phone masking logic is hardcoded in Service; needs flexible framework. |
 | D003 | Development Logging in Production | Config | Low | `DEBUG` logging enabled for security in `application.yml`. |
 | D004 | Incomplete Async Job Tracking | Evaluation | Medium | Re-evaluation job progress tracking needs persistent heartbeats. |

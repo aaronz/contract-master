@@ -36,9 +36,9 @@
 | `/api/rules/{id}` | PUT | Update an existing rule configuration | 1.3.0 |
 | `/api/rule-configs` | GET | [Legacy] List old rule configurations | 1.1.0 |
 | `/api/rule-configs/validate/{contractId}` | POST | [Legacy] Run rule validation | 1.1.0 |
-| `/api/metadata/contract-fields` | GET | Unified system and extended field metadata | 1.1.0 |
-| `/api/settings/fields` | GET | Get all global and tenant field configurations | 1.1.0 |
-| `/api/settings/extend-fields` | POST | Create new extended field definition | 1.0.0 |
+| `/api/metadata/contract-fields` | GET | Unified system and extended field metadata | 1.4.0 |
+| `/api/settings/fields` | GET | Get all global and tenant field configurations | 1.4.0 |
+| `/api/settings/extend-fields` | POST | Create new extended field definition | 1.4.0 |
 | `/api/v1/settings/downstream` | GET | List configured downstream systems | 1.0.0 |
 | `/api/webhook/{source}` | POST | Receive inbound sync data from CRM/external systems | 1.0.0 |
 | `/api/dashboard/stats` | GET | Retrieve real-time operational dashboard metrics | 1.0.0 |
