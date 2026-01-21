@@ -4,59 +4,47 @@ The **Integration Hub** is the central nerve center for connecting Contract Mast
 
 ## 1. Overview
 
-The Integration Hub supports two-way data flow:
-- **Inbound**: Automatic contract creation and updates from external CRMs via WebHooks.
-- **Outbound**: Pushing finalized contract data to downstream ERP or Finance systems.
+The Integration Hub supports flexible data flow patterns:
+- **Inbound (Push)**: Automatic contract creation from external CRMs via WebHooks.
+- **Outbound (Push)**: Persistent, reliable data delivery to downstream ERP/Finance systems via Kafka Outbox.
+- **Outbound (Pull)**: Secure data retrieval for external systems via the Pull-Model API using API Keys.
 
 ## 2. Managing Downstream Systems
 
-To send contract data to an external system, you must first register it as a "Downstream System".
-
-### Steps to Register a System:
-1. Navigate to **Settings > Integration Hub > Downstream Systems**.
+To integrate with an external system, you must first register it.
+1. Navigate to **Integration Hub > Downstream Systems**.
 2. Click **Add New System**.
-3. Provide the following details:
-   - **System Name**: A recognizable name (e.g., "SAP Finance").
-   - **Endpoint URL**: The target API URL where data will be sent.
-   - **Authentication Type**: Choose from `NONE`, `HMAC`, or `API_KEY`.
-   - **Status**: Set to `Enabled` to start the sync.
-4. Click **Save**. The system will generate a unique `Access Key` for HMAC signing if required.
+3. **Authentication Types**:
+   - `API_KEY` / `HMAC`: Standard static or signed keys.
+   - `OAUTH2`: Modern OAuth2 Client Credentials flow. Provide `Client ID`, `Client Secret`, and `Token URL`.
+4. **Connectivity**: Use the **Test Connection** button to verify the system is reachable.
 
-## 3. Field Mapping
+## 3. Transformation Center (Field Mapping)
 
-External systems often use different field names than Contract Master. Use **Field Mapping** to translate data between systems.
-
-### Configuration:
-1. Go to **Settings > Integration Hub > Field Mappings**.
-2. Define mappings for each external system:
-   - **Internal Field**: Select a field from Contract Master (Standard or Extended).
-   - **External Field**: Enter the corresponding field name in the target system.
-   - **Transformation**: (Optional) Choose a rule like `TO_UPPERCASE` or `DATE_FORMAT`.
-3. **Enabled**: Ensure the mapping is active.
+Data protocols are managed centrally in the **Field Mapping** view.
+1. **Direction**: Choose `INBOUND` (from CRM) or `OUTBOUND` (to ERP).
+2. **System**: Select the target system for this mapping.
+3. **Advanced Transformations**: Use **Groovy Scripts** for complex logic.
+   - Example: `return "Project-" + value`
+4. **Data Masking**: For the Pull API, only fields explicitly mapped here will be included in the response.
 
 ## 4. Inbound Integration (WebHooks)
 
-Receive data from your CRM automatically by configuring WebHooks.
+1. Configure your CRM to send POST requests to your **WebHook Endpoint**.
+2. Ensure you have defined **INBOUND** field mappings to correctly parse incoming payloads.
 
-### Setup:
-1. Go to **Settings > Integration Hub > WebHook Configs**.
-2. Note your **WebHook Endpoint URL** (e.g., `/api/webhook/salesforce`).
-3. Configure your CRM to send POST requests to this URL whenever a contract/opportunity is updated.
-4. Select the **Events** you wish to subscribe to (e.g., `CONTRACT_CREATED`, `CONTRACT_SIGNED`).
+## 5. Pull-Model API
 
-## 5. Monitoring and Logs
+External systems can pull data on-demand:
+- **Endpoint**: `GET /api/v1/integration/contracts`
+- **Header**: `X-API-KEY: <Your_Access_Key>`
+- **Delta Sync**: Use `?updatedSince=YYYY-MM-DDTHH:mm:ss` to pull only changed records.
 
-The **Integration Dashboard** provides real-time visibility into the health of your connections.
+## 6. Monitoring & Recovery
 
-- **Sync Success Rate**: Percentage of successful outbound pushes.
-- **Activity Feed**: A list of the last 10 integration events.
-- **Integration Logs**: Detailed logs for every sync attempt, including error messages and duration. If a sync fails, check the logs for the specific HTTP error code and payload.
-
-## 6. Security Best Practices
-
-- **Rotate Keys**: Periodically regenerate API keys and HMAC secrets.
-- **IP Whitelisting**: If possible, restrict inbound WebHook traffic to the IP ranges of your CRM provider.
-- **Tenant Isolation**: Remember that all integration settings (mappings, systems, logs) are strictly isolated per tenant. Ensure you are in the correct tenant context before making changes.
+- **Health Status**: Real-time "Healthy/Down" status via heartbeat monitoring.
+- **Audit Logs**: View the full **Request Payload** for every attempt.
+- **Manual Replay**: Click **Replay** on a failed log entry to re-enqueue the event immediately.
 
 ---
-*For technical support or complex transformation requirements, please contact the System Administrator.*
+*For complex script requirements or ESB architecture questions, please contact the System Administrator.*

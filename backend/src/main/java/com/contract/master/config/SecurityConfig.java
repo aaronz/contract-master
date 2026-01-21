@@ -51,6 +51,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/rules/**").permitAll()
                 .requestMatchers("/api/rules").permitAll() // Permit all for rules endpoints
                 .requestMatchers("/api/settings/fields").permitAll() // Permit all for field config
+                .requestMatchers("/api/v1/integration/contracts/**").permitAll()
                 .requestMatchers("/api/contracts/*/audit").authenticated()
                 .requestMatchers("/h2-console/**").permitAll()
                 .anyRequest().authenticated()
