@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,6 +21,8 @@ public interface ContractRepository {
     Optional<Contract> findByContractNo(ContractNo contractNo);
 
     Page<Contract> search(String query, Pageable pageable);
+
+    Page<Contract> findByUpdateTimeAfter(LocalDateTime dateTime, Pageable pageable);
 
     long count();
     

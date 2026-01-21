@@ -1,0 +1,42 @@
+openapi: 3.0.0
+info:
+  title: Pull-Model Integration API
+  version: 1.0.0
+paths:
+  /api/v1/integration/contracts:
+    get:
+      summary: Pull transformed contract data using API Key
+      parameters:
+        - name: updatedSince
+          in: query
+          description: ISO timestamp to filter changed contracts
+          schema:
+            type: string
+            format: date-time
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 20
+      headers:
+        X-API-KEY:
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Transformed contract data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: true
+        '401':
+          description: Unauthorized (Invalid API Key)
