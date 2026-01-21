@@ -64,7 +64,7 @@ public class IntegrationKafkaConsumer {
                     .filter(s -> s.getSystemId().equals(event.getSystemId()))
                     .findFirst().orElseThrow(() -> new RuntimeException("System not found: " + event.getSystemId()));
 
-            List<FieldMapping> mappings = mappingRepository.findAll();
+            List<FieldMapping> mappings = mappingRepository.findByTargetSystemIdAndDirectionAndIsEnabledTrue(event.getSystemId(), "OUTBOUND");
             Map<String, Object> payload = pushService.transformData(contract, mappings);
             String payloadJson = objectMapper.writeValueAsString(payload);
 

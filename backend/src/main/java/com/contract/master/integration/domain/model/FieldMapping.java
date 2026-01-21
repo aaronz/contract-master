@@ -26,6 +26,12 @@ public class FieldMapping extends BaseTenantEntity {
     @Column(name = "is_enabled")
     private Boolean isEnabled;
 
+    @Column(name = "direction", length = 16)
+    private String direction;
+
+    @Column(name = "target_system_id", length = 64)
+    private String targetSystemId;
+
     public String getInternalField() {
         return internalField;
     }
@@ -66,6 +72,22 @@ public class FieldMapping extends BaseTenantEntity {
         isEnabled = enabled;
     }
 
+    public String getDirection() {
+        return direction;
+    }
+
+    public void setDirection(String direction) {
+        this.direction = direction;
+    }
+
+    public String getTargetSystemId() {
+        return targetSystemId;
+    }
+
+    public void setTargetSystemId(String targetSystemId) {
+        this.targetSystemId = targetSystemId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -76,11 +98,13 @@ public class FieldMapping extends BaseTenantEntity {
                Objects.equals(externalField, that.externalField) &&
                Objects.equals(transformation, that.transformation) &&
                Objects.equals(transformationScript, that.transformationScript) &&
-               Objects.equals(isEnabled, that.isEnabled);
+               Objects.equals(isEnabled, that.isEnabled) &&
+               Objects.equals(direction, that.direction) &&
+               Objects.equals(targetSystemId, that.targetSystemId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), internalField, externalField, transformation, transformationScript, isEnabled);
+        return Objects.hash(super.hashCode(), internalField, externalField, transformation, transformationScript, isEnabled, direction, targetSystemId);
     }
 }

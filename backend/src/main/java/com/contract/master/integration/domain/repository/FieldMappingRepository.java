@@ -8,4 +8,5 @@ import java.util.List;
 
 @Repository
 public interface FieldMappingRepository extends JpaRepository<FieldMapping, Long> {
+    List<FieldMapping> findByTargetSystemIdAndDirectionAndIsEnabledTrue(String systemId, String direction);
 }

@@ -30,37 +30,14 @@
             <el-divider />
 
             <div class="form-section">
-              <h3>Field Mapping</h3>
-              <p class="section-desc">Map Contract Master fields to Salesforce Object fields.</p>
-              
-              <el-table :data="sfdcConfig.mapping" style="width: 100%" border>
-                <el-table-column prop="local" label="Contract Master Field" />
-                <el-table-column prop="remote" label="Salesforce API Name">
-                  <template #default="{ row }">
-                    <el-input v-model="row.remote" size="small" placeholder="e.g. AccountId" />
-                  </template>
-                </el-table-column>
-                <el-table-column label="Transformation" width="120" align="center">
-                  <template #default="{ row }">
-                    <el-button 
-                      type="primary" 
-                      link 
-                      size="small" 
-                      icon="Edit" 
-                      @click="openScriptEditor(row)"
-                    >
-                      Script
-                    </el-button>
-                  </template>
-                </el-table-column>
-                <el-table-column width="80" align="center">
-                  <template #default="{ $index }">
-                    <el-button type="danger" circle size="small" icon="Delete" @click="removeMapping('sfdc', $index)" />
-                  </template>
-                </el-table-column>
-              </el-table>
-              <div class="add-mapping">
-                <el-button link type="primary" icon="Plus" @click="addMapping('sfdc')">Add Field Mapping</el-button>
+              <div class="flex justify-between items-center">
+                <div>
+                  <h3>Field Mapping</h3>
+                  <p class="section-desc">Manage how data fields align between systems.</p>
+                </div>
+                <router-link to="/integrations/mapping">
+                  <el-button type="primary" icon="Connection">Manage Mappings in Transformation Center</el-button>
+                </router-link>
               </div>
             </div>
           </div>
@@ -127,22 +104,6 @@
       </el-tabs>
     </el-card>
 
-    <!-- Script Editor Dialog -->
-    <el-dialog v-model="scriptDialogVisible" title="Transformation Script" width="600px">
-      <p class="dialog-desc">Write a Groovy script to transform the value. Variable <code>value</code> is available.</p>
-      <el-input
-        v-model="currentScript"
-        type="textarea"
-        :rows="10"
-        class="code-editor"
-        placeholder="return value.toUpperCase();"
-      />
-      <template #footer>
-        <el-button @click="scriptDialogVisible = false">Cancel</el-button>
-        <el-button type="primary" @click="saveScript">Save Script</el-button>
-      </template>
-    </el-dialog>
-
     <!-- Payload Viewer Dialog -->
     <el-dialog v-model="payloadDialogVisible" title="Request Payload" width="600px">
       <pre class="json-viewer">{{ currentPayload }}</pre>
@@ -152,17 +113,12 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { Link, Delete, Plus, Edit, Refresh } from '@element-plus/icons-vue'
+import { Link, Refresh, Connection } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import axios from 'axios'
 
 const activeTab = ref('sfdc')
 const saving = ref(false)
-
-// Script Editor State
-const scriptDialogVisible = ref(false)
-const currentScript = ref('')
-const currentMappingRow = ref(null)
 
 // Logs State
 const logs = ref([])
@@ -172,13 +128,7 @@ const currentPayload = ref('')
 
 const sfdcConfig = ref({
   webhook: 'https://na1.salesforce.com/services/apexrest/contract_sync',
-  secret: 'my-super-secret-key',
-  mapping: [
-    { local: 'contract_title', remote: 'Name', transformation: '' },
-    { local: 'contract_amount', remote: 'Amount', transformation: 'return value * 1.0' },
-    { local: 'start_date', remote: 'StartDate', transformation: '' },
-    { local: 'customer_name', remote: 'Account.Name', transformation: '' }
-  ]
+  secret: 'my-super-secret-key'
 })
 
 const dingtalkConfig = ref({
@@ -186,39 +136,12 @@ const dingtalkConfig = ref({
   secret: ''
 })
 
-const addMapping = (type) => {
-  if (type === 'sfdc') {
-    sfdcConfig.value.mapping.push({ local: '', remote: '', transformation: '' })
-  }
-}
-
-const removeMapping = (type, index) => {
-  if (type === 'sfdc') {
-    sfdcConfig.value.mapping.splice(index, 1)
-  }
-}
-
 const saveConfig = () => {
   saving.value = true
   setTimeout(() => {
     saving.value = false
     ElMessage.success('Configuration saved successfully')
   }, 1000)
-}
-
-// Transformation Script Logic
-const openScriptEditor = (row) => {
-  currentMappingRow.value = row
-  currentScript.value = row.transformation || ''
-  scriptDialogVisible.value = true
-}
-
-const saveScript = () => {
-  if (currentMappingRow.value) {
-    currentMappingRow.value.transformation = currentScript.value
-  }
-  scriptDialogVisible.value = false
-  ElMessage.success('Script saved temporarily (don\'t forget to Save Configuration)')
 }
 
 // Logs Logic
@@ -313,23 +236,6 @@ onMounted(() => {
   font-size: 13px;
   color: var(--text-secondary);
   margin-bottom: 16px;
-}
-
-.add-mapping {
-  margin-top: 16px;
-  text-align: center;
-}
-
-.dialog-desc {
-  color: var(--text-secondary);
-  margin-bottom: 12px;
-}
-
-.code-editor :deep(.el-textarea__inner) {
-  font-family: 'Fira Code', monospace;
-  background-color: #f8f9fa;
-  color: #2c3e50;
-  line-height: 1.5;
 }
 
 .json-viewer {
