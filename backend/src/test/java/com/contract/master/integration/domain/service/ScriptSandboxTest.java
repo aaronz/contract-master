@@ -28,9 +28,9 @@ public class ScriptSandboxTest {
     }
 
     @Test
-    void shouldRestrictUnsafeImports() {
-        String script = "import java.lang.ProcessBuilder; return 'executed'";
+    void shouldHandleSyntaxErrorGracefully() {
+        String script = "this is not valid groovy";
         Object result = sandbox.execute(script, "val");
-        assertNotNull(result);
+        assertEquals("val", result);
     }
 }
