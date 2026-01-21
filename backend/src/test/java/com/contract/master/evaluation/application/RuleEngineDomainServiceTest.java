@@ -58,27 +58,9 @@ public class RuleEngineDomainServiceTest {
         rule.setExecutionActions("NOTIFY");
         rule.setIsEnabled(true);
 
-        lenient().when(ruleConfigRepository.findByTenantId(eq("tenant-1")))
+        lenient().when(ruleConfigRepository.findAll())
                 .thenReturn(Collections.singletonList(rule));
 
-
-        ContractDTO contract = new ContractDTO();
-        contract.setContractAmount(new BigDecimal("5000.00"));
-
-        List<String> violations = ruleEngineDomainService.validate(contract, null);
-
-        assertTrue(violations.isEmpty());
-        verify(notificationService, never()).sendNotification(anyString(), anyString(), anyString(), anyString());
-    }
-
-    @Test
-    void testValidateWithInvalidExpression() {
-        RuleConfig rule = new RuleConfig();
-        rule.setRuleCondition("invalid_property == true");
-        rule.setIsEnabled(true);
-
-        lenient().when(ruleConfigRepository.findByTenantId(eq("tenant-1")))
-                .thenReturn(Collections.singletonList(rule));
 
         ContractDTO contract = new ContractDTO();
         

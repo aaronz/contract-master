@@ -83,7 +83,7 @@ public class EvaluationConsumerTest {
         rule.setName("Test Rule");
         rule.setLogicType(RuleLogicType.GROOVY);
         rule.setStatus(RuleStatus.ACTIVE);
-        when(ruleRepository.findByTenantIdAndStatus(any(), any())).thenReturn(Collections.singletonList(rule));
+        when(ruleRepository.findByStatus(any())).thenReturn(Collections.singletonList(rule));
 
         when(ruleExecutor.execute(any(Rule.class), anyMap())).thenReturn(new RuleExecutionResult(true, null));
 
@@ -99,6 +99,25 @@ public class EvaluationConsumerTest {
         assertThat(capturedFacts.get("contractAmount")).isEqualTo(new BigDecimal("1000.00"));
         assertThat(capturedFacts.get("custom_field")).isEqualTo("custom_value");
         assertThat(capturedFacts.get("content")).isEqualTo("Test Contract");
+    }
+
+    @Test
+    public void testConsume_ClearsTenantContext() {
+        // Arrange
+        ProblemEvaluationJob job = new ProblemEvaluationJob();
+        ReflectionTestUtils.setField(job, "id", 1L);
+        job.setTenantId(TenantId.of("tenant-1"));
+        job.setContractId(UUID.randomUUID());
+        
+        when(jobRepository.findById(1L)).thenReturn(Optional.of(job));
+        when(contractRepository.findById(any())).thenReturn(Optional.of(mock(Contract.class)));
+        when(ruleRepository.findByStatus(any())).thenReturn(Collections.emptyList());
+
+        // Act
+        consumer.consume("1");
+
+        // Assert
+        assertThat(com.contract.master.security.TenantContext.getCurrentTenant()).isNull();
     }
 
     private static abstract class GroovyRuleExecutor implements RuleExecutor {}

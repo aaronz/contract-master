@@ -8,6 +8,6 @@ import java.util.List;
 
 @Repository
 public interface UserRoleRelRepository extends JpaRepository<UserRoleRel, Long> {
-    List<UserRoleRel> findByUserIdAndTenantId(String userId, TenantId tenantId);
-    void deleteByUserIdAndTenantId(String userId, TenantId tenantId);
+    List<UserRoleRel> findByUserId(String userId);
+    void deleteByUserId(String userId);
 }

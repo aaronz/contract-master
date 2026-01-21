@@ -20,6 +20,8 @@ public class KafkaTenantInterceptor implements RecordInterceptor<String, String>
         if (tenantIdHeader != null) {
             String tenantId = new String(tenantIdHeader, StandardCharsets.UTF_8);
             TenantContext.setCurrentTenant(tenantId);
+        } else {
+            TenantContext.clear();
         }
         return record;
     }

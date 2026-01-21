@@ -28,14 +28,13 @@ public class IntegrationHubController {
 
     @GetMapping("/stats")
     public GlobalExceptionHandler.ApiResponse<Map<String, Object>> getStats() {
-        TenantId tenantId = TenantId.of(TenantContext.getCurrentTenant());
         Map<String, Object> stats = new HashMap<>();
         
-        long activeConnectors = systemRepository.findByTenantId(tenantId).stream()
+        long activeConnectors = systemRepository.findAll().stream()
                 .filter(s -> Boolean.TRUE.equals(s.getIsEnabled()))
                 .count();
         
-        long totalLogs = logRepository.countByTenantId(tenantId);
+        long totalLogs = logRepository.count();
         double successRate = totalLogs == 0 ? 100.0 : 98.5; 
 
         stats.put("activeConnectors", activeConnectors);
@@ -48,7 +47,6 @@ public class IntegrationHubController {
 
     @GetMapping("/activities")
     public GlobalExceptionHandler.ApiResponse<List<IntegrationLog>> getActivities() {
-        TenantId tenantId = TenantId.of(TenantContext.getCurrentTenant());
-        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, logRepository.findTop10ByTenantIdOrderByCreateTimeDesc(tenantId));
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, logRepository.findTop10ByOrderByCreateTimeDesc());
     }
 }

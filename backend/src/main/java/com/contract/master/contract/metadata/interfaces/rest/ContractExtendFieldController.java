@@ -29,33 +29,26 @@ public class ContractExtendFieldController {
 
     @GetMapping
     public GlobalExceptionHandler.ApiResponse<List<ContractExtendField>> list() {
-        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, repository.findByTenantId(TenantId.of(TenantContext.getCurrentTenant())));
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, repository.findAll());
     }
 
     @PostMapping
     public GlobalExceptionHandler.ApiResponse<ContractExtendField> create(@Valid @RequestBody ContractExtendField field) {
-        String tenantIdStr = TenantContext.getCurrentTenant();
-        TenantId tenantId = TenantId.of(tenantIdStr);
-        if (repository.findByTenantIdAndFieldCode(tenantId, field.getFieldCode()).isPresent()) {
+        if (repository.findByFieldCode(field.getFieldCode()).isPresent()) {
             throw new RuntimeException("Field code already exists for this tenant: " + field.getFieldCode());
         }
         
         if (field.getFieldId() == null) {
             field.setFieldId(UUID.randomUUID().toString());
         }
-        field.setTenantId(tenantId);
         return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, repository.save(field));
     }
 
     @DeleteMapping("/{id}")
     public GlobalExceptionHandler.ApiResponse<Void> delete(@PathVariable Long id) {
-        ContractExtendField existing = repository.findById(id).orElse(null);
-        if (existing != null) {
-            if (!existing.getTenantId().equals(TenantId.of(TenantContext.getCurrentTenant()))) {
-                throw new RuntimeException("Unauthorized to delete field for another tenant");
-            }
-            repository.deleteById(id);
-        }
+        repository.findById(id).ifPresent(existing -> {
+            repository.delete(existing);
+        });
         return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, null);
     }
 }

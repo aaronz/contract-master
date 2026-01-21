@@ -9,6 +9,5 @@ import java.util.List;
 
 @Repository
 public interface ContractExtendFieldRepository extends JpaRepository<ContractExtendField, Long> {
-    List<ContractExtendField> findByTenantId(TenantId tenantId);
-    java.util.Optional<ContractExtendField> findByTenantIdAndFieldCode(TenantId tenantId, String fieldCode);
+    java.util.Optional<ContractExtendField> findByFieldCode(String fieldCode);
 }

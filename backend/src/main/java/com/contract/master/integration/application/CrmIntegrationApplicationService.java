@@ -35,7 +35,6 @@ public class CrmIntegrationApplicationService {
                 .orElseGet(() -> {
                     Contract newContract = new Contract();
                     newContract.setContractId(ContractId.of(UUID.randomUUID().toString()));
-                    newContract.setTenantId(TenantId.of(TenantContext.getCurrentTenant()));
                     return newContract;
                 });
 

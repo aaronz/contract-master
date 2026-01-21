@@ -20,12 +20,11 @@ public class FieldMappingController {
 
     @GetMapping
     public GlobalExceptionHandler.ApiResponse<List<FieldMapping>> list() {
-        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, repository.findByTenantId(TenantId.of(TenantContext.getCurrentTenant())));
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, repository.findAll());
     }
 
     @PostMapping
     public GlobalExceptionHandler.ApiResponse<FieldMapping> save(@RequestBody FieldMapping mapping) {
-        mapping.setTenantId(TenantId.of(TenantContext.getCurrentTenant()));
         return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, repository.save(mapping));
     }
 

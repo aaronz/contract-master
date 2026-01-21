@@ -38,9 +38,8 @@ public class AuthApplicationService {
                     new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
             );
             
-            List<String> roles = userRoleRelRepository.findByUserIdAndTenantId(
-                request.getUsername(), 
-                com.contract.master.shared.domain.model.TenantId.of(request.getTenantId())
+            List<String> roles = userRoleRelRepository.findByUserId(
+                request.getUsername()
             ).stream().map(com.contract.master.identity.domain.model.UserRoleRel::getRoleId).collect(Collectors.toList());
             
             if ("admin".equals(request.getUsername()) && roles.isEmpty()) {

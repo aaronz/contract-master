@@ -27,27 +27,23 @@ public class UserService {
     private RoleRepository roleRepository;
 
     public List<User> getAllUsers() {
-        TenantId tenantId = TenantId.of(TenantContext.getCurrentTenant());
-        return userRepository.findByTenantId(tenantId);
+        return userRepository.findAll();
     }
 
     @Transactional
     public void assignRoles(String userId, List<String> roleIds) {
-        TenantId tenantId = TenantId.of(TenantContext.getCurrentTenant());
-        userRoleRelRepository.deleteByUserIdAndTenantId(userId, tenantId);
+        userRoleRelRepository.deleteByUserId(userId);
         
         for (String roleId : roleIds) {
             UserRoleRel rel = new UserRoleRel();
             rel.setUserId(userId);
             rel.setRoleId(roleId);
-            rel.setTenantId(tenantId);
             userRoleRelRepository.save(rel);
         }
     }
 
     public List<String> getUserRoleIds(String userId) {
-        TenantId tenantId = TenantId.of(TenantContext.getCurrentTenant());
-        return userRoleRelRepository.findByUserIdAndTenantId(userId, tenantId).stream()
+        return userRoleRelRepository.findByUserId(userId).stream()
                 .map(UserRoleRel::getRoleId)
                 .collect(Collectors.toList());
     }

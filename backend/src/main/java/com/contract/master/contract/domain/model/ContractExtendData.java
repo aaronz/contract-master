@@ -1,17 +1,14 @@
 package com.contract.master.contract.domain.model;
 
+import com.contract.master.shared.domain.model.BaseTenantEntity;
 import jakarta.persistence.*;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-import com.contract.master.shared.domain.base.BaseDomainEntity;
-
 @Entity
 @Table(name = "contract_extend_data")
-@EntityListeners(AuditingEntityListener.class)
-public class ContractExtendData extends BaseDomainEntity {
+public class ContractExtendData extends BaseTenantEntity {
 
     public ContractExtendData() {
         
@@ -37,14 +34,6 @@ public class ContractExtendData extends BaseDomainEntity {
 
     @Column(name = "verification_status", length = 32)
     private String verificationStatus;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getContractId() {
         return contractId;
@@ -106,12 +95,14 @@ public class ContractExtendData extends BaseDomainEntity {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
         ContractExtendData that = (ContractExtendData) o;
-        return Objects.equals(id, that.id);
+        return Objects.equals(contractId, that.contractId) &&
+               Objects.equals(fieldId, that.fieldId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(super.hashCode(), contractId, fieldId);
     }
 }

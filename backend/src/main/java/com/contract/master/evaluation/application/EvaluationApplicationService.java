@@ -120,7 +120,7 @@ public class EvaluationApplicationService {
         jobRepository.save(job);
 
         auditService.logChange("JOB-" + job.getJobId(), "EvaluationJob", null, "Created", "CREATE", triggeredBy);
-        logger.info("Manual Evaluation Job Created - Job ID: {}, Tenant ID: {}", job.getJobId(), tenantId);
+        logger.info("Manual Evaluation Job Created - Job ID: {}, Tenant ID: {}", job.getJobId(), job.getTenantId().getId());
 
         kafkaProducerService.sendMessage(job.getJobId());
         return job;
@@ -128,12 +128,6 @@ public class EvaluationApplicationService {
 
     @Transactional
     public String triggerReEvaluationForSingleContract(String contractId, List<String> ruleIds, String triggeredBy) {
-        String tenantId = TenantContext.getCurrentTenant();
-        if (tenantId == null) {
-            logger.warn("Tenant ID missing from context, falling back to tenant-1");
-            tenantId = "tenant-1";
-        }
-
         if (contractService.getContractById(contractId) == null) {
             throw new IllegalArgumentException("Contract with ID " + contractId + " not found.");
         }
@@ -146,14 +140,14 @@ public class EvaluationApplicationService {
             throw new RuntimeException("Re-evaluation failed due to internal error.");
         }
         
-        List<EvaluationJob> inProgressJobs = jobRepository.findByTenantIdAndTargetContractsContainingAndStatus(
-                tenantId, contractIdJson, JobStatus.IN_PROGRESS);
+        List<EvaluationJob> inProgressJobs = jobRepository.findByTargetContractsContainingAndStatus(
+                contractIdJson, JobStatus.IN_PROGRESS);
 
         if (!inProgressJobs.isEmpty()) {
             throw new IllegalStateException("An evaluation for this contract is already in progress.");
         }
 
-        EvaluationJob job = createAndPublishEvaluationJob(ruleIds, List.of(contractId), tenantId, triggeredBy);
+        EvaluationJob job = createAndPublishEvaluationJob(ruleIds, List.of(contractId), null, triggeredBy);
         
         String rulesStr = ruleIds != null ? String.join(",", ruleIds) : "all";
         auditService.logReEvaluationTriggered(contractId, rulesStr, triggeredBy);

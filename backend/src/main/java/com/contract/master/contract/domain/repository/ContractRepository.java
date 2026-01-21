@@ -15,22 +15,24 @@ public interface ContractRepository {
     Optional<Contract> findById(ContractId id);
     Contract save(Contract contract);
     Page<Contract> findAll(Pageable pageable);
-    Page<Contract> findByTenantId(TenantId tenantId, Pageable pageable);
+    List<Contract> findAll();
     
     Optional<Contract> findByContractNo(ContractNo contractNo);
-    Optional<Contract> findByCrmId(String crmId);
-    List<Contract> findByTenantId(TenantId tenantId);
-    Long countByTenantId(TenantId tenantId);
-    Long countPendingApprovalsByTenantId(TenantId tenantId);
-    BigDecimal sumActiveValueByTenantId(TenantId tenantId);
-    Long countRiskAlertsByTenantId(TenantId tenantId);
+
     long count();
+    
+    @org.springframework.data.jpa.repository.Query("SELECT COUNT(c) FROM Contract c WHERE c.approvalStatus = 'PENDING'")
+    Long countPendingApprovals();
+    
+    @org.springframework.data.jpa.repository.Query("SELECT SUM(c.amount.amount) FROM Contract c WHERE c.status = 'PUBLISHED'")
+    BigDecimal sumActiveValue();
+    
+    @org.springframework.data.jpa.repository.Query("SELECT COUNT(c) FROM Contract c WHERE c.status = 'RISK_FLAGGED'")
+    Long countRiskAlerts();
 
-    Page<Contract> findByTenantIdAndQuery(TenantId tenantId, String query, Pageable pageable);
-
-    @org.springframework.data.jpa.repository.Query("SELECT new com.contract.master.dashboard.dto.DashboardStatsDTO$DailyCountDTO(FUNCTION('DATE_FORMAT', c.createTime, '%Y-%m-%d'), COUNT(c)) " +
-           "FROM Contract c WHERE c.tenantId.id = :#{#tenantId.id} " +
-           "GROUP BY FUNCTION('DATE_FORMAT', c.createTime, '%Y-%m-%d') " +
-           "ORDER BY FUNCTION('DATE_FORMAT', c.createTime, '%Y-%m-%d') ASC")
-    List<com.contract.master.dashboard.dto.DashboardStatsDTO.DailyCountDTO> getVolumeTrendByTenantId(TenantId tenantId);
+    @org.springframework.data.jpa.repository.Query("SELECT new com.contract.master.dashboard.dto.DashboardStatsDTO$DailyCountDTO(CAST(c.createTime as string), COUNT(c)) " +
+           "FROM Contract c " +
+           "GROUP BY CAST(c.createTime as string) " +
+           "ORDER BY CAST(c.createTime as string) ASC")
+    List<com.contract.master.dashboard.dto.DashboardStatsDTO.DailyCountDTO> getVolumeTrend();
 }

@@ -39,9 +39,8 @@ public class IntegrationPushService {
 
     @Async
     public void pushToDownstreamSystems(Contract contract) {
-        TenantId tenantId = contract.getTenantId();
-        List<DownstreamSystem> systems = systemRepository.findByTenantId(tenantId);
-        List<FieldMapping> mappings = mappingRepository.findByTenantId(tenantId);
+        List<DownstreamSystem> systems = systemRepository.findAll();
+        List<FieldMapping> mappings = mappingRepository.findAll();
 
         for (DownstreamSystem system : systems) {
             if (!Boolean.TRUE.equals(system.getIsEnabled())) continue;
@@ -50,7 +49,6 @@ public class IntegrationPushService {
             com.contract.master.integration.domain.model.IntegrationLog integrationLog = new com.contract.master.integration.domain.model.IntegrationLog();
             integrationLog.setSourceSystem(system.getSystemName());
             integrationLog.setEventType("OUTBOUND_PUSH");
-            integrationLog.setTenantId(tenantId);
             integrationLog.setRecordsCount(1);
 
             try {

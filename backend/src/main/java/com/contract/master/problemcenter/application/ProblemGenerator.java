@@ -15,7 +15,6 @@ public class ProblemGenerator {
         problem.setEvaluationJobId(job.getId());
         problem.setRuleId(rule.getId());
         problem.setContractId(contract.getContractId().value().toString());
-        problem.setTenantId(job.getTenantId());
         problem.setHighlightedText(highlightedText);
         problem.setLocationInContract(locationJson);
         problem.setGeneratedMessage("Violation of rule: " + rule.getName() + ". " + rule.getDescription());

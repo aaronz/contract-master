@@ -10,5 +10,4 @@ import java.util.List;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUserName(String userName);
-    List<User> findByTenantId(com.contract.master.shared.domain.model.TenantId tenantId);
 }

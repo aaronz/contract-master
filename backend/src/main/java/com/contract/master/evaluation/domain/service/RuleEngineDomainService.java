@@ -33,11 +33,7 @@ public class RuleEngineDomainService {
     }
 
     public List<String> validate(ContractDTO contract, List<String> specificRuleIds) {
-        String tenantIdStr = TenantContext.getCurrentTenant();
-        if (tenantIdStr == null) {
-            tenantIdStr = "default-tenant";
-        }
-        List<RuleConfig> rules = ruleConfigRepository.findByTenantId(tenantIdStr);
+        List<RuleConfig> rules = ruleConfigRepository.findAll();
         
         if (specificRuleIds != null && !specificRuleIds.isEmpty()) {
             rules = rules.stream()

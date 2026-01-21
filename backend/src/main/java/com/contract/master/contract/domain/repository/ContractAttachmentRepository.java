@@ -9,6 +9,5 @@ import java.util.List;
 @Repository
 public interface ContractAttachmentRepository extends JpaRepository<ContractAttachment, Long> {
     List<ContractAttachment> findByContractId(String contractId);
-    List<ContractAttachment> findByTenantId(TenantId tenantId);
     java.util.Optional<ContractAttachment> findByAttachmentId(String attachmentId);
 }

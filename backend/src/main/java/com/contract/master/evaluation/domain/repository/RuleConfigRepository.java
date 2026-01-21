@@ -11,11 +11,6 @@ import java.util.Optional;
 
 @Repository
 public interface RuleConfigRepository extends JpaRepository<RuleConfig, Long> {
-    @Query("SELECT rc FROM RuleConfig rc WHERE rc.tenantId.id = :tenantId AND rc.isEnabled = :isEnabled")
-    List<RuleConfig> findByTenantIdAndIsEnabled(String tenantId, Boolean isEnabled);
-
-    @Query("SELECT rc FROM RuleConfig rc WHERE rc.tenantId.id = :tenantId")
-    List<RuleConfig> findByTenantId(String tenantId);
-
+    List<RuleConfig> findByIsEnabled(Boolean isEnabled);
     Optional<RuleConfig> findByRuleId(String ruleId);
 }

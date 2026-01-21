@@ -29,10 +29,9 @@ public class MetadataService {
     private final Map<String, List<FieldConfig>> fieldConfigCache = new java.util.concurrent.ConcurrentHashMap<>();
 
     public List<FieldMetadataDTO> getContractFields() {
-        String tenantId = TenantContext.getCurrentTenant();
         List<FieldMetadataDTO> fields = new ArrayList<>();
         
-        List<FieldConfig> configs = fieldConfigRepository.findByTenantId(TenantId.of(tenantId));
+        List<FieldConfig> configs = fieldConfigRepository.findAll();
 
         for (Field field : com.contract.master.contract.dto.ContractDTO.class.getDeclaredFields()) {
             String name = field.getName();
@@ -50,7 +49,7 @@ public class MetadataService {
             fields.add(dto);
         }
 
-        List<ContractExtendField> extendFields = extendFieldRepository.findByTenantId(TenantId.of(tenantId));
+        List<ContractExtendField> extendFields = extendFieldRepository.findAll();
         for (ContractExtendField ef : extendFields) {
             FieldConfig config = configs.stream().filter(c -> c.getFieldCode().equals(ef.getFieldCode())).findFirst().orElse(null);
             String label = config != null && config.getFieldAlias() != null ? config.getFieldAlias() : ef.getFieldName();

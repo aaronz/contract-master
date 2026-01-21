@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface SearchTemplateRepository extends JpaRepository<SearchTemplate, Long> {
-    List<SearchTemplate> findByTenantIdAndUserId(TenantId tenantId, String userId);
+    List<SearchTemplate> findByUserId(String userId);
 }

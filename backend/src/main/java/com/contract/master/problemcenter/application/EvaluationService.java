@@ -36,7 +36,6 @@ public class EvaluationService {
     public Long startEvaluation(UUID contractId, java.util.List<String> ruleIds) {
         ProblemEvaluationJob job = new ProblemEvaluationJob();
         job.setContractId(contractId);
-        job.setTenantId(TenantId.of(TenantContext.getCurrentTenant()));
         job.setTriggeredBy(TenantContext.getCurrentTenant());
         
         if (ruleIds != null && !ruleIds.isEmpty()) {

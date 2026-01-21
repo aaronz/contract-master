@@ -20,25 +20,22 @@ public class AISettingController {
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public GlobalExceptionHandler.ApiResponse<AISetting> getSettings() {
-        TenantId tenantId = TenantId.of(TenantContext.getCurrentTenant());
         return GlobalExceptionHandler.ApiResponse.success(
             HttpStatus.OK, 
-            repository.findByTenantId(tenantId).orElse(new AISetting())
+            repository.findAll().stream().findFirst().orElse(new AISetting())
         );
     }
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public GlobalExceptionHandler.ApiResponse<AISetting> saveSettings(@RequestBody AISetting setting) {
-        TenantId tenantId = TenantId.of(TenantContext.getCurrentTenant());
-        AISetting existing = repository.findByTenantId(tenantId).orElse(new AISetting());
+        AISetting existing = repository.findAll().stream().findFirst().orElse(new AISetting());
         
         existing.setProvider(setting.getProvider());
         existing.setModelName(setting.getModelName());
         existing.setApiKey(setting.getApiKey());
         existing.setEndpointUrl(setting.getEndpointUrl());
         existing.setExtractionPrompt(setting.getExtractionPrompt());
-        existing.setTenantId(tenantId);
         
         return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, repository.save(existing));
     }

@@ -36,15 +36,8 @@ public class ProblemCenterLegacyController {
             throw new IllegalArgumentException("Page size must not be less than one");
         }
 
-        String tenantIdStr = TenantContext.getCurrentTenant();
-        if (tenantIdStr == null) {
-            tenantIdStr = "default-tenant";
-        }
-
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<EvaluationJob> evaluationJobs = evaluationJobRepository.findByTenantId(tenantIdStr, pageable);
-
-
+        Page<EvaluationJob> evaluationJobs = evaluationJobRepository.findAll(pageable);
 
         return ResponseEntity.ok(evaluationJobs.getContent());
     }
@@ -52,12 +45,7 @@ public class ProblemCenterLegacyController {
     @GetMapping("/evaluation-jobs/{jobId}/results")
     public ResponseEntity<List<EvaluationResult>> getEvaluationResults(
             @PathVariable String jobId) {
-        String tenantIdStr = TenantContext.getCurrentTenant();
-        if (tenantIdStr == null) {
-            tenantIdStr = "default-tenant";
-        }
-
-        List<EvaluationResult> results = evaluationResultRepository.findByJobIdAndTenantId(jobId, tenantIdStr);
+        List<EvaluationResult> results = evaluationResultRepository.findByJobId(jobId);
         return ResponseEntity.ok(results);
     }
 }

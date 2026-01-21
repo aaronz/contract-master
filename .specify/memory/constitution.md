@@ -2,30 +2,37 @@
 
 ## Core Principles
 
-### I. Tenant Isolation First
-Every database query, service call, and configuration access MUST include a validated `tenant_id`
-context. Logic multi-tenancy is the foundation of the system; cross-tenant data leakage is a
-critical security failure that must be prevented at the architectural level.
+### I. Transparent Tenant Isolation
+Logic multi-tenancy is the foundation of the system. Every database query, service call, and
+background task MUST automatically respect the current `tenant_id` context. Isolation is enforced
+transparently at the infrastructure level (Hibernate Filters & AOP); manual `tenant_id` handling in
+business logic is forbidden to prevent data leakage and reduce boilerplate.
 
-### II. AI-Manual Synergy & Traceability
+### II. Full-Link Context Propagation
+Multi-tenant context MUST be automatically propagated across all execution boundaries, including
+Web entries (HTTP Headers), Asynchronous Threads (TaskDecorator), and Message Queues (Kafka Headers).
+The system ensures that the triggering actor's tenant identity is preserved throughout the entire
+request lifecycle without manual intervention.
+
+### III. AI-Manual Synergy & Traceability
 AI-extracted data is treated as "suggested" until human verification or rule-based confirmation.
 Both AI and manual sources MUST be clearly identified in the data model. Every modification to
 contract elements MUST be traceable to an actor (User or AI model version).
 
-### III. Rule-Driven Data Governance
+### IV. Rule-Driven Data Governance
 All contract data MUST pass through the centralized rule engine before being published or considered
 "Complete". Risks and inconsistencies MUST be flagged with explicit severity levels (Info, Warning,
 Error) to ensure data quality and compliance.
 
-### IV. Middleware Standardization
+### V. Middleware Standardization
 Integration with external SaaS CRMs and internal downstream systems MUST use standardized API
 models and WebHooks. Decoupling through abstraction layers is mandatory to support diverse
 integrations without compromising core system stability.
 
-### V. Absolute Auditability
+### VI. Absolute Auditability
 Every change to contract data, configuration, or permissions MUST be recorded in an immutable audit
 log. Logs MUST include the timestamp, actor ID, field changed, original value, and new value,
-supporting full history reconstruction.
+supporting full history reconstruction. Automated capture via Entity Listeners and AOP is preferred.
 
 ### VII. Continuous Design Document Optimization
 Design artifacts (spec.md, plan.md, tasks.md) are "living documents". They MUST be updated whenever
@@ -54,8 +61,9 @@ accurate view of the system state.
 
 ## Development Workflow & Quality Gates
 
-- **Security**: Mandatory `tenant_id` filtering in all Repository layers.
-- **Audit**: All entity modifications must be captured via `TenantEntityListener` or equivalent automated mechanisms.
+- **Security**: Transparent logical isolation via Hibernate Filters and AOP. No manual `tenant_id` parameters in Repositories.
+- **Propagation**: Automatic context propagation across Web, Async Threads, and Kafka boundaries.
+- **Audit**: All entity modifications MUST be captured via `TenantEntityListener` or `AuditLogInterceptor`.
 - **Documentation**: All feature merges must trigger updates to global manifests (`features.md`, `bugs.md`, `api.md`, `table.md`) as per Principle IX.
 - **Review**: Every PR must verify adherence to all nine Core Principles and ensure design docs are in sync with code.
 
@@ -68,4 +76,4 @@ accurate view of the system state.
    "Constitution Check" section.
 4. Versioning follows Semantic Versioning (SemVer) rules.
 
-**Version**: 1.2.0 | **Ratified**: 2026-01-14 | **Last Amended**: 2026-01-15
+**Version**: 1.3.0 | **Ratified**: 2026-01-21 | **Last Amended**: 2026-01-21

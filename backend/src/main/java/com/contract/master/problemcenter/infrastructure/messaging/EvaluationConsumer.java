@@ -84,7 +84,7 @@ public class EvaluationConsumer {
                     .orElseThrow(() -> new RuntimeException("Contract not found: " + job.getContractId()));
 
             ContractDTO contractDTO = contractService.convertToDTO(contract);
-            List<Rule> rules = ruleRepository.findByTenantIdAndStatus(job.getTenantId(), RuleStatus.ACTIVE);
+            List<Rule> rules = ruleRepository.findByStatus(RuleStatus.ACTIVE);
             
             if (job.getRuleIdsJson() != null && !job.getRuleIdsJson().isEmpty()) {
                 try {
@@ -115,7 +115,7 @@ public class EvaluationConsumer {
             }
 
             String contractIdStr = contract.getContractId().value().toString();
-            problemRepository.deleteByContractIdAndTenantId(contractIdStr, job.getTenantId());
+            problemRepository.deleteByContractId(contractIdStr);
 
             List<Problem> problems = rules.stream()
                     .map(rule -> {
@@ -174,7 +174,6 @@ public class EvaluationConsumer {
         problem.setEvaluationJobId(job.getId());
         problem.setRuleId(rule.getId());
         problem.setContractId(contract.getContractId().value().toString());
-        problem.setTenantId(job.getTenantId());
         
         String message = "Rule hit: " + rule.getName();
         if (rule.getDescription() != null && !rule.getDescription().isEmpty()) {

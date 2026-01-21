@@ -14,14 +14,11 @@ import java.util.Optional;
 
 @Repository
 public interface EvaluationJobRepository extends JpaRepository<EvaluationJob, Long> {
-    @Query("SELECT ej FROM EvaluationJob ej WHERE ej.tenantId.id = :id ORDER BY ej.createdAt DESC")
-    List<EvaluationJob> findAllByTenantIdOrderByCreatedAtDesc(@org.springframework.data.repository.query.Param("id") String id);
-    
-    @Query("SELECT ej FROM EvaluationJob ej WHERE ej.tenantId.id = :tenantId")
-    Page<EvaluationJob> findByTenantId(String tenantId, Pageable pageable);
+    List<EvaluationJob> findAllByOrderByCreatedAtDesc();
+    Page<EvaluationJob> findAll(Pageable pageable);
     
     Optional<EvaluationJob> findByJobId(String jobId);
 
-    @Query(value = "SELECT ej FROM EvaluationJob ej WHERE ej.tenantId.id = :id AND ej.targetContracts LIKE %:contractIdJson% AND ej.status = :status")
-    List<EvaluationJob> findByTenantIdAndTargetContractsContainingAndStatus(@org.springframework.data.repository.query.Param("id") String id, String contractIdJson, JobStatus status);
+    @Query(value = "SELECT ej FROM EvaluationJob ej WHERE ej.targetContracts LIKE %:contractIdJson% AND ej.status = :status")
+    List<EvaluationJob> findByTargetContractsContainingAndStatus(String contractIdJson, JobStatus status);
 }

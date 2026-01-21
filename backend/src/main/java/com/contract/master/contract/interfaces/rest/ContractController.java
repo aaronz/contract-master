@@ -55,7 +55,6 @@ public class ContractController {
         if ("attachments".equals(id)) {
             return GlobalExceptionHandler.ApiResponse.error(400, "Invalid contract ID");
         }
-        TenantId tenantId = TenantId.of(com.contract.master.security.TenantContext.getCurrentTenant());
         
         String attachmentId = java.util.UUID.randomUUID().toString();
         String uploadDir = System.getProperty("user.dir") + java.io.File.separator + "uploads";
@@ -75,7 +74,6 @@ public class ContractController {
         attachment.setFileSize(file.getSize());
         attachment.setFileFormat(file.getContentType());
         attachment.setStoragePath(filePath.toString());
-        attachment.setTenantId(tenantId);
         attachment.setUploadUser(com.contract.master.security.TenantContext.getCurrentTenant());
         attachmentRepository.save(attachment);
         return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, null);

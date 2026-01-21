@@ -8,5 +8,4 @@ import java.util.List;
 
 @Repository
 public interface WebHookConfigRepository extends JpaRepository<WebHookConfig, Long> {
-    List<WebHookConfig> findByTenantId(TenantId tenantId);
 }

@@ -22,12 +22,8 @@ public class ExportService {
     private ContractExtendFieldRepository extendFieldRepository;
 
     public void exportToCsv(java.io.PrintWriter writer) {
-        String tenantId = TenantContext.getCurrentTenant();
-        List<ContractDTO> contracts = contractService.getAllContracts().stream()
-                .filter(c -> tenantId.equals(c.getTenantId()))
-                .collect(Collectors.toList());
-
-        List<ContractExtendField> extendFields = extendFieldRepository.findByTenantId(TenantId.of(tenantId));
+        List<ContractDTO> contracts = contractService.getAllContracts();
+        List<ContractExtendField> extendFields = extendFieldRepository.findAll();
 
         writer.print("Contract No,Contract Name,Party A,Party B,Amount,Status");
         for (ContractExtendField f : extendFields) {

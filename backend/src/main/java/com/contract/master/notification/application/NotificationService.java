@@ -41,11 +41,6 @@ public class NotificationService {
         notification.setType(type);
         notification.setIsRead(false);
         
-        String currentTenant = com.contract.master.security.TenantContext.getCurrentTenant();
-        if (currentTenant != null) {
-            notification.setTenantId(com.contract.master.shared.domain.model.TenantId.of(currentTenant));
-        }
-        
         notificationRepository.save(notification);
         log.info("Notification saved for user {}: {}", userId, title);
     }

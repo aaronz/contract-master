@@ -15,10 +15,10 @@ import org.springframework.data.repository.query.Param;
 
 @Repository
 public interface ProblemRepository extends JpaRepository<Problem, Long> {
-    List<Problem> findByContractIdAndTenantId(String contractId, TenantId tenantId);
-    List<Problem> findByContractIdAndStatusAndTenantId(String contractId, ProblemStatus status, TenantId tenantId);
+    List<Problem> findByContractId(String contractId);
+    List<Problem> findByContractIdAndStatus(String contractId, ProblemStatus status);
     
     @Modifying
-    @Query("DELETE FROM Problem p WHERE p.contractId = :contractId AND p.tenantId.id = :#{#tenantId.id}")
-    void deleteByContractIdAndTenantId(@Param("contractId") String contractId, @Param("tenantId") TenantId tenantId);
+    @Query("DELETE FROM Problem p WHERE p.contractId = :contractId")
+    void deleteByContractId(@Param("contractId") String contractId);
 }

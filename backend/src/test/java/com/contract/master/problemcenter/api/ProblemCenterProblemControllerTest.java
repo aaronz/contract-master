@@ -49,7 +49,7 @@ public class ProblemCenterProblemControllerTest {
         Problem p = new Problem();
         p.setGeneratedMessage("Issue 1");
         
-        when(problemRepository.findByContractIdAndTenantId(eq("contract-1"), any())).thenReturn(Arrays.asList(p));
+        when(problemRepository.findByContractId(eq("contract-1"))).thenReturn(Arrays.asList(p));
 
         mockMvc.perform(get("/api/problems")
                         .param("contractId", "contract-1")

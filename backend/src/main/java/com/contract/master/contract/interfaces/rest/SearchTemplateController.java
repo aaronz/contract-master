@@ -20,7 +20,7 @@ public class SearchTemplateController {
 
     @GetMapping
     public GlobalExceptionHandler.ApiResponse<List<SearchTemplate>> list() {
-        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, repository.findByTenantIdAndUserId(TenantId.of(TenantContext.getCurrentTenant()), "admin"));
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, repository.findByUserId("admin"));
     }
 
     @PostMapping

@@ -59,16 +59,14 @@ public class ContractService {
     }
 
     public List<ContractDTO> getAllContracts() {
-        String tenantId = TenantContext.getCurrentTenant();
-        return contractRepository.findByTenantId(TenantId.of(tenantId)).stream()
+        return contractRepository.findAll().stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
     @Transactional
     public void saveExtendedData(String contractId, Map<String, Object> data) {
-        String tenantId = TenantContext.getCurrentTenant();
-        List<ContractExtendField> tenantExtendFields = extendFieldRepository.findByTenantId(TenantId.of(tenantId));
+        List<ContractExtendField> tenantExtendFields = extendFieldRepository.findAll();
         List<ContractExtendData> existingData = extendDataRepository.findByContractId(contractId);
 
         data.forEach((fieldCode, value) -> {
@@ -109,19 +107,13 @@ public class ContractService {
     }
 
     public Page<ContractDTO> searchContracts(String query, Pageable pageable) {
-        String tenantId = TenantContext.getCurrentTenant();
         Pageable sortedPageable = org.springframework.data.domain.PageRequest.of(
             pageable.getPageNumber(), 
             pageable.getPageSize(), 
             org.springframework.data.domain.Sort.by("createTime").descending()
         );
         
-        Page<Contract> basePage;
-        if (query != null && !query.trim().isEmpty()) {
-            basePage = contractRepository.findByTenantIdAndQuery(TenantId.of(tenantId), query, sortedPageable);
-        } else {
-            basePage = contractRepository.findByTenantId(TenantId.of(tenantId), sortedPageable);
-        }
+        Page<Contract> basePage = contractRepository.findAll(sortedPageable);
         
         List<ContractDTO> dtoList = basePage.getContent().stream()
                 .map(this::convertToDTO)
@@ -212,10 +204,9 @@ public class ContractService {
             contractId = ContractId.generate();
         }
         
-        TenantId tenantId = TenantId.of(TenantContext.getCurrentTenant());
         ContractNo contractNo = new ContractNo(dto.getContractNo());
         
-        Contract base = new Contract(contractId, tenantId, contractNo);
+        Contract base = new Contract(contractId, null, contractNo);
         base.setContractName(dto.getContractName());
         base.setContractType(dto.getContractType());
         
@@ -254,7 +245,7 @@ public class ContractService {
         
         auditService.logChange(saved.getContractId().value().toString(), "contract", null, "CREATED", "MANUAL", "admin");
         
-        eventPublisher.publishEvent(new ContractSavedEvent(saved.getContractId().value(), tenantId.getId()));
+        eventPublisher.publishEvent(new ContractSavedEvent(saved.getContractId().value(), saved.getTenantId().getId()));
 
         return convertToDTO(saved);
     }
@@ -379,8 +370,7 @@ public class ContractService {
         }
         
         List<FieldConfig> configs = fieldConfigCache.computeIfAbsent(tenantId.toString(), 
-            tid -> fieldConfigRepository.findByTenantId(TenantId.of(tid)).stream()
-                .collect(Collectors.toList())
+            tid -> fieldConfigRepository.findAll()
         );
         
         filterStandardFields(dto, configs);

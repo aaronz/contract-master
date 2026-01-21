@@ -28,31 +28,19 @@ public class FieldConfigService {
     private ApplicationEventPublisher eventPublisher;
 
     public List<FieldConfig> getConfigs() {
-        String tenantId = TenantContext.getCurrentTenant();
-        if (tenantId == null) {
-            return Collections.emptyList();
-        }
-        return fieldConfigRepository.findByTenantId(TenantId.of(tenantId));
+        return fieldConfigRepository.findAll();
     }
 
     @Transactional
     public void saveConfig(FieldConfig config) {
         String tenantId = TenantContext.getCurrentTenant();
-        fieldConfigRepository.findByTenantId(TenantId.of(tenantId)).stream()
+        fieldConfigRepository.findAll().stream()
             .filter(c -> c.getFieldCode().equals(config.getFieldCode()) && !Objects.equals(c.getId(), config.getId()))
             .findFirst()
             .ifPresent(existing -> {
                 throw new RuntimeException("Config already exists for field: " + config.getFieldCode());
             });
 
-        if (config.getId() != null) {
-            fieldConfigRepository.findById(config.getId()).ifPresent(existing -> {
-                if (!existing.getTenantId().equals(TenantId.of(tenantId))) {
-                    throw new RuntimeException("Unauthorized to update config for another tenant");
-                }
-            });
-        }
-        config.setTenantId(TenantId.of(tenantId));
         fieldConfigRepository.save(config);
         eventPublisher.publishEvent(new FieldConfigChangedEvent(tenantId));
     }
@@ -60,7 +48,7 @@ public class FieldConfigService {
     @Transactional
     public void saveConfigs(List<FieldConfig> configs) {
         String tenantId = TenantContext.getCurrentTenant();
-        List<FieldConfig> existingConfigs = fieldConfigRepository.findByTenantId(TenantId.of(tenantId));
+        List<FieldConfig> existingConfigs = fieldConfigRepository.findAll();
 
         for (FieldConfig config : configs) {
             FieldConfig existing = null;
@@ -80,7 +68,6 @@ public class FieldConfigService {
                 existing.setRequiredRole(config.getRequiredRole());
                 fieldConfigRepository.save(existing);
             } else {
-                config.setTenantId(TenantId.of(tenantId));
                 fieldConfigRepository.save(config);
             }
         }

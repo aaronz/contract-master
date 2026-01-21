@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface DataPermissionRuleRepository extends JpaRepository<DataPermissionRule, Long> {
-    List<DataPermissionRule> findByTenantIdAndIsEnabled(TenantId tenantId, Boolean isEnabled);
+    List<DataPermissionRule> findByIsEnabled(Boolean isEnabled);
 }

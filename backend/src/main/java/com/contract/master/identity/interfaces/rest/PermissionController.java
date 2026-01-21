@@ -20,8 +20,7 @@ public class PermissionController {
 
     @GetMapping("/matrix")
     public GlobalExceptionHandler.ApiResponse<Map<String, Map<String, Object>>> getPermissionMatrix() {
-        TenantId tenantId = TenantId.of(TenantContext.getCurrentTenant());
-        List<DataPermissionRule> dataRules = dataRuleRepository.findByTenantIdAndIsEnabled(tenantId, true);
+        List<DataPermissionRule> dataRules = dataRuleRepository.findByIsEnabled(true);
         
         Map<String, Map<String, Object>> matrix = new HashMap<>();
         
@@ -41,19 +40,16 @@ public class PermissionController {
 
     @PostMapping("/matrix")
     public GlobalExceptionHandler.ApiResponse<Void> savePermissionMatrix(@RequestBody Map<String, Map<String, Map<String, Object>>> matrix) {
-        TenantId tenantId = TenantId.of(TenantContext.getCurrentTenant());
-        
         matrix.forEach((roleId, modules) -> {
             modules.forEach((modId, config) -> {
                 boolean enabled = (boolean) config.get("enabled");
                 String scope = (String) config.get("scope");
                 
-                Optional<DataPermissionRule> existing = dataRuleRepository.findByTenantIdAndIsEnabled(tenantId, true).stream()
+                Optional<DataPermissionRule> existing = dataRuleRepository.findByIsEnabled(true).stream()
                         .filter(r -> r.getRoleId().equals(roleId) && r.getDataType().equals(modId))
                         .findFirst();
                 
                 DataPermissionRule rule = existing.orElse(new DataPermissionRule());
-                rule.setTenantId(tenantId);
                 rule.setRoleId(roleId);
                 rule.setDataType(modId);
                 rule.setRuleName(roleId + " " + modId + " Permission");

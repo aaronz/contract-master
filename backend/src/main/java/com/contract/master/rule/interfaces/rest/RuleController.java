@@ -22,13 +22,11 @@ public class RuleController {
 
     @GetMapping
     public GlobalExceptionHandler.ApiResponse<List<Rule>> list() {
-        TenantId tenantId = TenantId.of(TenantContext.getCurrentTenant());
-        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, ruleRepository.findByTenantId(tenantId));
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, ruleRepository.findAll());
     }
 
     @PostMapping
     public GlobalExceptionHandler.ApiResponse<Rule> create(@RequestBody Rule rule) {
-        rule.setTenantId(TenantId.of(TenantContext.getCurrentTenant()));
         return GlobalExceptionHandler.ApiResponse.success(HttpStatus.CREATED, ruleRepository.save(rule));
     }
 

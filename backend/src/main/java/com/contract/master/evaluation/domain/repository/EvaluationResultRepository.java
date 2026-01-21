@@ -10,6 +10,5 @@ import java.util.List;
 
 @Repository
 public interface EvaluationResultRepository extends JpaRepository<EvaluationResult, Long> {
-    @Query("SELECT er FROM EvaluationResult er WHERE er.jobId = :jobId AND er.tenantId.id = :tenantId")
-    List<EvaluationResult> findByJobIdAndTenantId(String jobId, String tenantId);
+    List<EvaluationResult> findByJobId(String jobId);
 }

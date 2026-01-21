@@ -21,7 +21,7 @@ public class RoleController {
 
     @GetMapping
     public GlobalExceptionHandler.ApiResponse<List<Role>> list() {
-        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, roleRepository.findByTenantId(TenantId.of(TenantContext.getCurrentTenant())));
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, roleRepository.findAll());
     }
 
     @PostMapping
@@ -29,7 +29,6 @@ public class RoleController {
         if (role.getRoleId() == null) {
             role.setRoleId(UUID.randomUUID().toString());
         }
-        role.setTenantId(TenantId.of(TenantContext.getCurrentTenant()));
         role.setStatus(1);
         return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, roleRepository.save(role));
     }

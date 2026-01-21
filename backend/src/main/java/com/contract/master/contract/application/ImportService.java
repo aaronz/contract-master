@@ -32,7 +32,6 @@ public class ImportService {
             Contract contract = new Contract();
             contract.setContractId(ContractId.of(UUID.randomUUID().toString()));
             contract.setContractNo(new ContractNo(row[0]));
-            contract.setTenantId(TenantId.of(TenantContext.getCurrentTenant()));
             contract.setContractName(row[1]);
             contract.setPartyA(new ContractParty(null, row[2], null, null, null));
             contract.setPartyB(new ContractParty(null, row[3], null, null, null));

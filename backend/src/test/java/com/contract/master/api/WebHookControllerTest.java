@@ -67,7 +67,7 @@ public class WebHookControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     public void testListConfigsSuccess() throws Exception {
-        when(configRepository.findByTenantId(any())).thenReturn(Collections.emptyList());
+        when(configRepository.findAll()).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/api/webhook/configs"))
                 .andExpect(status().isOk())

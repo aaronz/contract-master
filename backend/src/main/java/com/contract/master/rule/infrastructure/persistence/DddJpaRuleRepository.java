@@ -7,5 +7,4 @@ import java.util.Optional;
 
 public interface DddJpaRuleRepository extends JpaRepository<RuleConfig, Long> {
     Optional<RuleConfig> findByRuleId(String ruleId);
-    List<RuleConfig> findByTenantId(String tenantId);
 }

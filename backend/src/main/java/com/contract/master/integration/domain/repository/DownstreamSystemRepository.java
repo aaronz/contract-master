@@ -9,6 +9,5 @@ import java.util.Optional;
 
 @Repository
 public interface DownstreamSystemRepository extends JpaRepository<DownstreamSystem, Long> {
-    List<DownstreamSystem> findByTenantId(TenantId tenantId);
     Optional<DownstreamSystem> findByAccessKeyAndIsEnabledTrue(String accessKey);
 }

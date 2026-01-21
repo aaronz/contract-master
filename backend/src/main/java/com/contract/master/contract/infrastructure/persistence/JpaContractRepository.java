@@ -5,6 +5,7 @@ import com.contract.master.contract.domain.model.ContractNo;
 import com.contract.master.shared.domain.model.TenantId;
 import com.contract.master.contract.domain.model.Contract;
 import com.contract.master.contract.domain.repository.ContractRepository;
+import com.contract.master.dashboard.dto.DashboardStatsDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,41 +24,29 @@ public interface JpaContractRepository extends JpaRepository<Contract, Long>, Co
 
     @Override
     Optional<Contract> findByContractNo(ContractNo contractNo);
+    
+    @Override
+    Page<Contract> findAll(Pageable pageable);
+    
+    @Override
+    List<Contract> findAll();
 
     @Override
-    Optional<Contract> findByCrmId(String crmId);
-
+    @Query("SELECT COUNT(c) FROM Contract c WHERE c.approvalStatus = 'PENDING'")
+    Long countPendingApprovals();
+    
     @Override
-    @Query("SELECT COUNT(c) FROM Contract c WHERE c.tenantId.id = :#{#tenantId.id}")
-    Long countByTenantId(TenantId tenantId);
-
+    @Query("SELECT SUM(c.amount.amount) FROM Contract c WHERE c.status = 'PUBLISHED'")
+    BigDecimal sumActiveValue();
+    
     @Override
-    @Query("SELECT COUNT(c) FROM Contract c WHERE c.tenantId.id = :#{#tenantId.id} AND c.approvalStatus = 'PENDING'")
-    Long countPendingApprovalsByTenantId(TenantId tenantId);
-
-    @Override
-    @Query("SELECT SUM(c.amount.amount) FROM Contract c WHERE c.tenantId.id = :#{#tenantId.id} AND c.status = 'PUBLISHED'")
-    BigDecimal sumActiveValueByTenantId(TenantId tenantId);
-
-    @Override
-    @Query("SELECT COUNT(c) FROM Contract c WHERE c.tenantId.id = :#{#tenantId.id} AND c.status = 'RISK_FLAGGED'")
-    Long countRiskAlertsByTenantId(TenantId tenantId);
-
-    @Override
-    @Query("SELECT c FROM Contract c WHERE c.tenantId.id = :#{#tenantId.id}")
-    Page<Contract> findByTenantId(TenantId tenantId, Pageable pageable);
-
-    @Override
-    @Query("SELECT c FROM Contract c WHERE c.tenantId.id = :#{#tenantId.id}")
-    List<Contract> findByTenantId(TenantId tenantId);
-
-    @Override
-    @Query("SELECT c FROM Contract c WHERE c.tenantId.id = :#{#tenantId.id} AND (c.contractName LIKE %:query% OR c.contractNo.value LIKE %:query%)")
-    Page<Contract> findByTenantIdAndQuery(TenantId tenantId, String query, Pageable pageable);
+    @Query("SELECT COUNT(c) FROM Contract c WHERE c.status = 'RISK_FLAGGED'")
+    Long countRiskAlerts();
 
     @Override
     @Query("SELECT new com.contract.master.dashboard.dto.DashboardStatsDTO$DailyCountDTO(CAST(c.createTime as string), COUNT(c)) " +
-           "FROM Contract c WHERE c.tenantId.id = :#{#tenantId.id} " +
-           "GROUP BY CAST(c.createTime as string)")
-    List<com.contract.master.dashboard.dto.DashboardStatsDTO.DailyCountDTO> getVolumeTrendByTenantId(TenantId tenantId);
+           "FROM Contract c " +
+           "GROUP BY CAST(c.createTime as string) " +
+           "ORDER BY CAST(c.createTime as string) ASC")
+    List<DashboardStatsDTO.DailyCountDTO> getVolumeTrend();
 }

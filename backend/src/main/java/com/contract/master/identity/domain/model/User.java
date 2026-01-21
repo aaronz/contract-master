@@ -1,6 +1,6 @@
 package com.contract.master.identity.domain.model;
 
-import com.contract.master.shared.domain.base.BaseDomainEntity;
+import com.contract.master.shared.domain.model.BaseTenantEntity;
 import com.contract.master.shared.domain.model.TenantId;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -8,17 +8,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Objects;
 
 @Entity
 @Table(name = "user_info")
-public class User extends BaseDomainEntity implements UserDetails {
+public class User extends BaseTenantEntity implements UserDetails {
 
     @Column(name = "user_id", length = 64)
     private String userId;
-
-    @Embedded
-    private TenantId tenantId;
 
     @Column(name = "user_name", length = 64)
     private String userName;
@@ -38,9 +34,6 @@ public class User extends BaseDomainEntity implements UserDetails {
 
     public String getUserId() { return userId; }
     public void setUserId(String userId) { this.userId = userId; }
-
-    public TenantId getTenantId() { return tenantId; }
-    public void setTenantId(TenantId tenantId) { this.tenantId = tenantId; }
 
     @Override
     public String getUsername() { return userName; }

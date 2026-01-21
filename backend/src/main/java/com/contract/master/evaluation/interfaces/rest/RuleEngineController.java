@@ -35,7 +35,7 @@ public class RuleEngineController {
 
     @GetMapping
     public GlobalExceptionHandler.ApiResponse<List<RuleConfig>> list() {
-        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, ruleConfigRepository.findByTenantId(TenantContext.getCurrentTenant()));
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, ruleConfigRepository.findAll());
     }
 
     @GetMapping("/{id}")
@@ -56,14 +56,12 @@ public class RuleEngineController {
         if (rule.getRuleType() == null) {
             rule.setRuleType("LOGIC");
         }
-        rule.setTenantId(TenantId.of(TenantContext.getCurrentTenant()));
         return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, ruleConfigRepository.save(rule));
     }
 
     @PutMapping("/{id}")
     public GlobalExceptionHandler.ApiResponse<RuleConfig> update(@PathVariable String id, @RequestBody RuleConfig rule) {
         rule.setRuleId(id);
-        rule.setTenantId(TenantId.of(TenantContext.getCurrentTenant()));
         return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, ruleConfigRepository.save(rule));
     }
 

@@ -49,14 +49,14 @@ public class MetadataServiceTest {
         field.setFieldName("Custom Field 1");
         field.setFieldType("TEXT");
         
-        when(extendFieldRepository.findByTenantId(eq(TenantId.of("tenant-1"))))
+        when(extendFieldRepository.findAll())
                 .thenReturn(Collections.singletonList(field));
 
         FieldConfig contractNoConfig = new FieldConfig();
         contractNoConfig.setFieldCode("contract_no");
         contractNoConfig.setFieldAlias("Contract No");
         contractNoConfig.setConfigType("CONTRACT");
-        when(fieldConfigRepository.findByTenantId(eq(TenantId.of("tenant-1"))))
+        when(fieldConfigRepository.findAll())
                 .thenReturn(Collections.singletonList(contractNoConfig));
 
         List<FieldMetadataDTO> result = metadataService.getContractFields();
@@ -68,6 +68,6 @@ public class MetadataServiceTest {
         
         assertTrue(result.stream().anyMatch(f -> "custom_1".equals(f.getFieldCode())));
         
-        verify(extendFieldRepository).findByTenantId(eq(TenantId.of("tenant-1")));
+        verify(extendFieldRepository).findAll();
     }
 }

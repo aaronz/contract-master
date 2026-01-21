@@ -21,7 +21,7 @@ public class DownstreamSystemController {
 
     @GetMapping
     public GlobalExceptionHandler.ApiResponse<List<DownstreamSystem>> list() {
-        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, repository.findByTenantId(TenantId.of(TenantContext.getCurrentTenant())));
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, repository.findAll());
     }
 
     @PostMapping
@@ -32,14 +32,12 @@ public class DownstreamSystemController {
         if (system.getAccessKey() == null) {
             system.setAccessKey("AK_" + UUID.randomUUID().toString().replace("-", "").substring(0, 16));
         }
-        system.setTenantId(TenantId.of(TenantContext.getCurrentTenant()));
         return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, repository.save(system));
     }
 
     @PutMapping("/{id}")
     public GlobalExceptionHandler.ApiResponse<DownstreamSystem> update(@PathVariable String id, @RequestBody DownstreamSystem system) {
         system.setSystemId(id);
-        system.setTenantId(TenantId.of(TenantContext.getCurrentTenant()));
         return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, repository.save(system));
     }
 }

@@ -10,5 +10,5 @@ import java.util.UUID;
 
 @Repository
 public interface ProblemEvaluationJobRepository extends JpaRepository<ProblemEvaluationJob, Long> {
-    List<ProblemEvaluationJob> findByContractIdAndTenantId(UUID contractId, TenantId tenantId);
+    List<ProblemEvaluationJob> findByContractId(UUID contractId);
 }

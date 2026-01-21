@@ -25,7 +25,7 @@ public class TenantAspect {
         if (tenantId != null) {
             session.enableFilter("tenantFilter").setParameter("tenantId", tenantId);
         } else {
-            session.enableFilter("tenantFilter").setParameter("tenantId", "LOGICAL_ISOLATION_BYPASS_PROTECTION");
+            session.disableFilter("tenantFilter");
         }
     }
 }

@@ -34,7 +34,7 @@ public class FieldMappingControllerTest {
     @Test
     @WithMockUser
     public void testListSuccess() throws Exception {
-        when(repository.findByTenantId(any(TenantId.class))).thenReturn(Collections.emptyList());
+        when(repository.findAll()).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/api/v1/settings/mapping"))
                 .andExpect(status().isOk())

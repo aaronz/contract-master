@@ -14,4 +14,18 @@ public class TenantContext {
     public static void clear() {
         CURRENT_TENANT.remove();
     }
+
+    public static void executeAsSystem(Runnable task) {
+        String originalTenant = getCurrentTenant();
+        try {
+            setCurrentTenant(null);
+            task.run();
+        } finally {
+            if (originalTenant != null) {
+                setCurrentTenant(originalTenant);
+            } else {
+                clear();
+            }
+        }
+    }
 }

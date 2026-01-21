@@ -10,6 +10,5 @@ import java.util.List;
 
 @Repository
 public interface RuleRepository extends JpaRepository<Rule, Long> {
-    List<Rule> findByTenantId(TenantId tenantId);
-    List<Rule> findByTenantIdAndStatus(TenantId tenantId, RuleStatus status);
+    List<Rule> findByStatus(RuleStatus status);
 }

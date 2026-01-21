@@ -35,7 +35,6 @@ public class AuditService {
         log.setNewValue(newVal);
         log.setModifyType(type);
         log.setModifyUser(user);
-        log.setTenantId(getCurrentTenantId());
         auditLogRepository.save(log);
     }
 
@@ -46,7 +45,6 @@ public class AuditService {
         log.setNewValue("Rules: " + ruleIds); // Details about the re-evaluation
         log.setModifyType(RE_EVALUATION_TRIGGERED);
         log.setModifyUser(user);
-        log.setTenantId(getCurrentTenantId());
         auditLogRepository.save(log);
     }
 

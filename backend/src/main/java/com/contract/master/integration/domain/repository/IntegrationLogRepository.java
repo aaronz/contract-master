@@ -8,6 +8,5 @@ import java.util.List;
 
 @Repository
 public interface IntegrationLogRepository extends JpaRepository<IntegrationLog, Long> {
-    List<IntegrationLog> findTop10ByTenantIdOrderByCreateTimeDesc(TenantId tenantId);
-    long countByTenantId(TenantId tenantId);
+    List<IntegrationLog> findTop10ByOrderByCreateTimeDesc();
 }

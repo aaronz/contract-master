@@ -29,18 +29,14 @@ public class ProblemCenterProblemController {
     public GlobalExceptionHandler.ApiResponse<List<Problem>> list(
             @RequestParam(required = false) String contractId,
             @RequestParam(required = false) ProblemStatus status) {
-        TenantId tenantId = TenantId.of(TenantContext.getCurrentTenant());
         List<Problem> problems;
 
         if (contractId != null && status != null) {
-            problems = problemRepository.findByContractIdAndStatusAndTenantId(contractId, status, tenantId);
+            problems = problemRepository.findByContractIdAndStatus(contractId, status);
         } else if (contractId != null) {
-            problems = problemRepository.findByContractIdAndTenantId(contractId, tenantId);
+            problems = problemRepository.findByContractId(contractId);
         } else {
-            // For now, return all tenant problems - can be optimized with pagination later
-            problems = problemRepository.findAll().stream()
-                    .filter(p -> p.getTenantId().getId().equals(tenantId.getId()))
-                    .toList();
+            problems = problemRepository.findAll();
         }
 
         return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, problems);

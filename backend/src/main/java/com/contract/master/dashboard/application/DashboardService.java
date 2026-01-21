@@ -22,16 +22,15 @@ public class DashboardService {
     private com.contract.master.problemcenter.domain.repository.ProblemRepository problemRepository;
 
     public DashboardStatsDTO getStats() {
-        TenantId tenantId = TenantId.of(TenantContext.getCurrentTenant());
         DashboardStatsDTO stats = new DashboardStatsDTO();
         
-        stats.setTotalContracts(contractRepository.countByTenantId(tenantId));
-        stats.setPendingApprovals(contractRepository.countPendingApprovalsByTenantId(tenantId));
-        BigDecimal activeValue = contractRepository.sumActiveValueByTenantId(tenantId);
+        stats.setTotalContracts(contractRepository.count());
+        stats.setPendingApprovals(contractRepository.countPendingApprovals());
+        BigDecimal activeValue = contractRepository.sumActiveValue();
         stats.setActiveValue(activeValue != null ? activeValue : BigDecimal.ZERO);
-        stats.setRiskAlerts(contractRepository.countRiskAlertsByTenantId(tenantId));
+        stats.setRiskAlerts(contractRepository.countRiskAlerts());
 
-        List<DashboardStatsDTO.DailyCountDTO> trend = contractRepository.getVolumeTrendByTenantId(tenantId);
+        List<DashboardStatsDTO.DailyCountDTO> trend = contractRepository.getVolumeTrend();
         stats.setVolumeTrend(trend);
 
         long total = stats.getTotalContracts();

@@ -42,7 +42,7 @@ public class DataScopeAspect {
                     .map(a -> a.getAuthority().replace("ROLE_", ""))
                     .collect(java.util.stream.Collectors.toList());
             
-            List<DataPermissionRule> rules = ruleRepository.findByTenantIdAndIsEnabled(TenantId.of(tenantIdStr), true);
+            List<DataPermissionRule> rules = ruleRepository.findByIsEnabled(true);
             Session session = entityManager.unwrap(Session.class);
             
             List<DataPermissionRule> applicableRules = rules.stream()

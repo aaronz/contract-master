@@ -10,5 +10,4 @@ import com.contract.master.shared.domain.model.TenantId;
 
 @Repository
 public interface FieldConfigRepository extends JpaRepository<FieldConfig, Long> {
-    List<FieldConfig> findByTenantId(TenantId tenantId);
 }

@@ -8,5 +8,4 @@ import java.util.Optional;
 
 @Repository
 public interface AISettingRepository extends JpaRepository<AISetting, Long> {
-    Optional<AISetting> findByTenantId(TenantId tenantId);
 }

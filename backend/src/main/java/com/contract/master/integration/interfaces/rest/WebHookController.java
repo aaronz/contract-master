@@ -46,13 +46,12 @@ public class WebHookController {
     @GetMapping("/configs")
     @PreAuthorize("hasRole('ADMIN')")
     public GlobalExceptionHandler.ApiResponse<List<WebHookConfig>> listConfigs() {
-        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, configRepository.findByTenantId(TenantId.of(TenantContext.getCurrentTenant())));
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, configRepository.findAll());
     }
 
     @PostMapping("/configs")
     @PreAuthorize("hasRole('ADMIN')")
     public GlobalExceptionHandler.ApiResponse<WebHookConfig> saveConfig(@RequestBody WebHookConfig config) {
-        config.setTenantId(TenantId.of(TenantContext.getCurrentTenant()));
         return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, configRepository.save(config));
     }
 

@@ -47,17 +47,14 @@ public class AIExtractionService {
     }
 
     public Map<String, Object> extract(MultipartFile file, String contractId) {
-        String currentTenant = TenantContext.getCurrentTenant();
-        TenantId tenantId = TenantId.of(currentTenant != null ? currentTenant : "tenant-1");
-        
-        AISetting setting = aiSettingRepository.findByTenantId(tenantId).orElse(null);
+        AISetting setting = aiSettingRepository.findAll().stream().findFirst().orElse(null);
 
         String textContent;
         try {
             textContent = extractTextFromFile(file);
             
             if (contractId != null && !contractId.isEmpty()) {
-                saveAsAttachment(file, contractId, tenantId);
+                saveAsAttachment(file, contractId);
             }
         } catch (Exception e) {
             log.error("Failed to process file for extraction", e);
@@ -84,7 +81,7 @@ public class AIExtractionService {
         }
     }
 
-    private void saveAsAttachment(MultipartFile file, String contractId, TenantId tenantId) throws IOException {
+    private void saveAsAttachment(MultipartFile file, String contractId) throws IOException {
         String attachmentId = java.util.UUID.randomUUID().toString();
         String uploadDir = System.getProperty("user.dir") + File.separator + "uploads";
         java.nio.file.Path uploadPath = java.nio.file.Paths.get(uploadDir);
@@ -103,7 +100,6 @@ public class AIExtractionService {
         attachment.setFileSize(file.getSize());
         attachment.setFileFormat(file.getContentType());
         attachment.setStoragePath(filePath.toString());
-        attachment.setTenantId(tenantId);
         attachment.setUploadUser(TenantContext.getCurrentTenant());
         attachmentRepository.save(attachment);
         log.info("Saved contract attachment {} to {} for contract {}", attachment.getAttachmentName(), filePath, contractId);
