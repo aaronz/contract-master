@@ -35,12 +35,13 @@
           <el-sub-menu index="integrations">
             <template #title>
               <el-icon><Connection /></el-icon>
-              <span>{{ $t('menu.connectors') }}</span>
+              <span>{{ $t('menu.integrationsHub') }}</span>
             </template>
             <el-menu-item index="/integrations">{{ $t('menu.hubOverview') }}</el-menu-item>
+            <el-menu-item index="/integrations/connectors">{{ $t('menu.connectors') }}</el-menu-item>
+            <el-menu-item index="/integrations/crm-settings">{{ $t('menu.crmIntegration') }}</el-menu-item>
             <el-menu-item index="/integrations/mapping">{{ $t('menu.fieldMapping') }}</el-menu-item>
             <el-menu-item index="/integrations/webhooks">{{ $t('menu.webhooks') }}</el-menu-item>
-            <el-menu-item index="/integrations/secrets">{{ $t('menu.secretsKeys') }}</el-menu-item>
           </el-sub-menu>
 
           <!-- Risk & Compliance -->

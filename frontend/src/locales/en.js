@@ -85,6 +85,8 @@ export default {
     developer: 'Developer',
     connectors: 'Connectors',
     hubOverview: 'Hub Overview',
+    connectors: 'Downstream Systems',
+    crmIntegration: 'CRM Settings',
     fieldMapping: 'Field Mapping',
     webhooks: 'Webhooks',
     secretsKeys: 'Secrets & Keys',

@@ -83,6 +83,8 @@ export default {
     developer: '开发者工具',
     connectors: '连接器',
     hubOverview: '集成概览',
+    connectors: '下游系统',
+    crmIntegration: 'CRM 集成配置',
     fieldMapping: '字段映射',
     webhooks: 'Webhooks',
     secretsKeys: '密钥管理',

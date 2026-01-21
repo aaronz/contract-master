@@ -36,6 +36,16 @@ const routes = [
         component: () => import('@/views/integrations/index.vue'),
       },
       {
+        path: 'integrations/connectors',
+        name: 'Connectors',
+        component: () => import('@/views/integrations/connectors.vue'),
+      },
+      {
+        path: 'integrations/crm-settings',
+        name: 'CRMSettings',
+        component: () => import('@/views/integrations/crm-settings.vue'),
+      },
+      {
         path: 'integrations/webhooks',
         name: 'Webhooks',
         component: () => import('@/views/integrations/webhooks.vue'),
