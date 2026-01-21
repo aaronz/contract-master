@@ -3,7 +3,8 @@ package com.contract.master.contract.application;
 import com.contract.master.contract.domain.model.ContractExtendField;
 import com.contract.master.contract.domain.repository.ContractExtendFieldRepository;
 import com.contract.master.contract.dto.ContractDTO;
-import com.contract.master.security.TenantContext;
+import com.contract.master.contract.metadata.application.MetadataService;
+import com.contract.master.contract.metadata.dto.FieldMetadataDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.contract.master.shared.domain.model.TenantId;
 @Service
 public class ExportService {
 
@@ -19,32 +19,57 @@ public class ExportService {
     private ContractService contractService;
 
     @Autowired
-    private ContractExtendFieldRepository extendFieldRepository;
+    private MetadataService metadataService;
 
     public void exportToCsv(java.io.PrintWriter writer) {
         List<ContractDTO> contracts = contractService.getAllContracts();
-        List<ContractExtendField> extendFields = extendFieldRepository.findAll();
+        List<FieldMetadataDTO> fields = metadataService.getContractFields().stream()
+                .filter(f -> Boolean.TRUE.equals(f.getIsVisible()))
+                .sorted(java.util.Comparator.comparing(FieldMetadataDTO::getDisplayOrder))
+                .collect(Collectors.toList());
 
-        writer.print("Contract No,Contract Name,Party A,Party B,Amount,Status");
-        for (ContractExtendField f : extendFields) {
-            writer.print("," + f.getFieldName());
-        }
-        writer.println();
+        String header = fields.stream()
+                .map(FieldMetadataDTO::getFieldName)
+                .collect(Collectors.joining(","));
+        writer.println(header);
 
         for (ContractDTO c : contracts) {
-            writer.print(c.getContractNo() + ",");
-            writer.print(c.getContractName() + ",");
-            writer.print(c.getPartyAName() + ",");
-            writer.print(c.getPartyBName() + ",");
-            writer.print(c.getContractAmount() + ",");
-            writer.print(c.getContractStatus());
-            
-            Map<String, Object> ext = c.getExtendedFields();
-            for (ContractExtendField f : extendFields) {
-                writer.print("," + (ext != null ? ext.getOrDefault(f.getFieldCode(), "") : ""));
-            }
-            writer.println();
+            org.springframework.beans.BeanWrapper src = new org.springframework.beans.BeanWrapperImpl(c);
+            String row = fields.stream()
+                    .map(f -> {
+                        Object val = null;
+                        if ("STANDARD".equals(f.getSource())) {
+                            String prop = snakeToCamelCase(f.getFieldCode());
+                            if (src.isReadableProperty(prop)) {
+                                val = src.getPropertyValue(prop);
+                            }
+                        } else {
+                            val = c.getExtendedFields() != null ? c.getExtendedFields().get(f.getFieldCode()) : "";
+                        }
+                        return val != null ? val.toString().replace(",", " ") : "";
+                    })
+                    .collect(Collectors.joining(","));
+            writer.println(row);
         }
+    }
+
+    private String snakeToCamelCase(String snakeCase) {
+        if (snakeCase == null || snakeCase.isEmpty()) return snakeCase;
+        StringBuilder result = new StringBuilder();
+        boolean nextUpper = false;
+        for (char c : snakeCase.toCharArray()) {
+            if (c == '_') {
+                nextUpper = true;
+            } else {
+                if (nextUpper) {
+                    result.append(Character.toUpperCase(c));
+                    nextUpper = false;
+                } else {
+                    result.append(c);
+                }
+            }
+        }
+        return result.toString();
     }
 
     public byte[] exportToPdf(String id) {

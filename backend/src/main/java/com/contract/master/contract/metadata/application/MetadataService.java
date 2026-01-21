@@ -2,21 +2,19 @@ package com.contract.master.contract.metadata.application;
 
 import com.contract.master.contract.domain.model.ContractExtendField;
 import com.contract.master.contract.domain.repository.ContractExtendFieldRepository;
+import com.contract.master.contract.metadata.domain.event.FieldConfigChangedEvent;
 import com.contract.master.contract.metadata.domain.model.FieldConfig;
 import com.contract.master.contract.metadata.domain.repository.FieldConfigRepository;
 import com.contract.master.contract.metadata.dto.FieldMetadataDTO;
 import com.contract.master.security.TenantContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map; // Add this import
+import java.util.*;
 import java.util.stream.Collectors;
-import com.contract.master.contract.dto.ContractDTO;
 
-import com.contract.master.shared.domain.model.TenantId;
 @Service
 public class MetadataService {
 
@@ -26,39 +24,53 @@ public class MetadataService {
     @Autowired
     private FieldConfigRepository fieldConfigRepository;
 
-    private final Map<String, List<FieldConfig>> fieldConfigCache = new java.util.concurrent.ConcurrentHashMap<>();
+    @Autowired
+    private MetadataValidator metadataValidator;
+
+    private final Map<String, List<FieldMetadataDTO>> metadataCache = new java.util.concurrent.ConcurrentHashMap<>();
+
+    @EventListener
+    public void handleFieldConfigChanged(FieldConfigChangedEvent event) {
+        metadataCache.remove(event.getTenantId());
+    }
 
     public List<FieldMetadataDTO> getContractFields() {
-        List<FieldMetadataDTO> fields = new ArrayList<>();
+        String tenantId = TenantContext.getCurrentTenant();
+        String cacheKey = tenantId != null ? tenantId : "NONE";
         
-        List<FieldConfig> configs = fieldConfigRepository.findAll();
+        return metadataCache.computeIfAbsent(cacheKey, k -> {
+            List<FieldMetadataDTO> fields = new ArrayList<>();
+            List<FieldConfig> configs = fieldConfigRepository.findAll();
 
-        for (Field field : com.contract.master.contract.dto.ContractDTO.class.getDeclaredFields()) {
-            String name = field.getName();
-            if (name.equals("extendedFields") || name.equals("attachments") || name.equals("tenantId") || name.equals("contractId")) {
-                continue;
+            for (Field field : com.contract.master.contract.dto.ContractDTO.class.getDeclaredFields()) {
+                String name = field.getName();
+                if (name.equals("extendedFields") || name.equals("attachments") || name.equals("tenantId") || name.equals("contractId")) {
+                    continue;
+                }
+                
+                String fieldCode = camelToSnakeCase(name);
+                FieldConfig config = configs.stream().filter(c -> c.getFieldCode().equals(fieldCode)).findFirst().orElse(null);
+                
+                String type = getMetadataType(field.getType());
+                String label = config != null && config.getFieldAlias() != null ? config.getFieldAlias() : camelToWords(name);
+                FieldMetadataDTO dto = new FieldMetadataDTO(fieldCode, label, type, "STANDARD");
+                applyConfigToDTO(dto, config);
+                fields.add(dto);
             }
-            
-            String fieldCode = camelToSnakeCase(name);
-            FieldConfig config = configs.stream().filter(c -> c.getFieldCode().equals(fieldCode)).findFirst().orElse(null);
-            
-            String type = getMetadataType(field.getType());
-            String label = config != null && config.getFieldAlias() != null ? config.getFieldAlias() : camelToWords(name);
-            FieldMetadataDTO dto = new FieldMetadataDTO(fieldCode, label, type, "STANDARD");
-            applyConfigToDTO(dto, config);
-            fields.add(dto);
-        }
 
-        List<ContractExtendField> extendFields = extendFieldRepository.findAll();
-        for (ContractExtendField ef : extendFields) {
-            FieldConfig config = configs.stream().filter(c -> c.getFieldCode().equals(ef.getFieldCode())).findFirst().orElse(null);
-            String label = config != null && config.getFieldAlias() != null ? config.getFieldAlias() : ef.getFieldName();
-            FieldMetadataDTO dto = new FieldMetadataDTO(ef.getFieldCode(), label, ef.getFieldType(), "EXTEND");
-            applyConfigToDTO(dto, config);
-            fields.add(dto);
-        }
+            List<ContractExtendField> extendFields = extendFieldRepository.findAll();
+            for (ContractExtendField ef : extendFields) {
+                FieldConfig config = configs.stream().filter(c -> c.getFieldCode().equals(ef.getFieldCode())).findFirst().orElse(null);
+                String label = config != null && config.getFieldAlias() != null ? config.getFieldAlias() : ef.getFieldName();
+                FieldMetadataDTO dto = new FieldMetadataDTO(ef.getFieldCode(), label, ef.getFieldType(), "EXTEND");
+                applyConfigToDTO(dto, config);
+                fields.add(dto);
+            }
 
-        return fields;
+            return fields.stream()
+                .sorted(Comparator.comparing(FieldMetadataDTO::getDisplayOrder))
+                .collect(Collectors.toList());
+        });
     }
 
     private String camelToSnakeCase(String camel) {
@@ -83,6 +95,7 @@ public class MetadataService {
             dto.setDisplayOrder(config.getDisplayOrder() != null ? config.getDisplayOrder() : 999);
             dto.setFieldColor(config.getFieldColor());
             dto.setFieldStyles(config.getFieldStyles());
+            dto.setRequiredRole(config.getRequiredRole());
         } else {
             dto.setIsVisible(true);
             dto.setApiReturn(true);
@@ -113,6 +126,6 @@ public class MetadataService {
     }
 
     public void clearFieldConfigCache() {
-        fieldConfigCache.clear();
+        metadataCache.clear();
     }
 }

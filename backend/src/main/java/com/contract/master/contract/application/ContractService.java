@@ -1,5 +1,6 @@
 package com.contract.master.contract.application;
 
+import com.contract.master.contract.metadata.application.MetadataValidator;
 import com.contract.master.contract.metadata.domain.event.FieldConfigChangedEvent;
 import com.contract.master.contract.domain.event.ContractSavedEvent;
 import org.springframework.context.ApplicationEventPublisher;
@@ -50,6 +51,9 @@ public class ContractService {
     @Autowired
     private ApplicationEventPublisher eventPublisher;
 
+    @Autowired
+    private MetadataValidator metadataValidator;
+
     private final Map<String, List<FieldConfig>> fieldConfigCache = new java.util.concurrent.ConcurrentHashMap<>();
     private static final String FIELD_CONFIG_TYPE_CONTRACT = "CONTRACT";
 
@@ -75,6 +79,9 @@ public class ContractService {
                 .findFirst()
                 .ifPresent(field -> {
                     String newVal = value != null ? value.toString() : null;
+                    
+                    metadataValidator.validate(field, newVal);
+                    
                     boolean isVerifying = fieldCode.endsWith("_verified") && value instanceof Boolean && (Boolean)value;
                     
                     Optional<ContractExtendData> existing = existingData.stream()
@@ -113,7 +120,12 @@ public class ContractService {
             org.springframework.data.domain.Sort.by("createTime").descending()
         );
         
-        Page<Contract> basePage = contractRepository.findAll(sortedPageable);
+        Page<Contract> basePage;
+        if (query != null && !query.trim().isEmpty()) {
+            basePage = contractRepository.search(query, sortedPageable);
+        } else {
+            basePage = contractRepository.findAll(sortedPageable);
+        }
         
         List<ContractDTO> dtoList = basePage.getContent().stream()
                 .map(this::convertToDTO)

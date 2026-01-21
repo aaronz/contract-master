@@ -32,6 +32,10 @@ public interface JpaContractRepository extends JpaRepository<Contract, Long>, Co
     List<Contract> findAll();
 
     @Override
+    @Query("SELECT c FROM Contract c WHERE c.contractNo.value LIKE %:query% OR c.contractName LIKE %:query%")
+    Page<Contract> search(String query, Pageable pageable);
+
+    @Override
     @Query("SELECT COUNT(c) FROM Contract c WHERE c.approvalStatus = 'PENDING'")
     Long countPendingApprovals();
     

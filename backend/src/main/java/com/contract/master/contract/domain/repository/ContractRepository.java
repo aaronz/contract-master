@@ -19,6 +19,8 @@ public interface ContractRepository {
     
     Optional<Contract> findByContractNo(ContractNo contractNo);
 
+    Page<Contract> search(String query, Pageable pageable);
+
     long count();
     
     @org.springframework.data.jpa.repository.Query("SELECT COUNT(c) FROM Contract c WHERE c.approvalStatus = 'PENDING'")

@@ -2,8 +2,9 @@ package com.contract.master.ai.application;
 
 import com.contract.master.ai.domain.model.AISetting;
 import com.contract.master.ai.domain.repository.AISettingRepository;
+import com.contract.master.contract.metadata.application.MetadataService;
+import com.contract.master.contract.metadata.dto.FieldMetadataDTO;
 import com.contract.master.security.TenantContext;
-import com.contract.master.shared.domain.model.TenantId;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,7 +24,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class AIExtractionService {
@@ -35,6 +38,9 @@ public class AIExtractionService {
 
     @Autowired
     private com.contract.master.contract.domain.repository.ContractAttachmentRepository attachmentRepository;
+
+    @Autowired
+    private MetadataService metadataService;
 
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -66,11 +72,22 @@ public class AIExtractionService {
             return generateMockData(file.getOriginalFilename());
         }
 
+        List<FieldMetadataDTO> fields = metadataService.getContractFields().stream()
+                .filter(f -> Boolean.TRUE.equals(f.getIsVisible()))
+                .collect(Collectors.toList());
+
+        StringBuilder fieldInstructions = new StringBuilder();
+        for (FieldMetadataDTO f : fields) {
+            fieldInstructions.append("- ").append(f.getFieldCode()).append(": ").append(f.getFieldName()).append(" (Type: ").append(f.getFieldType()).append(")\n");
+        }
+
         String prompt = setting.getExtractionPrompt();
         if (prompt == null || prompt.isEmpty()) {
-            prompt = "You are a legal analyzer. Extract fields from the provided contract text (English or Chinese). " +
-                     "Return ONLY a JSON object with keys: contractNo, contractName, partyAName, partyBName, contractAmount, contractType. " +
-                     "If missing, use null.";
+            prompt = "You are a legal analyzer. Extract the following fields from the provided contract text (English or Chinese):\n" +
+                     fieldInstructions.toString() +
+                     "\nReturn ONLY a JSON object where keys are the fieldCodes specified above. If a value is missing, use null.";
+        } else {
+            prompt = prompt + "\n\nAdditional instructions: Extract these specific fields and use their fieldCodes as JSON keys:\n" + fieldInstructions.toString();
         }
 
         try {

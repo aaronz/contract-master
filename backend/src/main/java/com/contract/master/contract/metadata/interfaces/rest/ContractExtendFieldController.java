@@ -2,53 +2,34 @@ package com.contract.master.contract.metadata.interfaces.rest;
 
 import com.contract.master.api.GlobalExceptionHandler;
 import com.contract.master.contract.domain.model.ContractExtendField;
-import com.contract.master.contract.domain.repository.ContractExtendFieldRepository;
-import com.contract.master.security.TenantContext;
-import com.contract.master.shared.domain.model.TenantId;
+import com.contract.master.contract.application.ExtendFieldService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
-import java.util.UUID;
+import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/settings/extend-fields")
 public class ContractExtendFieldController {
 
     @Autowired
-    private ContractExtendFieldRepository repository;
+    private ExtendFieldService service;
 
     @GetMapping
     public GlobalExceptionHandler.ApiResponse<List<ContractExtendField>> list() {
-        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, repository.findAll());
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, service.getAllFields());
     }
 
     @PostMapping
     public GlobalExceptionHandler.ApiResponse<ContractExtendField> create(@Valid @RequestBody ContractExtendField field) {
-        if (repository.findByFieldCode(field.getFieldCode()).isPresent()) {
-            throw new RuntimeException("Field code already exists for this tenant: " + field.getFieldCode());
-        }
-        
-        if (field.getFieldId() == null) {
-            field.setFieldId(UUID.randomUUID().toString());
-        }
-        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, repository.save(field));
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, service.createField(field));
     }
 
     @DeleteMapping("/{id}")
     public GlobalExceptionHandler.ApiResponse<Void> delete(@PathVariable Long id) {
-        repository.findById(id).ifPresent(existing -> {
-            repository.delete(existing);
-        });
+        service.deleteField(id);
         return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, null);
     }
 }

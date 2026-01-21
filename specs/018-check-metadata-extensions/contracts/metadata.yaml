@@ -1,0 +1,39 @@
+openapi: 3.0.0
+info:
+  title: Metadata API
+  version: 1.0.0
+paths:
+  /api/metadata/contract-fields:
+    get:
+      summary: Retrieve unified list of standard and extended fields
+      responses:
+        '200':
+          description: List of field metadata
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FieldMetadata'
+components:
+  schemas:
+    FieldMetadata:
+      type: object
+      properties:
+        fieldCode:
+          type: string
+        label:
+          type: string
+        type:
+          type: string
+        category:
+          type: string
+          enum: [STANDARD, EXTEND]
+        isVisible:
+          type: boolean
+        displayOrder:
+          type: integer
+        requiredRole:
+          type: string
+        styles:
+          type: object

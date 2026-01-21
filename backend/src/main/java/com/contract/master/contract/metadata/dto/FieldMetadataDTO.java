@@ -13,11 +13,12 @@ public class FieldMetadataDTO {
     private Integer displayOrder;
     private String fieldColor;
     private String fieldStyles;
+    private String requiredRole;
 
     public FieldMetadataDTO() {
     }
 
-    public FieldMetadataDTO(Long id, String fieldCode, String fieldName, String fieldType, String source, Boolean isVisible, Boolean apiReturn, Integer displayOrder, String fieldColor, String fieldStyles) {
+    public FieldMetadataDTO(Long id, String fieldCode, String fieldName, String fieldType, String source, Boolean isVisible, Boolean apiReturn, Integer displayOrder, String fieldColor, String fieldStyles, String requiredRole) {
         this.id = id;
         this.fieldCode = fieldCode;
         this.fieldName = fieldName;
@@ -28,6 +29,7 @@ public class FieldMetadataDTO {
         this.displayOrder = displayOrder;
         this.fieldColor = fieldColor;
         this.fieldStyles = fieldStyles;
+        this.requiredRole = requiredRole;
     }
 
     public FieldMetadataDTO(String fieldCode, String fieldName, String fieldType, String source) {
@@ -57,18 +59,20 @@ public class FieldMetadataDTO {
     public void setFieldColor(String fieldColor) { this.fieldColor = fieldColor; }
     public String getFieldStyles() { return fieldStyles; }
     public void setFieldStyles(String fieldStyles) { this.fieldStyles = fieldStyles; }
+    public String getRequiredRole() { return requiredRole; }
+    public void setRequiredRole(String requiredRole) { this.requiredRole = requiredRole; }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         FieldMetadataDTO that = (FieldMetadataDTO) o;
-        return Objects.equals(id, that.id) && Objects.equals(fieldCode, that.fieldCode) && Objects.equals(fieldName, that.fieldName) && Objects.equals(fieldType, that.fieldType) && Objects.equals(source, that.source) && Objects.equals(isVisible, that.isVisible) && Objects.equals(apiReturn, that.apiReturn) && Objects.equals(displayOrder, that.displayOrder) && Objects.equals(fieldColor, that.fieldColor) && Objects.equals(fieldStyles, that.fieldStyles);
+        return Objects.equals(id, that.id) && Objects.equals(fieldCode, that.fieldCode) && Objects.equals(fieldName, that.fieldName) && Objects.equals(fieldType, that.fieldType) && Objects.equals(source, that.source) && Objects.equals(isVisible, that.isVisible) && Objects.equals(apiReturn, that.apiReturn) && Objects.equals(displayOrder, that.displayOrder) && Objects.equals(fieldColor, that.fieldColor) && Objects.equals(fieldStyles, that.fieldStyles) && Objects.equals(requiredRole, that.requiredRole);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, fieldCode, fieldName, fieldType, source, isVisible, apiReturn, displayOrder, fieldColor, fieldStyles);
+        return Objects.hash(id, fieldCode, fieldName, fieldType, source, isVisible, apiReturn, displayOrder, fieldColor, fieldStyles, requiredRole);
     }
 
     @Override
@@ -84,6 +88,7 @@ public class FieldMetadataDTO {
                ", displayOrder=" + displayOrder +
                ", fieldColor='" + fieldColor + '\'' +
                ", fieldStyles='" + fieldStyles + '\'' +
+               ", requiredRole='" + requiredRole + '\'' +
                '}';
     }
 }
