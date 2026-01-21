@@ -55,6 +55,7 @@ public class ProblemCenterProblemController {
     }
 
     @PostMapping("/{id}/resolve")
+    @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
     public GlobalExceptionHandler.ApiResponse<Void> resolve(@PathVariable Long id) {
         // Simple resolve implementation reusing updateStatus logic if possible, or just setting status
         problemService.updateStatus(id, ProblemStatus.RESOLVED, "Resolved via API");

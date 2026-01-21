@@ -365,11 +365,9 @@ public class ContractService {
 
     private void filterFields(ContractDTO dto) {
         TenantId tenantId = dto.getTenantId();
-        if (tenantId == null) {
-            return;
-        }
+        String tenantIdKey = tenantId != null ? tenantId.toString() : "NONE";
         
-        List<FieldConfig> configs = fieldConfigCache.computeIfAbsent(tenantId.toString(), 
+        List<FieldConfig> configs = fieldConfigCache.computeIfAbsent(tenantIdKey, 
             tid -> fieldConfigRepository.findAll()
         );
         

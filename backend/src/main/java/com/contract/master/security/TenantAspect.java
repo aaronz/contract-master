@@ -24,8 +24,10 @@ public class TenantAspect {
         Session session = entityManager.unwrap(Session.class);
         if (tenantId != null) {
             session.enableFilter("tenantFilter").setParameter("tenantId", tenantId);
-        } else {
+        } else if (TenantContext.isSystemContext()) {
             session.disableFilter("tenantFilter");
+        } else {
+            session.enableFilter("tenantFilter").setParameter("tenantId", "LOGICAL_ISOLATION_BYPASS_PROTECTION");
         }
     }
 }

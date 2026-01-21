@@ -31,8 +31,8 @@ public class EvaluationController {
                 triggeredBy = authentication.getName();
             }
             
-            if (request.getContractIds() == null || request.getContractIds().isEmpty()) {
-                return new ResponseEntity<>(GlobalExceptionHandler.ApiResponse.error(HttpStatus.BAD_REQUEST.value(), "At least one contract ID is required."), HttpStatus.BAD_REQUEST);
+            if (request.getContractIds() == null || request.getContractIds().size() != 1) {
+                return new ResponseEntity<>(GlobalExceptionHandler.ApiResponse.error(HttpStatus.BAD_REQUEST.value(), "Exactly one contract ID is required for re-evaluation."), HttpStatus.BAD_REQUEST);
             }
             String contractId = request.getContractIds().get(0);
 
