@@ -1,0 +1,39 @@
+openapi: 3.0.0
+info:
+  title: ESB Replay and Health API
+  version: 1.0.0
+paths:
+  /api/v1/integration/logs/{id}/replay:
+    post:
+      summary: Manually replay a failed integration event
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '202':
+          description: Event re-enqueued successfully
+  /api/v1/integration/systems/{id}/test-connection:
+    post:
+      summary: Proactively test connection to a downstream system
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Connection test result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [SUCCESS, FAILURE]
+                  message:
+                    type: string

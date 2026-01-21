@@ -37,8 +37,9 @@
 
 | Table Name | Description | Key Fields |
 |------------|-------------|------------|
-| `downstream_system` | External ERP/Finance targets | `system_id` (PK), `endpoint_url`, `access_key`, `auth_type` |
-| `field_mapping` | Data translation for external sync | `id` (PK), `internal_field`, `external_field`, `transformation` |
+| `downstream_system` | External ERP/Finance targets | `db_id` (PK), `system_id`, `endpoint_url`, `access_key`, `auth_type`, `health_status`, `last_heartbeat` |
+| `field_mapping` | Data translation for external sync | `db_id` (PK), `internal_field`, `external_field`, `transformation`, `transformation_script` |
+| `integration_log` | Outbound push history | `db_id` (PK), `source_system`, `event_type`, `status`, `request_payload`, `retry_count` |
 | `audit_log` | Field-level modification history | `id` (PK), `contract_id`, `field_name`, `old_value`, `new_value` |
 | `notification` | System alerts and task reminders | `id` (PK), `user_id`, `title`, `content`, `is_read` |
 | `webhook_config` | Outbound event subscriptions | `id` (PK), `url`, `events`, `is_enabled` |

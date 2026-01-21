@@ -1,16 +1,13 @@
 package com.contract.master.integration.interfaces.rest;
 
 import com.contract.master.api.GlobalExceptionHandler;
+import com.contract.master.integration.application.IntegrationReplayService;
 import com.contract.master.integration.domain.model.IntegrationLog;
 import com.contract.master.integration.domain.repository.DownstreamSystemRepository;
 import com.contract.master.integration.domain.repository.IntegrationLogRepository;
-import com.contract.master.security.TenantContext;
-import com.contract.master.shared.domain.model.TenantId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +22,15 @@ public class IntegrationHubController {
 
     @Autowired
     private IntegrationLogRepository logRepository;
+
+    @Autowired
+    private IntegrationReplayService replayService;
+
+    @PostMapping("/logs/{id}/replay")
+    public GlobalExceptionHandler.ApiResponse<Void> replay(@PathVariable Long id) {
+        replayService.replay(id);
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.ACCEPTED, null);
+    }
 
     @GetMapping("/stats")
     public GlobalExceptionHandler.ApiResponse<Map<String, Object>> getStats() {

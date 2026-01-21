@@ -10,8 +10,6 @@ import java.util.Objects;
 @Table(name = "field_mapping")
 @EntityListeners({TenantEntityListener.class})
 public class FieldMapping extends BaseTenantEntity {
-    // ID is now inherited from BaseEntity
-    // No need for explicit ID field here
 
     @Column(name = "internal_field", length = 64)
     private String internalField;
@@ -21,6 +19,9 @@ public class FieldMapping extends BaseTenantEntity {
 
     @Column(name = "transformation", length = 32)
     private String transformation;
+
+    @Column(name = "transformation_script", columnDefinition = "TEXT")
+    private String transformationScript;
 
     @Column(name = "is_enabled")
     private Boolean isEnabled;
@@ -49,6 +50,14 @@ public class FieldMapping extends BaseTenantEntity {
         this.transformation = transformation;
     }
 
+    public String getTransformationScript() {
+        return transformationScript;
+    }
+
+    public void setTransformationScript(String transformationScript) {
+        this.transformationScript = transformationScript;
+    }
+
     public Boolean getIsEnabled() {
         return isEnabled;
     }
@@ -61,16 +70,17 @@ public class FieldMapping extends BaseTenantEntity {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false; // Compare parent class fields, including inherited ID
+        if (!super.equals(o)) return false;
         FieldMapping that = (FieldMapping) o;
         return Objects.equals(internalField, that.internalField) &&
                Objects.equals(externalField, that.externalField) &&
                Objects.equals(transformation, that.transformation) &&
+               Objects.equals(transformationScript, that.transformationScript) &&
                Objects.equals(isEnabled, that.isEnabled);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), internalField, externalField, transformation, isEnabled);
+        return Objects.hash(super.hashCode(), internalField, externalField, transformation, transformationScript, isEnabled);
     }
 }

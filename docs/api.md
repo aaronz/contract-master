@@ -43,3 +43,5 @@
 | `/api/webhook/{source}` | POST | Receive inbound sync data from CRM/external systems | 1.0.0 |
 | `/api/dashboard/stats` | GET | Retrieve real-time operational dashboard metrics | 1.0.0 |
 | `/api/problems/{id}/resolve` | POST | Mark a system issue or validation error as resolved | 1.0.0 |
+| `/api/v1/integration/logs/{id}/replay` | POST | Manually replay a failed integration event | 1.5.0 |
+| `/api/v1/settings/downstream/{id}/test-connection` | POST | Proactively test connection to a downstream system | 1.5.0 |

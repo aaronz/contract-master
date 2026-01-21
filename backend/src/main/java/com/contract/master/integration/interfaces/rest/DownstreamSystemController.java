@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -18,6 +20,26 @@ public class DownstreamSystemController {
 
     @Autowired
     private DownstreamSystemRepository repository;
+
+    @PostMapping("/{id}/test-connection")
+    public GlobalExceptionHandler.ApiResponse<Map<String, Object>> testConnection(@PathVariable String id) {
+        DownstreamSystem system = repository.findAll().stream()
+                .filter(s -> s.getSystemId().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("System not found: " + id));
+        
+        Map<String, Object> result = new HashMap<>();
+        try {
+            org.springframework.web.client.RestTemplate restTemplate = new org.springframework.web.client.RestTemplate();
+            org.springframework.http.ResponseEntity<String> response = restTemplate.getForEntity(system.getEndpointUrl() + "/health", String.class);
+            result.put("status", response.getStatusCode().is2xxSuccessful() ? "SUCCESS" : "FAILURE");
+            result.put("message", "Status code: " + response.getStatusCode());
+        } catch (Exception e) {
+            result.put("status", "FAILURE");
+            result.put("message", e.getMessage());
+        }
+        return GlobalExceptionHandler.ApiResponse.success(HttpStatus.OK, result);
+    }
 
     @GetMapping
     public GlobalExceptionHandler.ApiResponse<List<DownstreamSystem>> list() {
